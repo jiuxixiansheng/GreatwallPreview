@@ -51,6 +51,12 @@ public class CommandTerminal : MonoBehaviour
         ));
     }
 
+    public void ZhuanChang04(float time)
+    {
+        EventDispatcher.Instance.Dispatch("小龙特效转场",time);
+        EventDispatcher.Instance.Dispatch<float>("大龙特效转场", time);
+    }
+
     private IEnumerator SwitchObjectAfterDelay(GameObject hideObject, GameObject showObject, float delay)
     {
         if (delay > 0f)
