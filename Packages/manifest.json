@@ -1,5 +1,6 @@
 {
   "dependencies": {
+    "com.ezhex1991.ezsoftbone": "https://github.com/EZhex1991/EZSoftBone.git",
     "com.unity.ai.navigation": "2.0.8",
     "com.unity.collab-proxy": "2.12.4",
     "com.unity.formats.fbx": "5.1.6",
