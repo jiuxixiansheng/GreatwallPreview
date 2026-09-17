@@ -68,4 +68,15 @@ public class CommandTerminal : MonoBehaviour
         if (showObject != null)
             showObject.SetActive(true);
     }
+
+    public void XiaolouAppear()
+    {
+        EventDispatcher.Instance.Dispatch("ÐÞ¸´Ð¡Â¥");
+    }
+
+    public void ChangeShadowState()
+    {
+        EventDispatcher.Instance.Dispatch("ÇÐ»»ÒõÓ°Í¶Éä×´Ì¬");
+    }
+
 }
