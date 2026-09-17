@@ -28,6 +28,12 @@ namespace Greatwall.VRAnimation.Timeline
         [SerializeField] private DragonTurnController turnController;
         [SerializeField] private bool resetVisualRotationOffset = true;
 
+        [Header("Transition Pause")]
+        [Tooltip("切章转场动画播放期间需要暂停的角色 Animator。")]
+        [SerializeField] private Animator characterAnimatorToPause;
+        [Tooltip("切章转场动画播放期间需要暂停的音源。")]
+        [SerializeField] private AudioSource[] audioSourcesToPauseDuringTransition = new AudioSource[0];
+
         [Header("Player (Optional)")]
         [Tooltip("关闭此项即可完全停用本脚本的玩家传送，适合与其他人的转场系统合并。")]
         [SerializeField] private bool movePlayerDuringChapterTransition = true;
@@ -45,6 +51,10 @@ namespace Greatwall.VRAnimation.Timeline
         [SerializeField, Min(0)] private int startingChapterIndex;
         [SerializeField] private bool playStartingChapterOnStart;
 
+        [Header("Chapter Transition Animation")]
+        [Tooltip("切换章节前，等待你的转场动画播放多少秒。")]
+        [SerializeField, Min(0f)] private float chapterTransitionAnimationSeconds = 0f;
+
         [Header("Temporary Transition")]
         [Tooltip("开启时不等待黑场，直接换位置并播放下一条 Timeline。接入正式黑场后关闭。")]
         [SerializeField] private bool immediateTransitionWithoutFade = true;
@@ -58,10 +68,17 @@ namespace Greatwall.VRAnimation.Timeline
         private readonly List<TimelineCompletionRelay> subscribedRelays =
             new List<TimelineCompletionRelay>();
 
+        private readonly List<AudioSource> pausedAudioSources =
+            new List<AudioSource>();
+
         private int currentChapterIndex;
         private int pendingChapterIndex = -1;
         private bool transitionPending;
         private Coroutine blackScreenHoldCoroutine;
+        private Coroutine chapterTransitionAnimationCoroutine;
+
+        private float cachedCharacterAnimatorSpeed = 1f;
+        private bool characterAnimatorPausedByThisScript;
 
         private void Awake()
         {
@@ -92,15 +109,9 @@ namespace Greatwall.VRAnimation.Timeline
                 StoryChapterEntry startingChapter = GetChapter(currentChapterIndex);
                 if (startingChapter != null)
                 {
-                    // ===== 可选章节场景根物体切换（可由同事的场景系统替代）=====
                     ActivateOnlyChapterSceneRoot(currentChapterIndex);
-                    // ===== 可选章节场景根物体切换结束 =====
-
                     PlaceCharacterAt(startingChapter.characterSpawnPoint);
-
-                    // ===== 可选玩家传送（可由同事的转场系统替代）=====
                     PlacePlayerAt(startingChapter.playerSpawnPoint);
-                    // ===== 可选玩家传送结束 =====
                 }
 
                 PlayCurrentChapter();
@@ -109,12 +120,19 @@ namespace Greatwall.VRAnimation.Timeline
 
         private void OnDisable()
         {
+            if (chapterTransitionAnimationCoroutine != null)
+            {
+                StopCoroutine(chapterTransitionAnimationCoroutine);
+                chapterTransitionAnimationCoroutine = null;
+            }
+
             if (blackScreenHoldCoroutine != null)
             {
                 StopCoroutine(blackScreenHoldCoroutine);
                 blackScreenHoldCoroutine = null;
             }
 
+            ResumePausedAnimationAndAudio();
             UnsubscribeFromChapterCompletionEvents();
         }
 
@@ -131,6 +149,44 @@ namespace Greatwall.VRAnimation.Timeline
 
             transitionPending = true;
             pendingChapterIndex = nextIndex;
+
+            BeginChapterTransitionAnimation(chapterTransitionAnimationSeconds);
+        }
+
+        public void BeginChapterTransitionAnimation(float durationSeconds)
+        {
+            if (!transitionPending || !IsValidChapterIndex(pendingChapterIndex)) return;
+
+            if (chapterTransitionAnimationCoroutine != null)
+                StopCoroutine(chapterTransitionAnimationCoroutine);
+
+            chapterTransitionAnimationCoroutine =
+                StartCoroutine(WaitForChapterTransitionAnimationThenSwitch(durationSeconds));
+        }
+
+        private IEnumerator WaitForChapterTransitionAnimationThenSwitch(float durationSeconds)
+        {
+            PauseCurrentChapterAnimationAndAudio();
+
+            PlayChapterTransitionAnimation(durationSeconds);
+
+            if (durationSeconds > 0f)
+                yield return new WaitForSecondsRealtime(durationSeconds);
+
+            chapterTransitionAnimationCoroutine = null;
+            ContinuePendingChapterTransitionAfterAnimation();
+        }
+
+        private void PlayChapterTransitionAnimation(float durationSeconds)
+        {
+            EventDispatcher.Instance.Dispatch("zhuanchang");
+            // TODO: 在这里播放你的转场动画。
+            // durationSeconds 表示脚本会等待多少秒后真正切换到下一章。
+        }
+
+        private void ContinuePendingChapterTransitionAfterAnimation()
+        {
+            if (!transitionPending || !IsValidChapterIndex(pendingChapterIndex)) return;
 
             if (immediateTransitionWithoutFade)
                 ApplyTransitionAtBlack(false);
@@ -156,11 +212,7 @@ namespace Greatwall.VRAnimation.Timeline
             if (characterMover != null)
                 characterMover.StopMoving();
 
-            // ===== 可选章节场景根物体切换（可由同事的场景系统替代）=====
-            // 若同事已经负责章节根物体的启用和关闭，关闭 Inspector 中的
-            // Switch Chapter Scene Roots During Transition 即可。
             ActivateOnlyChapterSceneRoot(pendingChapterIndex);
-            // ===== 可选章节场景根物体切换结束 =====
 
             if (!PlaceCharacterAt(nextChapter.characterSpawnPoint))
             {
@@ -169,11 +221,7 @@ namespace Greatwall.VRAnimation.Timeline
                 return;
             }
 
-            // ===== 可选玩家传送（可由同事的转场系统替代）=====
-            // 若同事已经负责移动玩家，关闭 Inspector 中的
-            // Move Player During Chapter Transition 即可，无需删除其他章节逻辑。
             PlacePlayerAt(nextChapter.playerSpawnPoint);
-            // ===== 可选玩家传送结束 =====
 
             currentChapterIndex = pendingChapterIndex;
             pendingChapterIndex = -1;
@@ -198,6 +246,8 @@ namespace Greatwall.VRAnimation.Timeline
 
         private void FinishTransition()
         {
+            ResumePausedAnimationAndAudio();
+
             PlayCurrentChapter();
             onFadeInRequested?.Invoke();
 
@@ -220,6 +270,55 @@ namespace Greatwall.VRAnimation.Timeline
             chapter.director.Play();
         }
 
+        private void PauseCurrentChapterAnimationAndAudio()
+        {
+            StoryChapterEntry currentChapter = GetChapter(currentChapterIndex);
+            if (currentChapter?.director != null)
+                currentChapter.director.Pause();
+
+            if (characterMover != null)
+                characterMover.StopMoving();
+
+            if (characterAgent != null && characterAgent.enabled && characterAgent.isOnNavMesh)
+                characterAgent.isStopped = true;
+
+            if (characterAnimatorToPause != null && !characterAnimatorPausedByThisScript)
+            {
+                cachedCharacterAnimatorSpeed = characterAnimatorToPause.speed;
+                characterAnimatorToPause.speed = 0f;
+                characterAnimatorPausedByThisScript = true;
+            }
+
+            pausedAudioSources.Clear();
+
+            foreach (AudioSource audioSource in audioSourcesToPauseDuringTransition)
+            {
+                if (audioSource == null || !audioSource.isPlaying) continue;
+
+                audioSource.Pause();
+                pausedAudioSources.Add(audioSource);
+            }
+        }
+
+        private void ResumePausedAnimationAndAudio()
+        {
+            if (characterAnimatorPausedByThisScript && characterAnimatorToPause != null)
+                characterAnimatorToPause.speed = cachedCharacterAnimatorSpeed;
+
+            characterAnimatorPausedByThisScript = false;
+
+            foreach (AudioSource audioSource in pausedAudioSources)
+            {
+                if (audioSource != null)
+                    audioSource.UnPause();
+            }
+
+            pausedAudioSources.Clear();
+
+            if (characterAgent != null && characterAgent.enabled && characterAgent.isOnNavMesh)
+                characterAgent.isStopped = false;
+        }
+
         private bool PlaceCharacterAt(Transform spawnPoint)
         {
             if (characterAgent == null)
@@ -234,9 +333,6 @@ namespace Greatwall.VRAnimation.Timeline
                 return false;
             }
 
-            // 转场只负责把小龙根物体精确放到章节出生点。
-            // Agent 保持关闭，避免它在下一帧把根物体拉回旧位置；
-            // 真正执行 NavMesh Move Clip 时，由 DragonNavMeshMover 重新启用。
             characterAgent.enabled = false;
             characterAgent.transform.SetPositionAndRotation(
                 spawnPoint.position,
@@ -252,10 +348,6 @@ namespace Greatwall.VRAnimation.Timeline
             return true;
         }
 
-        // ===== 可选玩家传送（可由同事的转场系统替代）=====
-        // 合并其他人的玩家传送功能时，优先在 Inspector 关闭开关。
-        // 如果确定永久不用，也可以删除本方法、章节中的 playerSpawnPoint，
-        // 以及上方两处 PlacePlayerAt(...) 调用。
         private void PlacePlayerAt(Transform spawnPoint)
         {
             if (!movePlayerDuringChapterTransition) return;
@@ -288,8 +380,6 @@ namespace Greatwall.VRAnimation.Timeline
                 return;
             }
 
-            // 先让玩家实际视线的水平朝向与 SpawnPoint 一致。
-            // 不能直接设置 XR Origin 的 rotation，因为头显在根物体内部还有实时旋转偏移。
             Vector3 currentHeadForward =
                 Vector3.ProjectOnPlane(playerHead.forward, Vector3.up);
             Vector3 targetForward =
@@ -306,8 +396,6 @@ namespace Greatwall.VRAnimation.Timeline
                 playerRoot.Rotate(Vector3.up, yawDelta, Space.World);
             }
 
-            // 旋转后重新读取头显位置，再平移 XR Origin。
-            // X/Z 以实际头显位置对准 SpawnPoint，Y 仍表示 XR Origin 的地面高度。
             Vector3 rootPosition = playerRoot.position;
             Vector3 headPosition = playerHead.position;
 
@@ -316,12 +404,7 @@ namespace Greatwall.VRAnimation.Timeline
                 spawnPoint.position.y,
                 rootPosition.z + spawnPoint.position.z - headPosition.z);
         }
-        // ===== 可选玩家传送结束 =====
 
-        // ===== 可选章节场景根物体切换（可由同事的场景系统替代）=====
-        // 合并其他人的章节场景切换功能时，优先在 Inspector 关闭开关。
-        // 如果确定永久不用，也可以删除本方法、章节中的 sceneRoot，
-        // 以及上方两处 ActivateOnlyChapterSceneRoot(...) 调用。
         private void ActivateOnlyChapterSceneRoot(int targetChapterIndex)
         {
             if (!switchChapterSceneRootsDuringTransition) return;
@@ -347,15 +430,22 @@ namespace Greatwall.VRAnimation.Timeline
 
             targetRoot.SetActive(true);
         }
-        // ===== 可选章节场景根物体切换结束 =====
 
         private void CancelPendingTransition()
         {
+            if (chapterTransitionAnimationCoroutine != null)
+            {
+                StopCoroutine(chapterTransitionAnimationCoroutine);
+                chapterTransitionAnimationCoroutine = null;
+            }
+
             if (blackScreenHoldCoroutine != null)
             {
                 StopCoroutine(blackScreenHoldCoroutine);
                 blackScreenHoldCoroutine = null;
             }
+
+            ResumePausedAnimationAndAudio();
 
             transitionPending = false;
             pendingChapterIndex = -1;
