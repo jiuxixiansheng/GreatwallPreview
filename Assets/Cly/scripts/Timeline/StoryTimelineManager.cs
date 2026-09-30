@@ -13,10 +13,16 @@ namespace Greatwall.VRAnimation.Timeline
     public sealed class StoryChapterEntry
     {
         public string chapterName;
+
+        [Tooltip("这个章节是否使用 Timeline。关闭后 Director 可以为空，章节切换需要外部调用 SwitchToNextChapter。")]
+        public bool useTimeline = true;
+
+        [Tooltip("仅在 Use Timeline 开启时有效。开启后 Timeline 播完自动切换到下一章；关闭后需要外部手动调用 SwitchToNextChapter。")]
+        public bool switchWhenTimelineCompleted = true;
+
         public PlayableDirector director;
         public GameObject sceneRoot;
         public Transform characterSpawnPoint;
-        public Transform playerSpawnPoint;
     }
 
     [DisallowMultipleComponent]
@@ -33,14 +39,6 @@ namespace Greatwall.VRAnimation.Timeline
         [SerializeField] private Animator characterAnimatorToPause;
         [Tooltip("切章转场动画播放期间需要暂停的音源。")]
         [SerializeField] private AudioSource[] audioSourcesToPauseDuringTransition = new AudioSource[0];
-
-        [Header("Player (Optional)")]
-        [Tooltip("关闭此项即可完全停用本脚本的玩家传送，适合与其他人的转场系统合并。")]
-        [SerializeField] private bool movePlayerDuringChapterTransition = true;
-        [Tooltip("绑定 XR Origin、VR Rig 或其他代表玩家整体位置的根物体，不要绑定头显 Camera。")]
-        [SerializeField] private Transform playerRoot;
-        [Tooltip("绑定 Player Root 下的 Main Camera，用于消除头显实时位移造成的传送偏差。")]
-        [SerializeField] private Transform playerHead;
 
         [Header("Chapter Scene Roots (Optional)")]
         [Tooltip("关闭此项即可完全停用本脚本的章节根物体启用/关闭逻辑，适合与其他人的场景系统合并。")]
@@ -65,8 +63,14 @@ namespace Greatwall.VRAnimation.Timeline
         public UnityEvent onFadeOutRequested = new UnityEvent();
         public UnityEvent onFadeInRequested = new UnityEvent();
 
-        private readonly List<TimelineCompletionRelay> subscribedRelays =
-            new List<TimelineCompletionRelay>();
+        private sealed class TimelineRelaySubscription
+        {
+            public TimelineCompletionRelay relay;
+            public UnityAction action;
+        }
+
+        private readonly List<TimelineRelaySubscription> relaySubscriptions =
+            new List<TimelineRelaySubscription>();
 
         private readonly List<AudioSource> pausedAudioSources =
             new List<AudioSource>();
@@ -86,18 +90,12 @@ namespace Greatwall.VRAnimation.Timeline
                 startingChapterIndex,
                 0,
                 Mathf.Max(0, chapters.Count - 1));
-
-            if (playerHead == null && playerRoot != null)
-            {
-                Camera playerCamera = playerRoot.GetComponentInChildren<Camera>(true);
-                if (playerCamera != null)
-                    playerHead = playerCamera.transform;
-            }
         }
 
         private void OnEnable()
         {
             SubscribeToChapterCompletionEvents();
+            EventDispatcher.Instance.AddListener("切换章节", SwitchToNextChapter);
         }
 
         private void Start()
@@ -106,14 +104,7 @@ namespace Greatwall.VRAnimation.Timeline
 
             if (playStartingChapterOnStart && chapters.Count > 0)
             {
-                StoryChapterEntry startingChapter = GetChapter(currentChapterIndex);
-                if (startingChapter != null)
-                {
-                    ActivateOnlyChapterSceneRoot(currentChapterIndex);
-                    PlaceCharacterAt(startingChapter.characterSpawnPoint);
-                    PlacePlayerAt(startingChapter.playerSpawnPoint);
-                }
-
+                SetupChapter(currentChapterIndex);
                 PlayCurrentChapter();
             }
         }
@@ -134,21 +125,57 @@ namespace Greatwall.VRAnimation.Timeline
 
             ResumePausedAnimationAndAudio();
             UnsubscribeFromChapterCompletionEvents();
+
+            EventDispatcher.Instance.RemoveListener("切换章节", SwitchToNextChapter);
+        }
+
+        [ContextMenu("切换到下一章")]
+        public void SwitchToNextChapter()
+        {
+            BeginNextChapterTransition();
         }
 
         public void BeginNextChapterTransition()
         {
+            if (chapters == null || chapters.Count == 0)
+                return;
+
+            int nextChapterIndex = currentChapterIndex + 1;
+
+            if (nextChapterIndex >= chapters.Count)
+                nextChapterIndex = 0;
+
+            BeginChapterTransitionTo(nextChapterIndex);
+        }
+
+        public void SwitchToChapterByNumber(int chapterNumber)
+        {
+            BeginChapterTransitionTo(chapterNumber - 1);
+        }
+
+        public void SwitchToChapterByIndex(int chapterIndex)
+        {
+            BeginChapterTransitionTo(chapterIndex);
+        }
+
+        private void BeginChapterTransitionTo(int targetChapterIndex)
+        {
             if (transitionPending || chapters.Count == 0) return;
 
-            int nextIndex = currentChapterIndex + 1;
-            if (nextIndex >= chapters.Count)
+            if (!IsValidChapterIndex(targetChapterIndex))
             {
                 Debug.Log("StoryTimelineManager: 所有章节已播放完成。", this);
                 return;
             }
 
+            if (targetChapterIndex == currentChapterIndex)
+            {
+                Debug.LogWarning("StoryTimelineManager: 目标章节就是当前章节，已忽略切换。", this);
+                return;
+            }
+
             transitionPending = true;
-            pendingChapterIndex = nextIndex;
+            pendingChapterIndex = targetChapterIndex;
 
             BeginChapterTransitionAnimation(chapterTransitionAnimationSeconds);
         }
@@ -180,8 +207,6 @@ namespace Greatwall.VRAnimation.Timeline
         private void PlayChapterTransitionAnimation(float durationSeconds)
         {
             EventDispatcher.Instance.Dispatch("zhuanchang");
-            // TODO: 在这里播放你的转场动画。
-            // durationSeconds 表示脚本会等待多少秒后真正切换到下一章。
         }
 
         private void ContinuePendingChapterTransitionAfterAnimation()
@@ -204,7 +229,6 @@ namespace Greatwall.VRAnimation.Timeline
             if (!transitionPending || !IsValidChapterIndex(pendingChapterIndex)) return;
 
             StoryChapterEntry currentChapter = GetChapter(currentChapterIndex);
-            StoryChapterEntry nextChapter = GetChapter(pendingChapterIndex);
 
             if (currentChapter?.director != null)
                 currentChapter.director.Stop();
@@ -214,14 +238,13 @@ namespace Greatwall.VRAnimation.Timeline
 
             ActivateOnlyChapterSceneRoot(pendingChapterIndex);
 
+            StoryChapterEntry nextChapter = GetChapter(pendingChapterIndex);
             if (!PlaceCharacterAt(nextChapter.characterSpawnPoint))
             {
                 ActivateOnlyChapterSceneRoot(currentChapterIndex);
                 CancelPendingTransition();
                 return;
             }
-
-            PlacePlayerAt(nextChapter.playerSpawnPoint);
 
             currentChapterIndex = pendingChapterIndex;
             pendingChapterIndex = -1;
@@ -257,10 +280,26 @@ namespace Greatwall.VRAnimation.Timeline
         public void PlayCurrentChapter()
         {
             StoryChapterEntry chapter = GetChapter(currentChapterIndex);
-            if (chapter?.director == null)
+            if (chapter == null)
             {
                 Debug.LogError(
-                    $"StoryTimelineManager: 第 {currentChapterIndex} 个章节没有绑定 PlayableDirector。",
+                    $"StoryTimelineManager: 第 {currentChapterIndex} 个章节不存在。",
+                    this);
+                return;
+            }
+
+            if (!chapter.useTimeline)
+            {
+                Debug.Log(
+                    $"StoryTimelineManager: 第 {currentChapterIndex} 个章节不使用 Timeline，等待外部函数触发切章。",
+                    this);
+                return;
+            }
+
+            if (chapter.director == null)
+            {
+                Debug.LogError(
+                    $"StoryTimelineManager: 第 {currentChapterIndex} 个章节启用了 Timeline，但没有绑定 PlayableDirector。",
                     this);
                 return;
             }
@@ -268,6 +307,15 @@ namespace Greatwall.VRAnimation.Timeline
             chapter.director.time = 0d;
             chapter.director.Evaluate();
             chapter.director.Play();
+        }
+
+        private void SetupChapter(int chapterIndex)
+        {
+            StoryChapterEntry chapter = GetChapter(chapterIndex);
+            if (chapter == null) return;
+
+            ActivateOnlyChapterSceneRoot(chapterIndex);
+            PlaceCharacterAt(chapter.characterSpawnPoint);
         }
 
         private void PauseCurrentChapterAnimationAndAudio()
@@ -348,62 +396,6 @@ namespace Greatwall.VRAnimation.Timeline
             return true;
         }
 
-        private void PlacePlayerAt(Transform spawnPoint)
-        {
-            if (!movePlayerDuringChapterTransition) return;
-
-            if (playerRoot == null)
-            {
-                Debug.LogWarning(
-                    "StoryTimelineManager: 已开启玩家传送，但没有绑定 Player Root。",
-                    this);
-                return;
-            }
-
-            if (spawnPoint == null)
-            {
-                Debug.LogWarning(
-                    "StoryTimelineManager: 当前目标章节没有设置 Player Spawn Point。",
-                    this);
-                return;
-            }
-
-            if (playerHead == null || !playerHead.IsChildOf(playerRoot))
-            {
-                Debug.LogWarning(
-                    "StoryTimelineManager: 没有绑定有效的 Player Head，将使用旧的根物体传送方式。",
-                    this);
-
-                playerRoot.SetPositionAndRotation(
-                    spawnPoint.position,
-                    spawnPoint.rotation);
-                return;
-            }
-
-            Vector3 currentHeadForward =
-                Vector3.ProjectOnPlane(playerHead.forward, Vector3.up);
-            Vector3 targetForward =
-                Vector3.ProjectOnPlane(spawnPoint.forward, Vector3.up);
-
-            if (currentHeadForward.sqrMagnitude > 0.0001f &&
-                targetForward.sqrMagnitude > 0.0001f)
-            {
-                float yawDelta = Vector3.SignedAngle(
-                    currentHeadForward,
-                    targetForward,
-                    Vector3.up);
-
-                playerRoot.Rotate(Vector3.up, yawDelta, Space.World);
-            }
-
-            Vector3 rootPosition = playerRoot.position;
-            Vector3 headPosition = playerHead.position;
-
-            playerRoot.position = new Vector3(
-                rootPosition.x + spawnPoint.position.x - headPosition.x,
-                spawnPoint.position.y,
-                rootPosition.z + spawnPoint.position.z - headPosition.z);
-        }
 
         private void ActivateOnlyChapterSceneRoot(int targetChapterIndex)
         {
@@ -455,12 +447,17 @@ namespace Greatwall.VRAnimation.Timeline
         {
             UnsubscribeFromChapterCompletionEvents();
 
-            foreach (StoryChapterEntry chapter in chapters)
+            for (int i = 0; i < chapters.Count; i++)
             {
-                if (chapter?.director == null) continue;
+                StoryChapterEntry chapter = chapters[i];
+                if (chapter == null) continue;
+                if (!chapter.useTimeline) continue;
+                if (!chapter.switchWhenTimelineCompleted) continue;
+                if (chapter.director == null) continue;
 
                 TimelineCompletionRelay relay =
                     chapter.director.GetComponent<TimelineCompletionRelay>();
+
                 if (relay == null)
                 {
                     Debug.LogWarning(
@@ -469,24 +466,39 @@ namespace Greatwall.VRAnimation.Timeline
                     continue;
                 }
 
-                relay.onTimelineCompleted.AddListener(HandleTimelineCompleted);
-                subscribedRelays.Add(relay);
+                int chapterIndex = i;
+                UnityAction action = () => HandleTimelineCompleted(chapterIndex);
+
+                relay.onTimelineCompleted.AddListener(action);
+
+                relaySubscriptions.Add(new TimelineRelaySubscription
+                {
+                    relay = relay,
+                    action = action
+                });
             }
         }
 
         private void UnsubscribeFromChapterCompletionEvents()
         {
-            foreach (TimelineCompletionRelay relay in subscribedRelays)
+            foreach (TimelineRelaySubscription subscription in relaySubscriptions)
             {
-                if (relay != null)
-                    relay.onTimelineCompleted.RemoveListener(HandleTimelineCompleted);
+                if (subscription?.relay != null && subscription.action != null)
+                    subscription.relay.onTimelineCompleted.RemoveListener(subscription.action);
             }
 
-            subscribedRelays.Clear();
+            relaySubscriptions.Clear();
         }
 
-        private void HandleTimelineCompleted()
+        private void HandleTimelineCompleted(int completedChapterIndex)
         {
+            if (completedChapterIndex != currentChapterIndex) return;
+
+            StoryChapterEntry currentChapter = GetChapter(currentChapterIndex);
+            if (currentChapter == null) return;
+            if (!currentChapter.useTimeline) return;
+            if (!currentChapter.switchWhenTimelineCompleted) return;
+
             BeginNextChapterTransition();
         }
 

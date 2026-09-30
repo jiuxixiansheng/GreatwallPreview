@@ -79,4 +79,9 @@ public class CommandTerminal : MonoBehaviour
         EventDispatcher.Instance.Dispatch("ÇĞ»»ÒõÓ°Í¶Éä×´Ì¬");
     }
 
+    public void NextChapter()
+    {
+        EventDispatcher.Instance.Dispatch("ÇĞ»»ÕÂ½Ú");
+    }
+
 }
