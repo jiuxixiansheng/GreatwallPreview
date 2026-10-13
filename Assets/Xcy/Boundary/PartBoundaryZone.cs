@@ -15,6 +15,8 @@ namespace Xcy.Boundary
 
         private MeshRenderer guideRenderer;
         private MaterialPropertyBlock guideProperties;
+        private MeshRenderer warningRenderer;
+        private MaterialPropertyBlock warningProperties;
 
         public bool IsAvailable => isActiveAndEnabled && sceneRoot != null && sceneRoot.activeInHierarchy;
         public BoxCollider Volume => volume != null ? volume : GetComponent<BoxCollider>();
@@ -37,6 +39,56 @@ namespace Xcy.Boundary
             return Mathf.Abs(point.x) <= half.x &&
                    Mathf.Abs(point.y) <= half.y &&
                    Mathf.Abs(point.z) <= half.z;
+        }
+
+        public float DistanceToNearestSide(Vector3 worldPosition, out Vector3 nearestPoint)
+        {
+            BoxCollider box = Volume;
+            Vector3 local = transform.InverseTransformPoint(worldPosition) - box.center;
+            Vector3 half = box.size * 0.5f;
+            float xDistance = (half.x - Mathf.Abs(local.x)) * Mathf.Abs(transform.lossyScale.x);
+            float zDistance = (half.z - Mathf.Abs(local.z)) * Mathf.Abs(transform.lossyScale.z);
+
+            if (xDistance <= zDistance)
+                local.x = (local.x >= 0f ? 1f : -1f) * half.x;
+            else
+                local.z = (local.z >= 0f ? 1f : -1f) * half.z;
+
+            local.y = Mathf.Clamp(local.y, -half.y, half.y);
+            nearestPoint = transform.TransformPoint(box.center + local);
+            return Mathf.Min(xDistance, zDistance);
+        }
+
+        public void SetProximityWarning(Material material, Color color, float opacity,
+            Vector3 patchCenter, float patchRadius, float patchFeather,
+            float gridSpacing, float lineWidth)
+        {
+            if (opacity <= 0.001f || !IsAvailable)
+            {
+                if (warningRenderer != null) warningRenderer.enabled = false;
+                return;
+            }
+
+            if (warningRenderer == null) CreateWarning(material);
+            if (warningRenderer == null) return;
+
+            BoxCollider box = Volume;
+            Transform warning = warningRenderer.transform;
+            warning.localPosition = box.center;
+            warning.localRotation = Quaternion.identity;
+            warning.localScale = box.size;
+            warningRenderer.enabled = true;
+
+            if (warningProperties == null) warningProperties = new MaterialPropertyBlock();
+            warningProperties.SetColor("_Tint", color);
+            warningProperties.SetFloat("_Opacity", opacity);
+            warningProperties.SetVector("_PatchCenterWS", patchCenter);
+            warningProperties.SetFloat("_PatchRadius", patchRadius);
+            warningProperties.SetFloat("_PatchFeather", patchFeather);
+            warningProperties.SetFloat("_GridSpacing", gridSpacing);
+            warningProperties.SetFloat("_LineWidth", lineWidth);
+            warningProperties.SetVector("_BoxSize", box.size);
+            warningRenderer.SetPropertyBlock(warningProperties);
         }
 
         public void SetGuide(Material material, Color color, float opacity, float edgeSoftness)
@@ -76,6 +128,23 @@ namespace Xcy.Boundary
             guideRenderer.receiveShadows = false;
             guideRenderer.lightProbeUsage = LightProbeUsage.Off;
             guideRenderer.reflectionProbeUsage = ReflectionProbeUsage.Off;
+        }
+
+        private void CreateWarning(Material material)
+        {
+            if (material == null) return;
+            GameObject warning = GameObject.CreatePrimitive(PrimitiveType.Cube);
+            warning.name = "Boundary Proximity Warning (runtime)";
+            warning.transform.SetParent(transform, false);
+            warning.hideFlags = HideFlags.DontSave;
+            Collider collider = warning.GetComponent<Collider>();
+            if (collider != null) Destroy(collider);
+            warningRenderer = warning.GetComponent<MeshRenderer>();
+            warningRenderer.sharedMaterial = material;
+            warningRenderer.shadowCastingMode = ShadowCastingMode.Off;
+            warningRenderer.receiveShadows = false;
+            warningRenderer.lightProbeUsage = LightProbeUsage.Off;
+            warningRenderer.reflectionProbeUsage = ReflectionProbeUsage.Off;
         }
 
         private void OnDrawGizmosSelected()

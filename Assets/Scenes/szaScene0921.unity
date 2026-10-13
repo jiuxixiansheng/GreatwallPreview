@@ -13627,6 +13627,7 @@ MonoBehaviour:
   originalPlaneRenderer: {fileID: 0}
   interactable: {fileID: 1358640667}
   coordinator: {fileID: 1722645909}
+  repairShapeMask: {fileID: 0}
   repairDuration: 2.5
 --- !u!114 &1358640667
 MonoBehaviour:
@@ -13824,6 +13825,7 @@ MonoBehaviour:
   - {fileID: 310840783}
   blackoutMaterial: {fileID: 2100000, guid: d8dd4d2a09df1f9489a59a028827a498, type: 2}
   guideMaterial: {fileID: 2100000, guid: d08d51974b8821a498e1c97981281161, type: 2}
+  proximityWarningMaterial: {fileID: 2100000, guid: 2583d1ad58f22d1409ac351db7eb30bf, type: 2}
   promptFont: {fileID: 0}
   fadeOutSeconds: 0.6
   fadeInSeconds: 0.4
@@ -13835,6 +13837,13 @@ MonoBehaviour:
   pulseSpeed: 1.5
   pulseStrength: 0.12
   returnMessage: "\u8BF7\u8FD4\u56DE\u9EC4\u8272\u533A\u57DF"
+  warningDistance: 1.5
+  warningColor: {r: 1, g: 0.12, b: 0.1, a: 1}
+  warningMaximumOpacity: 0.8
+  warningPatchRadius: 1.75
+  warningPatchFeather: 0.65
+  warningGridSpacing: 0.45
+  warningLineWidth: 0.025
 --- !u!4 &1361589894
 Transform:
   m_ObjectHideFlags: 0
@@ -15442,6 +15451,7 @@ MonoBehaviour:
   originalPlaneRenderer: {fileID: 0}
   interactable: {fileID: 1635311618}
   coordinator: {fileID: 1722645909}
+  repairShapeMask: {fileID: 0}
   repairDuration: 2.5
 --- !u!114 &1635311618
 MonoBehaviour:
@@ -15992,6 +16002,7 @@ MonoBehaviour:
   originalPlaneRenderer: {fileID: 0}
   interactable: {fileID: 1726039038}
   coordinator: {fileID: 1722645909}
+  repairShapeMask: {fileID: 0}
   repairDuration: 2.5
 --- !u!114 &1726039038
 MonoBehaviour:
@@ -17942,6 +17953,7 @@ MonoBehaviour:
   originalPlaneRenderer: {fileID: 0}
   interactable: {fileID: 1880383341}
   coordinator: {fileID: 1722645909}
+  repairShapeMask: {fileID: 0}
   repairDuration: 2.5
 --- !u!114 &1880383341
 MonoBehaviour:

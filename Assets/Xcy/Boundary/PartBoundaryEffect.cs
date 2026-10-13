@@ -11,6 +11,7 @@ namespace Xcy.Boundary
         [SerializeField] private PartBoundaryZone[] zones;
         [SerializeField] private Material blackoutMaterial;
         [SerializeField] private Material guideMaterial;
+        [SerializeField] private Material proximityWarningMaterial;
         [SerializeField] private Font promptFont;
 
         [Header("Blackout")]
@@ -28,6 +29,18 @@ namespace Xcy.Boundary
         [SerializeField, Range(0f, 1f)] private float pulseStrength = 0.12f;
         [SerializeField] private string returnMessage = "请返回黄色区域";
 
+        [Header("Approaching boundary")]
+        [SerializeField, Min(0.01f), Tooltip("距离侧面边界多近时开始显示红色线框（米）。")]
+        private float warningDistance = 1.5f;
+        [SerializeField] private Color warningColor = new Color(1f, 0.12f, 0.1f, 1f);
+        [SerializeField, Range(0f, 1f)] private float warningMaximumOpacity = 0.8f;
+        [SerializeField, Min(0.1f), Tooltip("玩家附近线框区域的半径（米）。")]
+        private float warningPatchRadius = 1.75f;
+        [SerializeField, Min(0.01f), Tooltip("线框区域边缘消散的宽度（米）。")]
+        private float warningPatchFeather = 0.65f;
+        [SerializeField, Min(0.05f)] private float warningGridSpacing = 0.45f;
+        [SerializeField, Range(0.002f, 0.2f)] private float warningLineWidth = 0.025f;
+
         private Material runtimeBlackoutMaterial;
         private Font runtimePromptFont;
         private MeshRenderer blackoutRenderer;
@@ -42,9 +55,9 @@ namespace Xcy.Boundary
         private void Awake()
         {
             if (playerCamera == null) playerCamera = Camera.main;
-            if (playerCamera == null || blackoutMaterial == null || guideMaterial == null)
+            if (playerCamera == null || blackoutMaterial == null || guideMaterial == null || proximityWarningMaterial == null)
             {
-                Debug.LogError("PartBoundaryEffect: 请在 Inspector 中绑定玩家相机和两种材质。", this);
+                Debug.LogError("PartBoundaryEffect: 请在 Inspector 中绑定玩家相机和三种材质。", this);
                 enabled = false;
                 return;
             }
@@ -100,14 +113,26 @@ namespace Xcy.Boundary
 
             float pulse = 1f - pulseStrength * 0.5f +
                           pulseStrength * 0.5f * Mathf.Sin(Time.unscaledTime * pulseSpeed * Mathf.PI * 2f);
+            Vector3 warningCenter = Vector3.zero;
+            float warningOpacity = 0f;
+            if (activeZone != null && !outside)
+            {
+                float distance = activeZone.DistanceToNearestSide(playerCamera.transform.position, out warningCenter);
+                float closeness = Mathf.Clamp01(1f - distance / Mathf.Max(0.01f, warningDistance));
+                warningOpacity = Mathf.SmoothStep(0f, 1f, closeness) * warningMaximumOpacity;
+            }
             if (zones != null)
             {
                 foreach (PartBoundaryZone zone in zones)
                 {
-                    if (zone != null)
-                        zone.SetGuide(guideMaterial, guideColor,
-                            zone == activeZone ? amount * guideOpacity * pulse : 0f,
-                            guideEdgeSoftness);
+                    if (zone == null) continue;
+                    zone.SetGuide(guideMaterial, guideColor,
+                        zone == activeZone ? amount * guideOpacity * pulse : 0f,
+                        guideEdgeSoftness);
+                    zone.SetProximityWarning(proximityWarningMaterial, warningColor,
+                        zone == activeZone ? warningOpacity : 0f,
+                        warningCenter, warningPatchRadius, warningPatchFeather,
+                        warningGridSpacing, warningLineWidth);
                 }
             }
 

@@ -49,6 +49,7 @@ namespace Xcy.Boundary.Editor
 
             Material blackout = GetOrCreateMaterial("BoundaryBlackout.mat", "Xcy/Boundary/Blackout");
             Material guide = GetOrCreateMaterial("BoundaryGuide.mat", "Xcy/Boundary/Guide");
+            Material warning = GetOrCreateMaterial("BoundaryProximityWarning.mat", "Xcy/Boundary/ProximityWarning");
 
             GameObject system = Array.Find(roots, root => root.name == "Xcy Boundary System");
             if (system == null) system = new GameObject("Xcy Boundary System");
@@ -86,6 +87,7 @@ namespace Xcy.Boundary.Editor
             effectData.FindProperty("playerCamera").objectReferenceValue = camera;
             effectData.FindProperty("blackoutMaterial").objectReferenceValue = blackout;
             effectData.FindProperty("guideMaterial").objectReferenceValue = guide;
+            effectData.FindProperty("proximityWarningMaterial").objectReferenceValue = warning;
             SerializedProperty zoneArray = effectData.FindProperty("zones");
             zoneArray.arraySize = zones.Count;
             for (int i = 0; i < zones.Count; i++)
