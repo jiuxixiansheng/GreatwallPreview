@@ -14,12 +14,12 @@ namespace Xcy.CrackRepair
         [SerializeField] private MeshRenderer originalPlaneRenderer;
         [SerializeField] private XRSimpleInteractable interactable;
         [SerializeField] private Part2CrackRepairCoordinator coordinator;
+        [SerializeField] private Texture2D repairShapeMask;
         [SerializeField, Min(0.1f)] private float repairDuration = 2.5f;
 
         private Vector3 fullSize;
-        private Vector3 fullPivot;
-        private Vector2 fullUVScale;
-        private Vector2 fullUVBias;
+        private CrackRepairParticles particles;
+        private CrackRepairMaskAnimator maskAnimator;
         private bool unlocked;
         private bool repairing;
         private bool repaired;
@@ -32,6 +32,13 @@ namespace Xcy.CrackRepair
             if (originalPlaneRenderer == null) originalPlaneRenderer = GetComponent<MeshRenderer>();
             if (projector == null) projector = GetComponentInChildren<DecalProjector>(true);
             CaptureFullProjectorState();
+            if (repairShapeMask == null) repairShapeMask = Resources.Load<Texture2D>("CrackRepairShape");
+            maskAnimator = GetComponent<CrackRepairMaskAnimator>();
+            if (maskAnimator == null) maskAnimator = gameObject.AddComponent<CrackRepairMaskAnimator>();
+            maskAnimator.Initialize(projector, repairShapeMask);
+            particles = GetComponent<CrackRepairParticles>();
+            if (particles == null) particles = gameObject.AddComponent<CrackRepairParticles>();
+            particles.Initialize(projector, fullSize);
         }
 
         private void OnEnable()
@@ -50,9 +57,6 @@ namespace Xcy.CrackRepair
         {
             if (projector == null) return;
             fullSize = projector.size;
-            fullPivot = projector.pivot;
-            fullUVScale = projector.uvScale;
-            fullUVBias = projector.uvBias;
         }
 
         public void SetCoordinator(Part2CrackRepairCoordinator value) => coordinator = value;
@@ -60,6 +64,7 @@ namespace Xcy.CrackRepair
         public void ResetRepair()
         {
             StopAllCoroutines();
+            if (particles != null) particles.Clear();
             unlocked = false;
             repairing = false;
             repaired = false;
@@ -68,7 +73,7 @@ namespace Xcy.CrackRepair
             if (projector != null)
             {
                 projector.enabled = true;
-                ApplyProgress(0f);
+                maskAnimator?.SetProgress(0f);
             }
         }
 
@@ -88,6 +93,7 @@ namespace Xcy.CrackRepair
             repairing = true;
             unlocked = false;
             if (interactable != null) interactable.enabled = false;
+            if (particles != null) particles.Begin();
             StartCoroutine(AnimateRepair());
         }
 
@@ -98,29 +104,18 @@ namespace Xcy.CrackRepair
             {
                 elapsed += Time.deltaTime;
                 float t = Mathf.Clamp01(elapsed / repairDuration);
-                ApplyProgress(t * t * (3f - 2f * t));
+                float progress = t * t * (3f - 2f * t);
+                maskAnimator?.SetProgress(progress);
+                if (particles != null) particles.EmitAt(progress, Time.deltaTime);
                 yield return null;
             }
 
-            ApplyProgress(1f);
+            maskAnimator?.SetProgress(1f);
             projector.enabled = false;
             repairing = false;
             repaired = true;
             coordinator?.NotifyRepairCompleted(this);
         }
 
-        private void ApplyProgress(float progress)
-        {
-            if (projector == null) return;
-            progress = Mathf.Clamp01(progress);
-            float remaining = Mathf.Max(0.001f, 1f - progress);
-
-            // Crop away the lower part while preserving the texture's original scale.
-            projector.size = new Vector3(fullSize.x, fullSize.y * remaining, fullSize.z);
-            projector.pivot = fullPivot + Vector3.up * (fullSize.y * progress * 0.5f);
-            projector.uvScale = new Vector2(fullUVScale.x, fullUVScale.y * remaining);
-            projector.uvBias = fullUVBias + new Vector2(0f, fullUVScale.y * progress);
-            projector.fadeFactor = progress >= 0.999f ? 0f : 1f;
-        }
     }
 }
