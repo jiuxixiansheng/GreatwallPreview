@@ -205,6 +205,11 @@ namespace Greatwall.Flight
         [Range(10f, 240f)]
         public float RotationSpeedDeg = 18f;
 
+        /// <summary>★ 平滑后的 pitch 状态：K 帧俯仰角经匀速角速度限制后应用——
+        ///   升空段 K 帧 pitch 变化剧烈，直通会造成龙身突跳式摆动（用户实测）；
+        ///   限速后全程姿态变化速率恒定（匀速观感），巡航段变化慢不受影响。</summary>
+        private float _smoothedPitch;
+
         [Tooltip("起飞时向前滑行的距离（米）。0 = 纯垂直上升。")]
         [Range(0f, 30f)]
         public float TakeOffForwardDistance = 3f;
@@ -521,7 +526,11 @@ namespace Greatwall.Flight
                 Quaternion.Euler(0f, transform.eulerAngles.y, 0f),
                 Quaternion.Euler(0f, rootYaw, 0f),
                 RotationSpeedDeg * Time.deltaTime).eulerAngles.y;
-            transform.rotation = Quaternion.Euler(-pitch, newYaw, 0f);
+            // ★ pitch 匀速追踪（与 yaw 同速 RotationSpeedDeg）：
+            //   摆动速度全程恒定，不再有升空段的突跳。
+            _smoothedPitch = Mathf.MoveTowards(_smoothedPitch, pitch,
+                RotationSpeedDeg * Time.deltaTime);
+            transform.rotation = Quaternion.Euler(-_smoothedPitch, newYaw, 0f);
             FlightYaw = yaw;
 
             // 阶段推进：只改状态，不动位置
@@ -1011,6 +1020,12 @@ namespace Greatwall.Flight
             _phaseStartPos = GetVisualCenter();
             _takeOffForward = transform.forward;
             _keyTime = 0f;
+            // ★ 平滑 pitch 同步到轨迹起点俯仰角，避免复位后残余追赶
+            if (Keyframes != null && Keyframes.frames != null
+                && Keyframes.frames.Count > 0)
+            {
+                _smoothedPitch = Keyframes.frames[0].pitch;
+            }
             _localPhase = FlightPhase.TakeOff;
             NetPhase = (int)FlightPhase.TakeOff;
 
