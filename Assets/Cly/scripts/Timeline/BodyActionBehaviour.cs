@@ -12,6 +12,7 @@ namespace Greatwall.VRAnimation.Timeline
         public float stateCrossFadeSeconds = 0.2f;
         public float layerFadeSeconds = 0.25f;
         public float referenceAnimationLength = 0f;
+        public bool followAnimatorSpeed;
 
         private bool triggered;
         private CharacterTimelineAnimator controller;
@@ -66,9 +67,12 @@ namespace Greatwall.VRAnimation.Timeline
                 triggered = true;
             }
 
-            if (referenceAnimationLength > 0f)
+            if (!followAnimatorSpeed && referenceAnimationLength > 0f)
             {
-                float normalizedTime = Mathf.Repeat(localTime, referenceAnimationLength) / referenceAnimationLength;
+                float normalizedTime =
+                    Mathf.Repeat(localTime, referenceAnimationLength)
+                    / referenceAnimationLength;
+
                 controller.SampleBodyState(statePath, normalizedTime);
             }
         }
