@@ -175,5 +175,18 @@ namespace Greatwall.VRAnimation.Timeline
         {
             return requestedSeconds < 0f ? defaultBodyLayerFadeSeconds : requestedSeconds;
         }
+
+        public void SampleBodyState(string fullStatePath, float normalizedTime)
+        {
+            if (!TryGetStateHash(bodyActionLayerIndex, fullStatePath, out int stateHash)) return;
+
+            if (bodyLayerControlMode == BodyLayerControlMode.SeparateActionLayer)
+            {
+                animator.SetLayerWeight(bodyActionLayerIndex, 1f);
+            }
+
+            animator.Play(stateHash, bodyActionLayerIndex, Mathf.Repeat(normalizedTime, 1f));
+            animator.Update(0f);
+        }
     }
 }
