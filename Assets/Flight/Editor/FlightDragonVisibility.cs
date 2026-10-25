@@ -135,7 +135,7 @@ namespace Greatwall.Flight.EditorTools
                 {
                     // 只看 part3 下的飞行龙，避免误改 Dragon_root 那条
                     if (t.name != "SKM_Dragon") continue;
-                    if (!HasAncestor(t, "龙环绕飞行6")) continue;
+                    if (!HasAncestor(t, "骑龙飞上天空") && !HasAncestor(t, "龙环绕飞行6")) continue;
 
                     foreach (var r in t.GetComponentsInChildren<SkinnedMeshRenderer>(true))
                     {

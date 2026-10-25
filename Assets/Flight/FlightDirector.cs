@@ -37,10 +37,10 @@ namespace Greatwall.Flight
     ///   - 客户端对龙的姿态做插值，掩盖网络抖动。
     ///
     /// ★ 接入步骤（重要）：
-    ///   1. 挂载对象是 **`part3/龙环绕飞行6`**（不是 Dragon_root）。
+    ///   1. 挂载对象是 **`part3/骑龙飞上天空`**（不是 Dragon_root）。
     ///      它的层级：
     ///        part3 (天幕球)
-    ///        └─ 龙环绕飞行6     ← 本脚本挂这里（已有 Animator + BigDragonBehavior）
+    ///        └─ 骑龙飞上天空     ← 本脚本挂这里（已有 Animator + BigDragonBehavior）
     ///           ├─ SKM_Dragon
     ///           └─ SKM_Dragon.001
     ///              └─ Head    ← DragonSeatAnchor 挂这里或骨骼上
@@ -66,7 +66,7 @@ namespace Greatwall.Flight
         [Tooltip("起飞爬升时长。设为 0 则跳过起飞阶段。")]
         public float TakeOffDuration = 6f;
 
-        [Tooltip("环绕飞行的总时长。这条龙叫「龙环绕飞行6」，绕一圈通常 12~20 秒舒适。")]
+        [Tooltip("环绕飞行的总时长。这条龙叫「骑龙飞上天空」，绕一圈通常 12~20 秒舒适。")]
         public float OrbitDuration = 30f;
 
         [Tooltip("向远处飞走的时长。")]
@@ -96,7 +96,7 @@ namespace Greatwall.Flight
         [Tooltip("飞行时龙中心的世界高度 Y。\n" +
                  "★ 实测：本项目三章地面点位在 Y≈5.5~9，\n" +
                  "  part3 天幕球在 (15.5, -12.2, -29.7)，\n" +
-                 "  龙环绕飞行6 起点约 Y≈7。\n" +
+                 "  骑龙飞上天空 起点约 Y≈7。\n" +
                  "  建议设 25~40 获得足够凌空感。")]
         public float FlightAltitude = 32f;
 
@@ -121,7 +121,7 @@ namespace Greatwall.Flight
         public bool AutoCompensateVisualCenter = true;
 
         [Tooltip("模型中心的本地坐标（相对于本脚本所在物体）。\n" +
-                 "实测值来自 SKM_Dragon 在 龙环绕飞行6 下的位置。\n" +
+                 "实测值来自 SKM_Dragon 在 骑龙飞上天空 下的位置。\n" +
                  "若换了模型请在 Inspector 里调整。")]
         public Vector3 ModelCenterLocal = new Vector3(0f, 7.19f, 24.54f);
 

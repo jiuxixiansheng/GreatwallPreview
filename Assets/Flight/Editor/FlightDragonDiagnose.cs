@@ -21,12 +21,12 @@ namespace Greatwall.Flight.EditorTools
             {
                 foreach (Transform t in root.GetComponentsInChildren<Transform>(true))
                 {
-                    if (t.name == "龙环绕飞行6") dragon = t;
+                    if (t.name == "骑龙飞上天空" || t.name == "龙环绕飞行6") dragon = t;
                     if (t.name == "FlightClouds") clouds = t;
                 }
             }
 
-            if (dragon == null) { Debug.LogError("找不到 龙环绕飞行6"); return; }
+            if (dragon == null) { Debug.LogError("找不到 骑龙飞上天空（旧名 龙环绕飞行6）"); return; }
 
             Debug.Log("========== 龙可见性诊断 ==========");
             Debug.Log($"龙 active: {dragon.gameObject.activeInHierarchy}");

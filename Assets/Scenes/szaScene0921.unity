@@ -16860,7 +16860,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1083301446}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 8c4ba7dd49bf84aa49e8c5681ba5a32e, type: 3}
   m_Name: 
@@ -18969,7 +18969,7 @@ MonoBehaviour:
     director: {fileID: 937205705}
     sceneRoot: {fileID: 614664459}
     characterSpawnPoint: {fileID: 863660072}
-  startingChapterIndex: 4
+  startingChapterIndex: 0
   playStartingChapterOnStart: 0
   chapterTransitionAnimationSeconds: 3
   immediateTransitionWithoutFade: 1
@@ -23678,7 +23678,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: 397247fcfbcb4b14e8aa3719ce4cc7f4, type: 3}
       propertyPath: m_Name
-      value: "\u9F99\u73AF\u7ED5\u98DE\u884C6"
+      value: "\u9A91\u9F99\u98DE\u4E0A\u5929\u7A7A"
       objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: 397247fcfbcb4b14e8aa3719ce4cc7f4, type: 3}
       propertyPath: m_IsActive

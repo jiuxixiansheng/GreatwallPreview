@@ -6,10 +6,10 @@ namespace Greatwall.Flight
     /// 龙背座位锚点。
     ///
     /// ★ 挂载位置（重要）：
-    ///   本项目的飞行龙是 `part3/龙环绕飞行6`，不是 `Dragon_root`。
+    ///   本项目的飞行龙是 `part3/骑龙飞上天空`，不是 `Dragon_root`。
     ///   它的层级是：
     ///     part3 (天幕球)
-    ///     └─ 龙环绕飞行6        ← Animator + BigDragonBehavior 在这层
+    ///     └─ 骑龙飞上天空        ← Animator + BigDragonBehavior 在这层
     ///        ├─ SKM_Dragon      (SkinnedMeshRenderer, scale 5.0)
     ///        └─ SKM_Dragon.001  (Transform)
     ///           └─ Head         (22 个子骨骼，骨骼树入口)

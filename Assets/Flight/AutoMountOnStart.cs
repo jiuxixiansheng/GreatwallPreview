@@ -41,7 +41,7 @@ namespace Greatwall.Flight
         public float RevealDuration = 1f;
 
         [Tooltip("★ 强制激活飞行龙与其父级 part3。\n" +
-                 "实测：Play 时 part3 激活但 龙环绕飞行6 自身为 inactive，\n" +
+                 "实测：Play 时 part3 激活但 骑龙飞上天空 自身为 inactive，\n" +
                  "Prefab 激活 override 正确但运行时未生效，所以这里强制打开。")]
         public bool ForceActivateDragon = true;
 

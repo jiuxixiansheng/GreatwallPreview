@@ -456,7 +456,7 @@ namespace Greatwall.Flight.EditorTools
             {
                 foreach (Transform t in root.GetComponentsInChildren<Transform>(true))
                 {
-                    if (t.name != "龙环绕飞行6") continue;
+                    if (t.name != "骑龙飞上天空" && t.name != "龙环绕飞行6") continue;
                     var anim = t.GetComponent<Animator>();
                     if (anim == null) continue;
 

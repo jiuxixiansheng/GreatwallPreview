@@ -37,7 +37,7 @@ namespace Greatwall.Flight
         public Texture2D CloudTexture;
 
         [Header("生成区域")]
-        [Tooltip("飞行中心点。★ 拖入 part3/龙环绕飞行6，云会跟着龙走。")]
+        [Tooltip("飞行中心点。★ 拖入 part3/骑龙飞上天空，云会跟着龙走。")]
         public Transform FlightCenter;
 
         [Tooltip("云团生成半径。\n" +

@@ -19,9 +19,9 @@ namespace Greatwall.Flight
     ///      玩家实际用的是 **sza_ 那套**，所以挂它上面。
     ///
     ///   2. `Seat Anchor` → 拖入龙身上的 DragonSeatAnchor
-    ///      （建议挂在 `part3/龙环绕飞行6/SKM_Dragon.001` 或其子骨骼）
+    ///      （建议挂在 `part3/骑龙飞上天空/SKM_Dragon.001` 或其子骨骼）
     ///
-    ///   3. `Director` → 拖入 `part3/龙环绕飞行6` 上的 FlightDirector
+    ///   3. `Director` → 拖入 `part3/骑龙飞上天空` 上的 FlightDirector
     ///
     ///   4. `Movement Behaviours To Disable` → 拖入要禁用的移动组件
     ///      （Move 下的 DynamicMoveProvider、Teleportation 下的 TeleportationProvider 等）
