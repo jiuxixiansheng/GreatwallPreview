@@ -30,6 +30,16 @@ public class Controlappear : MonoBehaviour
         UpdateShaderProperties(startProgress);
     }
 
+    private void OnEnable()
+    {
+        EventDispatcher.Instance.AddListener("修复城墙结束", TriggerRestoration);
+    }
+
+    private void OnDisable()
+    {
+        EventDispatcher.Instance.RemoveListener("修复城墙结束", TriggerRestoration);
+    }
+
     // 外部调用这个方法触发复原
     public void TriggerRestoration()
     {
