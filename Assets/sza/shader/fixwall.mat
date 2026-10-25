@@ -27,7 +27,7 @@ Material:
     serializedVersion: 3
     m_TexEnvs:
     - _AO:
-        m_Texture: {fileID: 2800000, guid: 63e7b5b416961b14e8944a3d8cc51d8a, type: 3}
+        m_Texture: {fileID: 2800000, guid: 20170cd69d42d3143a7af14788b3a396, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _BaseMap:
@@ -75,11 +75,11 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _basecolor:
-        m_Texture: {fileID: 2800000, guid: 7cf3c91a3b1553245939b387a199a61f, type: 3}
+        m_Texture: {fileID: 2800000, guid: f8028ec95de20b74cbe35b18134bdcaf, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _normal:
-        m_Texture: {fileID: 2800000, guid: 0e066dd332ee2eb429c3a5d40dfcd8d5, type: 3}
+        m_Texture: {fileID: 2800000, guid: 18a365ad2559ee14fad7feafe2de2cbc, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - unity_Lightmaps:
@@ -99,7 +99,7 @@ Material:
     - _AddPrecomputedVelocity: 0
     - _AlphaClip: 1
     - _AlphaToMask: 1
-    - _BaseWorldHeight: 5.42
+    - _BaseWorldHeight: 3.79
     - _Blend: 0
     - _BlendModePreserveSpecular: 1
     - _BumpScale: 1
@@ -124,7 +124,7 @@ Material:
     - _QueueControl: 0
     - _QueueOffset: 0
     - _ReceiveShadows: 1
-    - _RestoreProgress: 0
+    - _RestoreProgress: 0.33
     - _Smoothness: 0.2
     - _SmoothnessTextureChannel: 0
     - _SpecularHighlights: 1
@@ -141,7 +141,7 @@ Material:
     - _Color: {r: 1, g: 1, b: 1, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
     - _SpecColor: {r: 0.19999996, g: 0.19999996, b: 0.19999996, a: 1}
-    - _emissioncolor: {r: 1, g: 0, b: 0, a: 0}
+    - _emissioncolor: {r: 15.999998, g: 0.71735024, b: 0, a: 0}
   m_BuildTextureStacks: []
   m_AllowLocking: 1
 --- !u!114 &4624911820080027198

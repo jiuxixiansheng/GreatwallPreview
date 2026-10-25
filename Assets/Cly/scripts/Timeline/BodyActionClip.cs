@@ -18,7 +18,7 @@ namespace Greatwall.VRAnimation.Timeline
         [Tooltip("填写负数时使用 CharacterTimelineAnimator 的默认值。")]
         public float layerFadeSeconds = 0.25f;
 
-        public ClipCaps clipCaps => ClipCaps.Blending | ClipCaps.ClipIn;
+        public ClipCaps clipCaps => ClipCaps.Blending | ClipCaps.ClipIn | ClipCaps.Looping;
         public override double duration =>
             referenceAnimationClip != null ? Math.Max(0.01d, referenceAnimationClip.length) : 0.5d;
 
@@ -31,7 +31,12 @@ namespace Greatwall.VRAnimation.Timeline
             behaviour.statePath = statePath;
             behaviour.stateCrossFadeSeconds = stateCrossFadeSeconds;
             behaviour.layerFadeSeconds = layerFadeSeconds;
+            behaviour.referenceAnimationLength = referenceAnimationClip != null ? referenceAnimationClip.length : 0f;
+            behaviour.followAnimatorSpeed = followAnimatorSpeed;
             return playable;
         }
+
+        [Tooltip("走路动作勾选：使用 Animator 状态的速度倍率播放；其他动作不勾选。")]
+        public bool followAnimatorSpeed;
     }
 }
