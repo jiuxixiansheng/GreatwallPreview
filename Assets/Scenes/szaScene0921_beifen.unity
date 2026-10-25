@@ -11222,7 +11222,7 @@ MonoBehaviour:
     director: {fileID: 937205705}
     sceneRoot: {fileID: 614664459}
     characterSpawnPoint: {fileID: 863660072}
-  startingChapterIndex: 1
+  startingChapterIndex: 3
   playStartingChapterOnStart: 1
   chapterTransitionAnimationSeconds: 3
   immediateTransitionWithoutFade: 1
