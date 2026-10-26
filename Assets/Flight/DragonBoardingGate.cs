@@ -182,15 +182,19 @@ namespace Greatwall.Flight
             float eased = t * t * (3f - 2f * t);
             PadVisual.transform.localScale = _padScale * eased;
 
-            // 由暗到亮
+            // 由暗到亮（只对带 _BaseColor 的材质生效；
+            // 复用 part1 的 board.mat 全息边框时没有该属性，就只做缩放淡入）
             var renderer = PadVisual.GetComponentInChildren<Renderer>();
             if (renderer != null)
             {
-                var mat = renderer.material;
-                Color baseColor = new Color(0.18f, 0.78f, 1f, 0.55f);
-                Color emit = new Color(0.1f, 0.55f, 1f) * (0.4f + 1.6f * eased);
-                if (mat.HasProperty(BaseColorId)) mat.SetColor(BaseColorId, new Color(baseColor.r, baseColor.g, baseColor.b, baseColor.a * eased));
-                if (mat.HasProperty(EmissionColorId)) mat.SetColor(EmissionColorId, emit);
+                var mat = renderer.sharedMaterial;
+                if (mat != null && mat.HasProperty(BaseColorId) && mat.HasProperty(EmissionColorId))
+                {
+                    Color baseColor = new Color(0.18f, 0.78f, 1f, 0.55f);
+                    Color emit = new Color(0.1f, 0.55f, 1f) * (0.4f + 1.6f * eased);
+                    mat.SetColor(BaseColorId, new Color(baseColor.r, baseColor.g, baseColor.b, baseColor.a * eased));
+                    mat.SetColor(EmissionColorId, emit);
+                }
             }
 
             if (t >= 1f)
