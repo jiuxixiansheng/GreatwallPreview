@@ -41,6 +41,7 @@ namespace Greatwall.VRAnimation.Timeline
 
             if (director.state == PlayState.Playing)
                 ArmForCurrentPlayback();
+            EventDispatcher.Instance.AddListener("ÐÞ¸´³ÇÇ½½áÊø", ResumeTimeline);
         }
 
         private void OnDisable()
@@ -52,6 +53,7 @@ namespace Greatwall.VRAnimation.Timeline
             }
 
             armed = false;
+            EventDispatcher.Instance.RemoveListener("ÐÞ¸´³ÇÇ½½áÊø", ResumeTimeline);
         }
 
         private void Update()
@@ -99,6 +101,16 @@ namespace Greatwall.VRAnimation.Timeline
 
             invoked = true;
             onTimelineCompleted?.Invoke();
+        }
+
+        public void PauseTimeline()
+        {
+            director.Pause();
+        }
+
+        private void ResumeTimeline()
+        {
+            director.Resume();
         }
     }
 }
