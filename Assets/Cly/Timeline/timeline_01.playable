@@ -30,7 +30,6 @@ MonoBehaviour:
   statePath: BaseLayer.Chapter1.WalkCycle1
   stateCrossFadeSeconds: 0.6
   layerFadeSeconds: 0.25
-  followAnimatorSpeed: 0
 --- !u!114 &-8935653769916947683
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -72,7 +71,6 @@ MonoBehaviour:
   statePath: BaseLayer.Chapter1.Talk
   stateCrossFadeSeconds: 0.7
   layerFadeSeconds: 0.25
-  followAnimatorSpeed: 0
 --- !u!114 &-8491328030160472073
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -90,7 +88,6 @@ MonoBehaviour:
   statePath: BaseLayer.Chapter1.WalkCycle1
   stateCrossFadeSeconds: 0.6
   layerFadeSeconds: 0.25
-  followAnimatorSpeed: 1
 --- !u!114 &-8148659098119053922
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -108,7 +105,6 @@ MonoBehaviour:
   statePath: BaseLayer.Idle
   stateCrossFadeSeconds: 0.5
   layerFadeSeconds: 0.25
-  followAnimatorSpeed: 0
 --- !u!114 &-7362702528974459679
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -184,7 +180,6 @@ MonoBehaviour:
   statePath: BaseLayer.Chapter1.Turn
   stateCrossFadeSeconds: 0.5
   layerFadeSeconds: 0.25
-  followAnimatorSpeed: 0
 --- !u!114 &-5882842196481305495
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -202,7 +197,6 @@ MonoBehaviour:
   statePath: BaseLayer.Chapter1.TurnBack
   stateCrossFadeSeconds: 0.5
   layerFadeSeconds: 0.25
-  followAnimatorSpeed: 0
 --- !u!114 &-5419102308370045347
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -588,7 +582,6 @@ MonoBehaviour:
   statePath: BaseLayer.Chapter1.WalkCycle1
   stateCrossFadeSeconds: 0.6
   layerFadeSeconds: 0.25
-  followAnimatorSpeed: 1
 --- !u!114 &-4767189575731396951
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -1366,7 +1359,6 @@ MonoBehaviour:
   statePath: BaseLayer.Chapter1.Talk
   stateCrossFadeSeconds: 0.7
   layerFadeSeconds: 0.25
-  followAnimatorSpeed: 0
 --- !u!114 &-2362873891612052109
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -1399,7 +1391,6 @@ MonoBehaviour:
   statePath: BaseLayer.Chapter1.Talk
   stateCrossFadeSeconds: 0.5
   layerFadeSeconds: 0.25
-  followAnimatorSpeed: 0
 --- !u!114 &-2002305170662707275
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -2055,7 +2046,6 @@ MonoBehaviour:
   statePath: BaseLayer.Chapter1.Lookat
   stateCrossFadeSeconds: 0.7
   layerFadeSeconds: 0.25
-  followAnimatorSpeed: 0
 --- !u!114 &11400000
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2133,7 +2123,6 @@ MonoBehaviour:
   statePath: BaseLayer.Chapter1.WalkCycle1
   stateCrossFadeSeconds: 0.6
   layerFadeSeconds: 0.25
-  followAnimatorSpeed: 1
 --- !u!114 &1096180183700637293
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -2151,7 +2140,6 @@ MonoBehaviour:
   statePath: BaseLayer.Idle
   stateCrossFadeSeconds: 0.2
   layerFadeSeconds: 0.25
-  followAnimatorSpeed: 0
 --- !u!114 &1379541824955979694
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -2184,7 +2172,6 @@ MonoBehaviour:
   statePath: BaseLayer.Chapter1.WalkCycle2
   stateCrossFadeSeconds: 0.7
   layerFadeSeconds: 0.25
-  followAnimatorSpeed: 1
 --- !u!114 &2428842127106536640
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -2232,7 +2219,6 @@ MonoBehaviour:
   statePath: BaseLayer.Chapter1.WalkCycle2
   stateCrossFadeSeconds: 0.7
   layerFadeSeconds: 0.25
-  followAnimatorSpeed: 0
 --- !u!114 &3406153952632113348
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -2265,7 +2251,6 @@ MonoBehaviour:
   statePath: BaseLayer.Chapter1.Talk
   stateCrossFadeSeconds: 0.7
   layerFadeSeconds: 0.25
-  followAnimatorSpeed: 0
 --- !u!114 &4167957967150669472
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -2283,7 +2268,6 @@ MonoBehaviour:
   statePath: BaseLayer.Idle
   stateCrossFadeSeconds: 0.2
   layerFadeSeconds: 0.25
-  followAnimatorSpeed: 0
 --- !u!114 &4988732635241143110
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -2576,7 +2560,6 @@ MonoBehaviour:
   statePath: BaseLayer.Chapter1.Talk
   stateCrossFadeSeconds: 0.7
   layerFadeSeconds: 0.25
-  followAnimatorSpeed: 0
 --- !u!114 &6809588048517225505
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -3197,7 +3180,6 @@ MonoBehaviour:
   statePath: BaseLayer.Chapter1.WalkCycle2
   stateCrossFadeSeconds: 0.7
   layerFadeSeconds: 0.25
-  followAnimatorSpeed: 1
 --- !u!114 &8709638280127529778
 MonoBehaviour:
   m_ObjectHideFlags: 1
