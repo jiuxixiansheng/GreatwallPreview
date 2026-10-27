@@ -1,72 +1,66 @@
-using UnityEngine;
 using System.Collections.Generic;
+using Mirror;
+using UnityEngine;
 
 public class BrickDropZone : MonoBehaviour
 {
-    [Header("解谜设置")]
-    [Tooltip("需要放入的砖块总数")]
-    public int targetBrickCount = 3;
-
-    [Tooltip("目标物体的 Tag 标签")]
+    [Header("瑙ｈ皽璁剧疆")]
+    [Min(1)] public int targetBrickCount = 3;
     public string targetTag = "Brick";
-
-    private readonly List<Collider> bricksInside = new List<Collider>();
-    private bool isSolved = false;
-
     public List<GameObject> targetObjects = new List<GameObject>();
+    private readonly Dictionary<Rigidbody, HashSet<Collider>> bricksInside =
+        new Dictionary<Rigidbody, HashSet<Collider>>();
+    private bool isSolved;
+    public bool IsSolved => isSolved;
+    public int CurrentBrickCount => bricksInside.Count;
+
+    private bool CanJudge => !NetworkGameplayCoordinator.IsManaged || NetworkServer.active;
 
     private void OnTriggerEnter(Collider other)
     {
-        if (isSolved || !other.CompareTag(targetTag)) return;
-        if (bricksInside.Contains(other)) return;
-
-        bricksInside.Add(other);
-        Debug.Log(
-            $"[解谜] 放入了一块砖！当前进度: {bricksInside.Count} / {targetBrickCount}");
-
+        if (isSolved || !CanJudge) return;
+        Rigidbody brick = other.attachedRigidbody;
+        if (brick == null || (!other.CompareTag(targetTag) && !brick.CompareTag(targetTag))) return;
+        if (NetworkGameplayCoordinator.IsManaged &&
+            !NetworkGameplayCoordinator.Instance.IsRegisteredBrick(brick)) return;
+        if (!bricksInside.TryGetValue(brick, out var colliders))
+        {
+            colliders = new HashSet<Collider>();
+            bricksInside.Add(brick, colliders);
+        }
+        colliders.Add(other);
+        Debug.Log($"[淇] 褰撳墠鐮栧潡锛歿bricksInside.Count}/{targetBrickCount}", this);
         if (bricksInside.Count >= targetBrickCount)
         {
-            ExecuteSolveLogic();
+            if (NetworkGameplayCoordinator.IsManaged) NetworkGameplayCoordinator.Instance.ServerSolve(this);
+            else ApplySolvedState(true);
         }
     }
 
     private void OnTriggerExit(Collider other)
     {
-        if (isSolved || !other.CompareTag(targetTag)) return;
-
-        if (bricksInside.Remove(other))
-        {
-            Debug.Log(
-                $"[解谜] 拿走了一块砖。当前进度: {bricksInside.Count} / {targetBrickCount}");
-        }
+        if (isSolved || !CanJudge) return;
+        var brick = other.attachedRigidbody;
+        if (brick == null || !bricksInside.TryGetValue(brick, out var colliders)) return;
+        colliders.Remove(other);
+        if (colliders.Count == 0) bricksInside.Remove(brick);
     }
+
+    private void OnDisable() => bricksInside.Clear();
 
     public void ForceSolvePuzzle()
     {
-        if (isSolved)
-        {
-            Debug.LogWarning("[解谜调试] 谜题已经解开过了，无需重复触发。");
-            return;
-        }
-
-        Debug.Log("[解谜调试] 收到外部强制放行指令！跳过搬砖过程。");
-        ExecuteSolveLogic();
+        if (isSolved) return;
+        if (NetworkGameplayCoordinator.IsManaged) NetworkGameplayCoordinator.Instance.RequestDebugSolve(this);
+        else ApplySolvedState(true);
     }
 
-    private void ExecuteSolveLogic()
+    public void ApplySolvedState(bool dispatchEvent)
     {
-        if (isSolved) return;
-
+        bool firstApplication = !isSolved;
         isSolved = true;
-        Debug.Log("[解谜] 目标达成！发送修复城墙结束事件。");
-        EventDispatcher.Instance.Dispatch("修复城墙结束");
-        foreach (GameObject obj in targetObjects)
-        {
-            if (obj != null)
-            {
-                obj.SetActive(false);
-            }
-        }
+        if (firstApplication && dispatchEvent) EventDispatcher.Instance.Dispatch("淇鍩庡缁撴潫");
+        foreach (var obj in targetObjects) if (obj != null) obj.SetActive(false);
         gameObject.SetActive(false);
     }
 }
