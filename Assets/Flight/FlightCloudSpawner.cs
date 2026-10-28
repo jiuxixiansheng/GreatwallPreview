@@ -502,6 +502,8 @@ namespace Greatwall.Flight
                       $"{DistantCloudCount} 团（粒子数={_system.particleCount}）", this);
         }
 
+#endif
+
         /// <summary>
         /// ★ 清空并按当前参数重新撒云（改 CloudSize / MaxCloudCount /
         ///   ParticlesPerCloud 后用这个，比"应用参数"更彻底——
@@ -537,6 +539,7 @@ namespace Greatwall.Flight
         }
 
 
+#if UNITY_EDITOR
         /// <summary>
         /// ★ Play 中实时调参：改 Inspector 的 CloudSize / MaxCloudCount /
         ///   CloudOpacity 后右键执行，立即生效（不用重启 Play）。
