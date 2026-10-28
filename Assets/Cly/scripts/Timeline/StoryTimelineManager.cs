@@ -100,6 +100,7 @@ namespace Greatwall.VRAnimation.Timeline
 
         private void Start()
         {
+            if (NetworkGameplayCoordinator.IsManaged) return;
             SubscribeToChapterCompletionEvents();
 
             if (playStartingChapterOnStart && chapters.Count > 0)
@@ -160,6 +161,7 @@ namespace Greatwall.VRAnimation.Timeline
 
         private void BeginChapterTransitionTo(int targetChapterIndex)
         {
+            if (NetworkGameplayCoordinator.RouteChapterRequest(targetChapterIndex)) return;
             if (transitionPending || chapters.Count == 0) return;
 
             if (!IsValidChapterIndex(targetChapterIndex))
@@ -492,6 +494,7 @@ namespace Greatwall.VRAnimation.Timeline
 
         private void HandleTimelineCompleted(int completedChapterIndex)
         {
+            if (NetworkGameplayCoordinator.IsFollower) return;
             if (completedChapterIndex != currentChapterIndex) return;
 
             StoryChapterEntry currentChapter = GetChapter(currentChapterIndex);
@@ -500,6 +503,72 @@ namespace Greatwall.VRAnimation.Timeline
             if (!currentChapter.switchWhenTimelineCompleted) return;
 
             BeginNextChapterTransition();
+        }
+
+        public int CurrentChapterIndex => currentChapterIndex;
+        public int ChapterCount => chapters.Count;
+        public bool IsTransitionPending => transitionPending;
+        public PlayableDirector CurrentDirector => GetChapter(currentChapterIndex)?.director;
+        private bool networkTransitionVisible;
+
+        public void InitializeNetworkChapter()
+        {
+            currentChapterIndex = Mathf.Clamp(startingChapterIndex, 0, Mathf.Max(0, chapters.Count - 1));
+            SetupChapter(currentChapterIndex);
+            PlayCurrentChapter();
+        }
+
+        public void SetNetworkPlayback(bool play)
+        {
+            var director = CurrentDirector;
+            if (director == null) return;
+            if (play)
+            {
+                ResumePausedAnimationAndAudio();
+                director.Resume();
+            }
+            else PauseCurrentChapterAnimationAndAudio();
+        }
+
+        public void ApplyNetworkState(int index, double time, bool play, bool transitioning,
+            bool initialize, float correctionThreshold)
+        {
+            if (!IsValidChapterIndex(index)) return;
+            bool changed = initialize || currentChapterIndex != index;
+            if (changed)
+            {
+                CancelPendingTransition();
+                foreach (var chapter in chapters)
+                    if (chapter.director != null) chapter.director.Stop();
+                currentChapterIndex = index;
+                SetupChapter(index);
+            }
+            if (transitioning && !networkTransitionVisible)
+            {
+                PauseCurrentChapterAnimationAndAudio();
+                PlayChapterTransitionAnimation(chapterTransitionAnimationSeconds);
+            }
+            else if (!transitioning && networkTransitionVisible)
+                ResumePausedAnimationAndAudio();
+            networkTransitionVisible = transitioning;
+            var director = CurrentDirector;
+            if (director == null) return;
+            double target = Math.Max(0d, Math.Min(time, director.duration));
+            bool shouldPlay = play && !transitioning;
+            bool stateChanged = (director.state == PlayState.Playing) != shouldPlay;
+            if (changed || stateChanged || Math.Abs(director.time - target) > correctionThreshold)
+            {
+                if (shouldPlay && director.state != PlayState.Playing) director.Play();
+                director.time = target;
+                director.Evaluate();
+            }
+            if (!shouldPlay)
+            {
+                if (director.state == PlayState.Playing) director.Pause();
+                PauseCurrentChapterAnimationAndAudio();
+            }
+            else if (!transitioning)
+                ResumePausedAnimationAndAudio();
         }
 
         private StoryChapterEntry GetChapter(int index)

@@ -65,6 +65,7 @@ namespace Greatwall.Navigation
 
         public void MoveToPosition(Vector3 position)
         {
+            if (NetworkGameplayCoordinator.IsFollower) return;
             if (agent == null)
             {
                 Debug.LogError("DragonNavMeshMover: 没有找到 NavMeshAgent。", this);
@@ -93,6 +94,7 @@ namespace Greatwall.Navigation
 
         public void MoveToPositionInDuration(Vector3 position, float durationSeconds)
         {
+            if (NetworkGameplayCoordinator.IsFollower) return;
             if (agent == null)
             {
                 Debug.LogError("DragonNavMeshMover: 没有找到 NavMeshAgent。", this);

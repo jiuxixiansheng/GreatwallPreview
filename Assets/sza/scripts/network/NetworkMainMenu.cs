@@ -42,7 +42,7 @@ public class NetworkMainMenu : MonoBehaviour
     // 点击“作为客户端连接”时执行
     private void OnClientClicked()
     {
-        ConnectionManager.singleton.InitializeAsClient("192.168.31.82",5678);
+        ConnectionManager.singleton.InitializeAsClient("192.168.31.12", 5678);
         SceneManager.LoadScene(1);
     }
 

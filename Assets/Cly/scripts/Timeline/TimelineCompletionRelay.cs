@@ -105,11 +105,21 @@ namespace Greatwall.VRAnimation.Timeline
 
         public void PauseTimeline()
         {
+            if (NetworkGameplayCoordinator.IsManaged)
+            {
+                NetworkGameplayCoordinator.Instance.HandleTimelineSignal(director, false);
+                return;
+            }
             director.Pause();
         }
 
         private void ResumeTimeline()
         {
+            if (NetworkGameplayCoordinator.IsManaged)
+            {
+                NetworkGameplayCoordinator.Instance.HandleTimelineSignal(director, true);
+                return;
+            }
             director.Resume();
         }
     }
