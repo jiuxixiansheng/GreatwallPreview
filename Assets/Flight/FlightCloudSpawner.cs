@@ -179,6 +179,27 @@ namespace Greatwall.Flight
         [Range(50, 2000)]
         public int CloudSeaCount = 900;
 
+        [Tooltip("★ 关闭一切飞行中的实时生成（推荐）：环境补云、滚动云海、收尾白化云全部停用。\n" +
+                 "云雾完全由预撒沿轨迹铺好 —— 云在到达之前就固定在空间里，没有生成过程，就不会在眼前突现。\n" +
+                 "关掉后云量完全由 PreWarmClouds（含末段云墙）决定。")]
+        public bool DisableRuntimeSpawn = true;
+
+        [Header("收尾云墙（纯预撒）")]
+        [Tooltip("黑场前云墙的云团数：在最后 14% 轨迹 + 终点之外一次性铺好。\n" +
+                 "数值越大，冲进黑场前的云越厚；全部预先生成，飞行中不会再冒新云。")]
+        public int EndingWallCount = 120;
+
+        [Tooltip("云墙向轨迹终点之外延伸的距离（米）。让黑场那一刻相机已经在云里，而不是刚好穿出云层。")]
+        public float EndingWallForward = 80f;
+
+        [Tooltip("云墙云团的尺寸倍率（相对普通云）。越大越厚实，少量团就能填满视野。")]
+        public float EndingWallSizeMul = 1.35f;
+
+        [Tooltip("★ 云团生成的最小距离（米，相对头显）。小于这个距离的云会被推到外面，\n" +
+                 "避免在眼前「凭空冒出来」。近处只保留预撒时就已存在的云。")]
+        [Range(10f, 200f)]
+        public float MinSpawnDistance = 60f;
+
         [Tooltip("★ 云的整体不透明度 0~1。Play 中可实时调，改完右键「应用参数」。")]
         [Range(0.2f, 1f)]
         public float CloudOpacity = 0.85f;
@@ -202,6 +223,21 @@ namespace Greatwall.Flight
         private ParticleSystem.Particle[] _alive;
         private int _aliveCount;
         private int _maxParticles;
+
+        /// <summary>
+        /// 粒子池大小。按预撒团数兜底：纯预撒模式下云量由 PreWarmClouds 决定，
+        /// 若 MaxCloudCount（环境云配额）比它小，池子会静默挤掉最老的云。
+        /// </summary>
+        private int PoolSize
+        {
+            get
+            {
+                int clusters = Mathf.Max(MaxCloudCount, PreWarmClouds)
+                             + Mathf.Max(0, EndingWallCount);
+                return clusters * ParticlesPerCloud + CloudSeaCount + 200;
+            }
+        }
+
         private float _spawnTimer;
         private System.Random _random;
         private FlightDirector _director;
@@ -210,8 +246,13 @@ namespace Greatwall.Flight
         private void Awake()
         {
             _random = new System.Random(RandomSeed);
-            _director = FindFirstObjectByType<FlightDirector>();
+            // ★ 必须包含未激活对象：本组件挂在 FlightClouds 上，它在「上龙」那一刻才被激活，
+            //   而飞行总控（FlightDirector）所在的 part3/骑龙飞上天空 可能同一帧还没启用。
+            //   FindFirstObjectByType 默认只查活动对象 → 返回 null → 预撒云整块逻辑被跳过，
+            //   表现就是「天上几乎没有云雾」。
+            _director = FindFirstObjectByType<FlightDirector>(FindObjectsInactive.Include);
             SetupParticleSystem();
+            TryPreWarm();
         }
 
         private void SetupParticleSystem()
@@ -226,7 +267,7 @@ namespace Greatwall.Flight
             // ★ 总粒子配额 = 环境云团数 × 每团粒子数 + 云海粒子数。
             //   之前 maxParticles=500 而预撒 150团×48粒=7200，
             //   Emit 超配额会挤掉最老的粒子 → 天上只剩 500 个散点。
-            _maxParticles = MaxCloudCount * ParticlesPerCloud + CloudSeaCount + 200;
+            _maxParticles = PoolSize;
             _alive = new ParticleSystem.Particle[_maxParticles];
 
             var main = _system.main;
@@ -296,6 +337,19 @@ namespace Greatwall.Flight
 
             _system.Play();
 
+            // ★ 出生渐入：寿命 150s，把前 2%（约 3 秒）做成 alpha 0→1 的斜坡。
+            //   作用只有刚 Emit 出来的粒子 —— 预撒的老云早已在满不透明段，
+            //   所以飞行中新增的云是「淡入」，不会在视野里凭空闪现。
+            {
+                var col = _system.colorOverLifetime;
+                col.enabled = true;
+                var g = new Gradient();
+                g.SetKeys(
+                    new[] { new GradientColorKey(Color.white, 0f), new GradientColorKey(Color.white, 1f) },
+                    new[] { new GradientAlphaKey(0f, 0f), new GradientAlphaKey(1f, 0.02f), new GradientAlphaKey(1f, 1f) });
+                col.color = new ParticleSystem.MinMaxGradient(g);
+            }
+
             // ★ 远景天际线云独立系统：独立配额（不与近景/云海互挤）、
             //   独立材质（alpha 恒定可见，仅轻微随进度变浓）。
             if (_distantSystem == null)
@@ -327,6 +381,22 @@ namespace Greatwall.Flight
                 _distantMat = new Material(_cloudMat);
                 _distantMat.name = "M_FlightCloud_Distant";
                 dr.sharedMaterial = _distantMat;
+
+                // ★ 必须显式 Play：AddComponent 出来的 ParticleSystem 停在 Stopped 状态，
+                //   在停止的系统上 Emit() 会被直接丢弃 —— 远景云整套流程里粒子数恒为 0，
+                //   天空只剩玩家周围一小圈云。
+                _distantSystem.Play();
+
+                // 远景同样做出生渐入（寿命 300s，前 1% ≈ 3 秒）
+                {
+                    var dcol = _distantSystem.colorOverLifetime;
+                    dcol.enabled = true;
+                    var dg = new Gradient();
+                    dg.SetKeys(
+                        new[] { new GradientColorKey(Color.white, 0f), new GradientColorKey(Color.white, 1f) },
+                        new[] { new GradientAlphaKey(0f, 0f), new GradientAlphaKey(1f, 0.01f), new GradientAlphaKey(1f, 1f) });
+                    dcol.color = new ParticleSystem.MinMaxGradient(dg);
+                }
             }
 
             Debug.Log($"[Cloud] ✅ 初始化完成：maxParticles={_system.main.maxParticles} " +
@@ -416,7 +486,7 @@ namespace Greatwall.Flight
             _arcPoints = null;
             _arcProgress = null;
             _cloudSeaSpawned = 0f;
-            _maxParticles = MaxCloudCount * ParticlesPerCloud + CloudSeaCount + 200;
+            _maxParticles = PoolSize;
             var main = _system.main;
             main.maxParticles = _maxParticles;
             main.startLifetime = 150f;
@@ -450,11 +520,14 @@ namespace Greatwall.Flight
             _cloudSeaSpawned = 0f;
             _seaTimer = 0f;
             _prewarmed = false;
+            // ★ 重新取一次路线偏移（改完参数重撒时飞行总控可能已重新起飞）
+            _routeOffsetResolved = false;
+            _routeOffsetValid = false;
             // ★ 复位渐浓因子：循环体验从"前薄"重新开始
             _globalFade = SampleNearDensity(0f);
             _cloudFade = 1f;
             ApplyMaterialAlpha();
-            _maxParticles = MaxCloudCount * ParticlesPerCloud + CloudSeaCount + 200;
+            _maxParticles = PoolSize;
             _alive = new ParticleSystem.Particle[_maxParticles];
             var main = _system.main;
             main.maxParticles = _maxParticles;
@@ -476,7 +549,7 @@ namespace Greatwall.Flight
                 _system = GetComponent<ParticleSystem>();
             }
             var main = _system.main;
-            main.maxParticles = MaxCloudCount * ParticlesPerCloud + CloudSeaCount + 200;
+            main.maxParticles = PoolSize;
             main.startColor = new Color(1f, 1f, 1f, CloudOpacity);
             // ★ 存量粒子只调 alpha，不动 startSize——
             //   尺寸是 55%~100% 随机分布的，统一重设会破坏蓬松感。
@@ -501,38 +574,272 @@ namespace Greatwall.Flight
         {
             // ★ 启动预撒：一次性沿全轨迹撒云（之前逐帧慢慢撒，
             //   前十几秒天空空荡荡，用户反馈"只有一点粒子"）
-            if (!_prewarmed && _director != null && _system != null)
-            {
-                _prewarmed = true;
-                if (PreWarmClouds > 0)
-                {
-                    for (int i = 0; i < PreWarmClouds; i++)
-                    {
-                        EmitCloud(1, spreadAcrossTrack: true);
-                    }
-                }
-                // ★ 远景天际线云：外围环带大尺寸云团，
-                //   消除"只有玩家周围有云、远处天空空荡"的出戏感
-                if (DistantCloudCount > 0)
-                {
-                    for (int i = 0; i < DistantCloudCount; i++)
-                    {
-                        EmitCloud(1, spreadAcrossTrack: true, distant: true);
-                    }
-                }
-                if (PreWarmClouds > 0 || DistantCloudCount > 0)
-                {
-                    Debug.Log($"[Cloud] ✅ 预撒近景 {PreWarmClouds} 团 + 远景 " +
-                              $"{DistantCloudCount} 团（粒子数={_system.particleCount}）", this);
-                }
-            }
+            TryPreWarm();
 
             HandleCloudSea();
+            HandleEndingWhiteout();
             HandleAmbientClouds();
             HandleGlobalFade();
         }
 
+        // ---------------- 收尾「冲进云里」 ----------------
+        private int _whiteoutClusters;
+        private bool _whiteoutStarted;
+        private float _whiteoutTimer;
+
+        /// <summary>
+        /// 黑场前的几秒：在相机周围快速铺满云团，让视野被云完全包住再黑场。
+        /// 这一段是刻意的「冲进云层」，所以不受 MinSpawnDistance / 关闭实时补云的限制。
+        /// </summary>
+        private void HandleEndingWhiteout()
+        {
+            // ★ 纯预撒模式：收尾不临时喷云。原来这里会在黑场前 1~2 秒
+            //   往相机四周 Emit 上百团云（并关掉出生渐入），看起来就是
+            //   「黑场前瞬间冒出一大堆云」；收尾的云墙由预撒铺好。
+            if (DisableRuntimeSpawn) return;
+
+            if (_director == null) return;
+            if (_director.CurrentPhase != FlightPhase.Ending) return;
+
+            // ★ 收尾阶段关掉「出生渐入」：白化要立刻生效，
+            //   否则新云还在 3 秒的 alpha 斜坡里，黑场前根本来不及变白。
+            if (!_whiteoutStarted)
+            {
+                _whiteoutStarted = true;
+                var col = _system.colorOverLifetime;
+                if (col.enabled) col.enabled = false;
+
+                // ★ 粒子池已接近上限，不扩容的话 Emit 会被直接丢弃（实测只进得去 52 颗），
+                //   白化根本铺不出来。这里临时把上限抬高，专门给收尾这一段用。
+                var m = _system.main;
+                m.maxParticles = _maxParticles + 4000;
+            }
+
+            _whiteoutTimer += Time.deltaTime;
+            if (_whiteoutTimer < 0.08f) return;
+            _whiteoutTimer = 0f;
+
+            var cam = Camera.main;
+            if (cam == null) return;
+            Vector3 origin = cam.transform.position;
+            Vector3 fwd = cam.transform.forward;
+
+            for (int i = 0; i < 4; i++)
+            {
+                float ahead = Mathf.Lerp(6f, 34f, (float)_random.NextDouble());
+                float side = Mathf.Lerp(-22f, 22f, (float)_random.NextDouble());
+                float up = Mathf.Lerp(-14f, 14f, (float)_random.NextDouble());
+                Vector3 center = origin + fwd * ahead
+                               + cam.transform.right * side
+                               + Vector3.up * up;
+
+                float clusterR = CloudSize * 0.42f;
+                Color col = new Color(1f, 1f, 1f, CloudOpacity);
+                for (int k = 0; k < ParticlesPerCloud; k++)
+                {
+                    float rr = clusterR * Mathf.Pow((float)_random.NextDouble(), 0.5f);
+                    float a = (float)_random.NextDouble() * Mathf.PI * 2f;
+                    float b = Mathf.Acos(2f * (float)_random.NextDouble() - 1f);
+                    Vector3 off = new Vector3(
+                        rr * Mathf.Sin(b) * Mathf.Cos(a),
+                        rr * Mathf.Cos(b) * 0.55f,
+                        rr * Mathf.Sin(b) * Mathf.Sin(a));
+
+                    _system.Emit(new ParticleSystem.EmitParams
+                    {
+                        position = center + off,
+                        startSize = CloudSize * 1.25f * Mathf.Lerp(0.6f, 1f, (float)_random.NextDouble()),
+                        startColor = col,
+                        applyShapeToPosition = false
+                    }, 1);
+                }
+                _whiteoutClusters++;
+                if (_whiteoutClusters > 120) return;
+            }
+        }
+
         private bool _prewarmed;
+
+        // ---------------- 路线起点对齐 ----------------
+        // ★ 预撒必须套用 FlightDirector 起飞时记录的「路线偏移」：
+        //   K 帧表是烘焙时的绝对坐标，实际飞行会把整条轨迹搬到骑龙
+        //   起飞那一刻的位姿（平移 + 偏航）。若预撒直接用原始表坐标，
+        //   云会整段偏离真实航线——实测黑场前正前方晴空万里，
+        //   云墙全落在了别处。
+        //   另外预撒不能在上龙瞬间就做：Board() 激活云雾后，
+        //   MountNextFrame 下一帧才把骑龙对齐到开场龙头，此时位姿还不是起飞位姿。
+        private bool _routeOffsetResolved;
+        private bool _routeOffsetValid;
+        private Vector3 _routeOrigin;
+        private Vector3 _routeRefPos;
+        private float _routeYawOffset;
+
+        private bool TryResolveRouteOffset()
+        {
+            if (_routeOffsetResolved) return true;
+            if (_director == null) return false;
+
+            var t = _director.GetType();
+            var fReady = t.GetField("_routeOffsetReady",
+                System.Reflection.BindingFlags.NonPublic
+                | System.Reflection.BindingFlags.Instance);
+            if (fReady == null)
+            {
+                // 旧版总控没有路线偏移 → 直接按原始坐标撒
+                _routeOffsetResolved = true;
+                return true;
+            }
+            if (!(bool)fReady.GetValue(_director)) return false;   // 还没起飞
+
+            var fOrigin = t.GetField("_routeOrigin",
+                System.Reflection.BindingFlags.NonPublic
+                | System.Reflection.BindingFlags.Instance);
+            var fRef = t.GetField("_routeRefPos",
+                System.Reflection.BindingFlags.NonPublic
+                | System.Reflection.BindingFlags.Instance);
+            var fYaw = t.GetField("_routeYawOffset",
+                System.Reflection.BindingFlags.NonPublic
+                | System.Reflection.BindingFlags.Instance);
+            if (fOrigin == null || fRef == null || fYaw == null)
+            {
+                _routeOffsetResolved = true;
+                return true;
+            }
+
+            _routeOrigin = (Vector3)fOrigin.GetValue(_director);
+            _routeRefPos = (Vector3)fRef.GetValue(_director);
+            _routeYawOffset = (float)fYaw.GetValue(_director);
+            _routeOffsetValid = true;
+            _routeOffsetResolved = true;
+            Debug.Log($"[Cloud] 预撒套用路线偏移：起点 {_routeOrigin:F1}，" +
+                      $"yaw 偏移 {_routeYawOffset:F1}°", this);
+            return true;
+        }
+
+        /// <summary>把 K 帧表的原始坐标映射到实际飞行世界坐标。</summary>
+        private Vector3 RouteToWorld(Vector3 raw)
+        {
+            if (!_routeOffsetValid) return raw;
+            return _routeOrigin
+                 + Quaternion.Euler(0f, _routeYawOffset, 0f) * (raw - _routeRefPos);
+        }
+
+        /// <summary>
+        /// 一次性预撒：近景云沿全轨迹按弧长排布 + 远景天际线云。
+        /// 需要飞行总控才能拿到 K 帧轨迹，找不到就下一帧再试（不要直接放弃）。
+        /// </summary>
+        private void TryPreWarm()
+        {
+            if (_prewarmed || _system == null) return;
+            if (_director == null)
+                _director = FindFirstObjectByType<FlightDirector>(FindObjectsInactive.Include);
+            if (_director == null) return;
+
+            // ★ Play 中必须等飞行总控捕获「路线原点」后再撒（见上面说明）；
+            //   编辑模式预览没有起飞流程，按原始坐标撒即可。
+            if (Application.isPlaying && !TryResolveRouteOffset()) return;
+
+            _prewarmed = true;
+            // ★ 近景云按「飞行进度」加权铺开，而不是均匀铺：
+            //   p = u^0.45 会把采样压向后段（前段疏、后段密）；
+            //   再额外把 30% 的团压在最后 12% 进度上，形成黑场前的云墙。
+            int wallCount = Mathf.RoundToInt(PreWarmClouds * 0.3f);
+            int spreadCount = Mathf.Max(0, PreWarmClouds - wallCount);
+            for (int i = 0; i < spreadCount; i++)
+            {
+                float p = Mathf.Pow((float)_random.NextDouble(), 0.45f);
+                EmitCloudAtProgress(p, 6f, SpawnRadius * 0.5f);
+            }
+            for (int i = 0; i < wallCount; i++)
+            {
+                float p = Mathf.Lerp(0.88f, 1f, (float)_random.NextDouble());
+                // 云墙贴得近一些，并延伸过终点 ~60m：黑场那一刻相机是在云里，
+                // 而不是刚好穿出云层。全部在进入段落时一次性铺好，之后不再生成。
+                float ahead = Mathf.Lerp(0f, 60f, (float)_random.NextDouble());
+                EmitCloudAtProgress(p, 2f, SpawnRadius * 0.28f, ahead);
+            }
+            // ★ 收尾云墙（加厚）：原来"冲进云里"靠 Ending 阶段每 0.08s 在相机前
+            //   实时喷云，会在黑场前瞬间冒出一大片。现在把同样的云量提前摆在
+            //   最后 14% 轨迹 + 终点之外 80m 的空间里，飞行中不再生成任何粒子。
+            int wrapWall = Mathf.Max(0, EndingWallCount);
+            for (int i = 0; i < wrapWall; i++)
+            {
+                float p = Mathf.Lerp(0.85f, 1f, (float)_random.NextDouble());
+                float ahead = Mathf.Lerp(0f, Mathf.Max(0f, EndingWallForward),
+                                         Mathf.Pow((float)_random.NextDouble(), 0.8f));
+                EmitCloudAtProgress(p, 0f, SpawnRadius * 0.45f, ahead, EndingWallSizeMul);
+            }
+            // ★ 远景天际线云：外围环带大尺寸云团，
+            //   消除"只有玩家周围有云、远处天空空荡"的出戏感
+            if (DistantCloudCount > 0)
+            {
+                if (_distantSystem != null && !_distantSystem.isPlaying) _distantSystem.Play();
+                for (int i = 0; i < DistantCloudCount; i++)
+                {
+                    EmitCloud(1, spreadAcrossTrack: true, distant: true);
+                }
+            }
+            if (PreWarmClouds > 0 || DistantCloudCount > 0)
+            {
+                Debug.Log($"[Cloud] ✅ 预撒近景 {PreWarmClouds} 团 + 远景 " +
+                          $"{DistantCloudCount} 团（近景粒子={_system.particleCount} " +
+                          $"远景粒子={(_distantSystem != null ? _distantSystem.particleCount : -1)}）", this);
+            }
+        }
+
+        /// <summary>
+        /// 在指定【飞行进度】处撒一团云。预撒专用：可按进度精确控制密度分布
+        /// （EmitCloud 内部是随机取弧长点，做不出"前疏后密"）。
+        /// </summary>
+        private void EmitCloudAtProgress(float p, float lateralMin, float lateralMax,
+                                         float forwardOffset = 0f, float sizeMul = 1f)
+        {
+            if (_arcPoints == null || _arcPoints.Count == 0) BuildArcPoints();
+            if (_arcPoints == null || _arcPoints.Count == 0) return;
+
+            int idx = Mathf.Clamp(
+                Mathf.RoundToInt(Mathf.Clamp01(p) * (_arcPoints.Count - 1)),
+                0, _arcPoints.Count - 1);
+            Vector3 basePos = _arcPoints[idx];
+            if (forwardOffset != 0f)
+            {
+                // 沿末段切线往前铺：收尾云墙要盖住轨迹终点之外，
+                // 否则龙会在黑场前几秒「飞出云层」、前方只剩晴空。
+                int prev = Mathf.Max(0, idx - 1);
+                Vector3 tan = basePos - _arcPoints[prev];
+                tan.y = 0f;
+                if (tan.sqrMagnitude < 0.0001f) tan = Vector3.forward;
+                basePos += tan.normalized * forwardOffset;
+            }
+
+            float ang = (float)_random.NextDouble() * Mathf.PI * 2f;
+            float dist = Mathf.Lerp(lateralMin, lateralMax, (float)_random.NextDouble());
+            float h = Mathf.Lerp(HeightRangeMin, HeightRangeMax, (float)_random.NextDouble());
+            Vector3 center = basePos + new Vector3(
+                Mathf.Cos(ang) * dist, h, Mathf.Sin(ang) * dist);
+
+            float clusterR = CloudSize * 0.30f;
+            Color col = new Color(1f, 1f, 1f, CloudOpacity);
+            for (int i = 0; i < ParticlesPerCloud; i++)
+            {
+                float rr = clusterR * Mathf.Pow((float)_random.NextDouble(), 0.5f);
+                float a = (float)_random.NextDouble() * Mathf.PI * 2f;
+                float b = Mathf.Acos(2f * (float)_random.NextDouble() - 1f);
+                Vector3 off = new Vector3(
+                    rr * Mathf.Sin(b) * Mathf.Cos(a),
+                    rr * Mathf.Cos(b) * 0.55f,
+                    rr * Mathf.Sin(b) * Mathf.Sin(a));
+
+                _system.Emit(new ParticleSystem.EmitParams
+                {
+                    position = center + off,
+                    startSize = CloudSize * sizeMul
+                              * Mathf.Lerp(0.55f, 1f, (float)_random.NextDouble()),
+                    startColor = col,
+                    applyShapeToPosition = false
+                }, 1);
+            }
+        }
 
         /// <summary>
         /// ★ 弧长均匀采样点缓存：沿 K 帧表每 PreWarmArcStep 米取一个点。
@@ -553,7 +860,7 @@ namespace Greatwall.Flight
             float total = Mathf.Max(0.01f, _director.Keyframes.totalTime);
             float step = Mathf.Max(5f, PreWarmArcStep);
             float acc = step;   // 强制首点附近也有一个
-            _arcPoints.Add(frames[0].pos);
+            _arcPoints.Add(RouteToWorld(frames[0].pos));
             _arcProgress.Add(frames[0].time / total);
             for (int i = 1; i < frames.Count; i++)
             {
@@ -561,7 +868,7 @@ namespace Greatwall.Flight
                                                     frames[i].pos);
                 if (acc >= step)
                 {
-                    _arcPoints.Add(frames[i].pos);
+                    _arcPoints.Add(RouteToWorld(frames[i].pos));
                     _arcProgress.Add(frames[i].time / total);
                     acc = 0f;
                 }
@@ -646,6 +953,11 @@ namespace Greatwall.Flight
         /// </summary>
         private void HandleCloudSea()
         {
+            // ★ 纯预撒模式：云海也不实时生成。滚动云海是在龙前方 119m 处
+            //   一次次凭空 Emit 出来的（0.35s 一批），在后半段看起来就是
+            //   「云在眼前浮现」；收尾的云墙改由预撒铺好（见 TryPreWarm）。
+            if (DisableRuntimeSpawn) return;
+
             if (!EnableCloudSea || _system == null || _director == null)
             {
                 return;
@@ -792,6 +1104,12 @@ namespace Greatwall.Flight
         /// </summary>
         private void HandleAmbientClouds()
         {
+            // ★ 默认关闭实时补云：云雾完全由「预撒」铺好。
+            //   预撒的云在玩家到达之前就已经在空间里固定位置，
+            //   没有任何「生成过程」，因此不可能在眼前突现；
+            //   代价是云的分布是固定的，不会随飞行随机变化。
+            if (DisableRuntimeSpawn) return;
+
             _spawnTimer += Time.deltaTime;
             if (_spawnTimer < SpawnInterval) return;
             _spawnTimer = 0f;
@@ -828,6 +1146,9 @@ namespace Greatwall.Flight
                 case FlightPhase.TakeOff: return TakeOffDensity;
                 case FlightPhase.Orbit: return OrbitDensity;
                 case FlightPhase.Departure: return DepartureDensity;
+                // ★ 黑场前的收尾段也要继续补云：之前 Ending 返回 0，
+                //   预撒云被穿过之后最后几秒附近一片空白。
+                case FlightPhase.Ending: return DepartureDensity;
                 default: return 0f;
             }
         }
@@ -936,7 +1257,7 @@ namespace Greatwall.Flight
                         Vector3 tp; float tyaw, troll;
                         _director.Keyframes.Sample(at, out tp, out tyaw,
                                                    out troll);
-                        basePos = tp;
+                        basePos = RouteToWorld(tp);
                         }
 
                         // 近景：高度带=相对轨迹的绝对高度偏移（Inspector 可调），
@@ -965,6 +1286,22 @@ namespace Greatwall.Flight
                         Mathf.Lerp(HeightRangeMin, HeightRangeMax,
                                    (float)_random.NextDouble()),
                         radius * Mathf.Sin(phi) * Mathf.Sin(theta));
+                }
+
+                // ★ 太近的云会在眼前「凭空冒出来」：
+                //   环境云原来的横向偏移是 Lerp(6, SpawnRadius*0.5) → 最近只有 6m，
+                //   等于在镜头前生成一团 38m 的云。这里把团心推到最小距离之外，
+                //   近处只保留预撒时就已经在那里的云（玩家是「飞进去」而不是「冒出来」）。
+                if (!distant)
+                {
+                    var cam = Camera.main;
+                    Vector3 from = cam != null
+                        ? cam.transform.position
+                        : (FlightCenter != null ? FlightCenter.position : transform.position);
+                    Vector3 dd = center - from;
+                    float len = dd.magnitude;
+                    if (len > 0.01f && len < MinSpawnDistance)
+                        center = from + dd / len * MinSpawnDistance;
                 }
 
                 // ★ 团内粒子：围绕团中心，30% 半径内分布（pow 让中心更密），
