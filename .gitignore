@@ -76,3 +76,17 @@ crashlytics-build.properties
 # Temporary auto-generated Android Assets
 /[Aa]ssets/[Ss]treamingAssets/aa.meta
 /[Aa]ssets/[Ss]treamingAssets/aa/*
+
+# ---- 本地调试 / 测试产物（2026-10-28 清理时补充，勿提交）----
+# Unity 截图工具与临时抓图
+/Assets/Screenshots/
+/Assets/Screenshots.meta
+# Unity 崩溃转储（单个可达数十 MB）
+mono_crash*.blob
+*.blob
+# Unity MCP 桥接调试包（manifest 已指向 git 源，本地 embedded 副本不入库）
+/Packages/MCPForUnity/
+/Packages/MCPForUnity.meta
+# 编辑器临时备份文件（编辑器崩溃/覆盖保存产生）
+*.md2*
+*~
