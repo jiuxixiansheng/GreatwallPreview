@@ -746,7 +746,9 @@ namespace Greatwall.Flight
             // ★ 近景云按「飞行进度」加权铺开，而不是均匀铺：
             //   p = u^0.45 会把采样压向后段（前段疏、后段密）；
             //   再额外把 30% 的团压在最后 12% 进度上，形成黑场前的云墙。
-            int wallCount = Mathf.RoundToInt(PreWarmClouds * 0.3f);
+            // 末段轻云（原 30% → 15%）：只在最后 10% 铺一层薄的，
+            // 真正的「遮盖视野」交给下面的收尾云墙，避免两处叠加导致后段过密。
+            int wallCount = Mathf.RoundToInt(PreWarmClouds * 0.15f);
             int spreadCount = Mathf.Max(0, PreWarmClouds - wallCount);
             for (int i = 0; i < spreadCount; i++)
             {
@@ -755,10 +757,10 @@ namespace Greatwall.Flight
             }
             for (int i = 0; i < wallCount; i++)
             {
-                float p = Mathf.Lerp(0.88f, 1f, (float)_random.NextDouble());
-                // 云墙贴得近一些，并延伸过终点 ~60m：黑场那一刻相机是在云里，
+                float p = Mathf.Lerp(0.90f, 1f, (float)_random.NextDouble());
+                // 云墙贴得近一些，并延伸过终点 ~40m：黑场那一刻相机是在云里，
                 // 而不是刚好穿出云层。全部在进入段落时一次性铺好，之后不再生成。
-                float ahead = Mathf.Lerp(0f, 60f, (float)_random.NextDouble());
+                float ahead = Mathf.Lerp(0f, 40f, (float)_random.NextDouble());
                 EmitCloudAtProgress(p, 2f, SpawnRadius * 0.28f, ahead);
             }
             // ★ 收尾云墙（加厚）：原来"冲进云里"靠 Ending 阶段每 0.08s 在相机前

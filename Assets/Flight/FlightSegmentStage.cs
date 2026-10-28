@@ -91,6 +91,15 @@ namespace Greatwall.Flight
         [Tooltip("云雾整体不透明度覆盖。")]
         public float CloudOpacity = 0.62f;
 
+        [Tooltip("收尾云墙团数：只负责黑场前那一小段把视野盖住，多了会白白增加后段开销。")]
+        public int CloudEndingWallCount = 45;
+
+        [Tooltip("收尾云墙越过终点向前延伸的距离（米）。")]
+        public float CloudEndingWallForward = 45f;
+
+        [Tooltip("收尾云墙的尺寸倍率（团数少时可调大以保持遮盖力）。")]
+        public float CloudEndingWallSizeMul = 1.6f;
+
         private const string OpeningDragonResource = "OpeningDragon";
 
         // part 显隐是演出流程（CommandTerminal.ZhuanChang01/02/03）驱动的，不由章节驱动：
@@ -376,6 +385,9 @@ namespace Greatwall.Flight
             if (CloudMinSpawnDistance > 0f) spawner.MinSpawnDistance = CloudMinSpawnDistance;
             if (CloudSpawnInterval > 0f) spawner.SpawnInterval = CloudSpawnInterval;
             if (CloudOpacity > 0f) spawner.CloudOpacity = CloudOpacity;
+            if (CloudEndingWallCount > 0) spawner.EndingWallCount = CloudEndingWallCount;
+            if (CloudEndingWallForward > 0f) spawner.EndingWallForward = CloudEndingWallForward;
+            if (CloudEndingWallSizeMul > 0f) spawner.EndingWallSizeMul = CloudEndingWallSizeMul;
         }
 
         // ---------------- XR Device Simulator ----------------
