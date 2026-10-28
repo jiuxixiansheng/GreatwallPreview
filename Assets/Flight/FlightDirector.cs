@@ -331,7 +331,7 @@ namespace Greatwall.Flight
         public float CurrentProgress => _localProgress;
 
         public FlightPhase CurrentPhase =>
-            (StandaloneMode && !HasNetwork) ? _localPhase : (FlightPhase)NetPhase;
+            LocalSolo ? _localPhase : (FlightPhase)NetPhase;
 
         private void Awake()
         {
@@ -385,7 +385,7 @@ namespace Greatwall.Flight
         private void Update()
         {
             // 单机模式：没有网络时也推进飞行（预览用）
-            bool authority = isServer || (StandaloneMode && !HasNetwork);
+            bool authority = IsLocalAuthority;
 
             if (authority)
             {
@@ -416,6 +416,16 @@ namespace Greatwall.Flight
                 return nm != null && nm.isNetworkActive;
             }
         }
+
+        /// <summary>
+        /// 单机式推进：没有网络会话，或者骑龙的 NetworkIdentity 没有作为场景
+        /// 同步对象注册（netId==0，联机框架下这是默认状态）。此时 Command 会被
+        /// 静默丢弃，必须由本机自己跑完整段体验。
+        /// </summary>
+        private bool LocalSolo => StandaloneMode && (!HasNetwork || netId == 0);
+
+        /// <summary>本机是否负责推进飞行状态机</summary>
+        private bool IsLocalAuthority => isServer || LocalSolo;
 
         /// <summary>
         /// 服务器：推进阶段与龙的运动。全场唯一的真相来源。
@@ -977,7 +987,10 @@ namespace Greatwall.Flight
         /// </summary>
         public void ReportSeated()
         {
-            if (isServer || (StandaloneMode && !HasNetwork))
+            // ★ netId == 0：骑龙的 NetworkIdentity 没有作为场景同步对象注册
+            //   （团队 10-27 联机版的默认状态）。这时 Command 会被静默丢弃，
+            //   段落永远停在 WaitingForPlayers，必须在本地直接起飞。
+            if (IsLocalAuthority)
             {
                 TryLaunch();
             }
@@ -1019,7 +1032,7 @@ namespace Greatwall.Flight
                 expected = 1;
             }
 
-            if (StandaloneMode && !HasNetwork)
+            if (LocalSolo)
             {
                 // 单机调试：不计人数，直接起飞
                 NetSeatedCount = 1;
@@ -1071,7 +1084,9 @@ namespace Greatwall.Flight
         /// </summary>
         public void ResetFlight()
         {
-            if (Application.isPlaying && !(isServer || (StandaloneMode && !HasNetwork)))
+            // netId == 0 与 ReportSeated 同理：未作为场景同步对象注册时没有服务器可言，
+            // 本机就是唯一的执行者。
+            if (Application.isPlaying && !IsLocalAuthority)
             {
                 Debug.LogWarning("[Flight] ResetFlight 仅服务器/单机可调。", this);
                 return;
@@ -1125,7 +1140,7 @@ namespace Greatwall.Flight
                 Debug.LogWarning("[Flight] 需在运行模式下使用。", this);
                 return;
             }
-            if (isServer || (StandaloneMode && !HasNetwork))
+            if (IsLocalAuthority)
             {
                 TryLaunch();
             }

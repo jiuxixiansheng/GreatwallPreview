@@ -102,6 +102,7 @@ namespace Greatwall.Flight
         private bool _started;
         private bool _everMounted;
         private DragonRideController _rider;
+        private bool _riderWarned;
         private XRDeviceSimulator _simulator;
         private bool _chapterResolved;
         private MonoBehaviour _chapterManager;
@@ -134,9 +135,7 @@ namespace Greatwall.Flight
                 return;
             }
 
-            if (_rider == null)
-                _rider = FindFirstObjectByType<DragonRideController>(FindObjectsInactive.Include);
-            if (_rider == null) return;
+            if (EnsureRider() == null) return;
 
             // 模拟器的 WASD 只挪「头显」，XR Origin 根不动。上龙前每帧把这段位移
             // 并进根（头显偏移始终≈0），否则攒到传送板前一次性并回会让眼睛跟着前移，
@@ -170,6 +169,56 @@ namespace Greatwall.Flight
         {
             if (RideDragon == null || !RideDragon.gameObject.activeSelf) return;
             RideDragon.gameObject.SetActive(false);
+        }
+
+        /// <summary>
+        /// 团队 10-27 联机版把玩家改成运行时生成的预制体（Mirror playerPrefab），
+        /// 场景里那份挂着 DragonRideController 的旧 XR Origin 被删掉了。
+        /// 这里在段落开始时给「本机玩家」补一个并接好座位/飞行总控，
+        /// 只影响本机镜头所在的 rig，远端玩家不会被瞬移。
+        /// </summary>
+        private DragonRideController EnsureRider()
+        {
+            if (_rider != null) return _rider;
+
+            Camera cam = Camera.main;
+            Transform rig = cam != null ? cam.transform.root : null;
+
+            // 优先认本机镜头所在的 rig，避免多人时误抓远端玩家的控制器
+            var rider = rig != null ? rig.GetComponent<DragonRideController>() : null;
+            if (rider == null) rider = FindFirstObjectByType<DragonRideController>(FindObjectsInactive.Include);
+            if (rider == null)
+            {
+                if (rig == null) return null;   // 玩家 rig 还没生成（联机 host/client 尚未就绪）
+                rider = rig.gameObject.AddComponent<DragonRideController>();
+            }
+
+            if (rider.SeatAnchor == null)
+            {
+                if (RideDragon != null) rider.SeatAnchor = RideDragon.GetComponentInChildren<DragonSeatAnchor>(true);
+                if (rider.SeatAnchor == null)
+                    rider.SeatAnchor = FindFirstObjectByType<DragonSeatAnchor>(FindObjectsInactive.Include);
+            }
+            if (rider.Director == null)
+            {
+                if (RideDragon != null) rider.Director = RideDragon.GetComponent<FlightDirector>();
+                if (rider.Director == null)
+                    rider.Director = FindFirstObjectByType<FlightDirector>(FindObjectsInactive.Include);
+            }
+
+            if (rider.SeatAnchor == null || rider.Director == null)
+            {
+                if (!_riderWarned)
+                {
+                    _riderWarned = true;
+                    Debug.LogWarning("[FlightStage] 玩家 rig 上补了 DragonRideController，但找不到 " +
+                                     "DragonSeatAnchor/FlightDirector，无法上龙。", this);
+                }
+                return null;
+            }
+
+            _rider = rider;
+            return _rider;
         }
 
         /// <summary>
