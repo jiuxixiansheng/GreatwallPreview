@@ -20,6 +20,7 @@ public class CommandTerminal : MonoBehaviour
 
     public void ZhuanChang01()
     {
+        if (NetworkGameplayCoordinator.IsApplyingSnapshot) return;
         EventDispatcher.Instance.Dispatch("zhuanchang");
 
         StartCoroutine(SwitchObjectAfterDelay(
@@ -31,6 +32,7 @@ public class CommandTerminal : MonoBehaviour
 
     public void ZhuanChang02()
     {
+        if (NetworkGameplayCoordinator.IsApplyingSnapshot) return;
         EventDispatcher.Instance.Dispatch("zhuanchang");
 
         StartCoroutine(SwitchObjectAfterDelay(
@@ -42,6 +44,7 @@ public class CommandTerminal : MonoBehaviour
 
     public void ZhuanChang03()
     {
+        if (NetworkGameplayCoordinator.IsApplyingSnapshot) return;
         EventDispatcher.Instance.Dispatch("zhuanchang");
 
         StartCoroutine(SwitchObjectAfterDelay(
@@ -53,6 +56,7 @@ public class CommandTerminal : MonoBehaviour
 
     public void ZhuanChang04(float time)
     {
+        if (NetworkGameplayCoordinator.IsApplyingSnapshot) return;
         EventDispatcher.Instance.Dispatch("小龙特效转场",time);
         EventDispatcher.Instance.Dispatch<float>("大龙特效转场", time);
     }
@@ -71,16 +75,19 @@ public class CommandTerminal : MonoBehaviour
 
     public void XiaolouAppear()
     {
+        if (NetworkGameplayCoordinator.IsApplyingSnapshot) return;
         EventDispatcher.Instance.Dispatch("修复小楼");
     }
 
     public void ChangeShadowState()
     {
+        if (NetworkGameplayCoordinator.IsApplyingSnapshot) return;
         EventDispatcher.Instance.Dispatch("切换阴影投射状态");
     }
 
     public void NextChapter()
     {
+        if (NetworkGameplayCoordinator.IsApplyingSnapshot) return;
         EventDispatcher.Instance.Dispatch("切换章节");
     }
 

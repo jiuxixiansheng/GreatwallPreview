@@ -12,9 +12,14 @@ public class EventDispatcher : MonoBehaviour
             if (_instance == null)
             {
                 // 自动创建一个管理器对象
-                var obj = new GameObject("EventDispatcher");
-                _instance = obj.AddComponent<EventDispatcher>();
-                DontDestroyOnLoad(obj);
+                _instance = FindFirstObjectByType<EventDispatcher>(FindObjectsInactive.Include);
+                if (_instance == null)
+                {
+                    var obj = new GameObject("EventDispatcher");
+                    _instance = obj.AddComponent<EventDispatcher>();
+                }
+                if (Application.isPlaying)
+                    DontDestroyOnLoad(_instance.gameObject);
             }
             return _instance;
         }

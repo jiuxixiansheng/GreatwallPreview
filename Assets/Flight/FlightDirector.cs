@@ -270,6 +270,16 @@ namespace Greatwall.Flight
         /// <summary>K 帧驱动的全局时间（秒）</summary>
         private float _keyTime;
 
+        // ★ 轨迹原点偏移：K 帧表里烘焙的是「设计时的绝对世界坐标」。
+        //   如果龙在起飞前被摆到了别处（例如盘悬浮段落把它放到城墙外），
+        //   直接按表采样会让龙在起飞瞬间瞬移回烘焙起点。
+        //   这里在起飞首帧记录「当前龙的位姿」作为轨迹原点，
+        //   把整条轨迹按同样的平移 + 偏航偏移搬过去，路线形状不变。
+        private bool _routeOffsetReady;
+        private Vector3 _routeOrigin;
+        private Vector3 _routeRefPos;
+        private float _routeYawOffset;
+
         /// <summary>
         /// 阶段时间节点。★ 直接读 K 帧表里烘焙好的值，不做按比例推算 ——
         /// 推算会在阶段时长调整后产生偏差。
@@ -321,7 +331,7 @@ namespace Greatwall.Flight
         public float CurrentProgress => _localProgress;
 
         public FlightPhase CurrentPhase =>
-            (StandaloneMode && !HasNetwork) ? _localPhase : (FlightPhase)NetPhase;
+            LocalSolo ? _localPhase : (FlightPhase)NetPhase;
 
         private void Awake()
         {
@@ -375,7 +385,7 @@ namespace Greatwall.Flight
         private void Update()
         {
             // 单机模式：没有网络时也推进飞行（预览用）
-            bool authority = isServer || (StandaloneMode && !HasNetwork);
+            bool authority = IsLocalAuthority;
 
             if (authority)
             {
@@ -406,6 +416,16 @@ namespace Greatwall.Flight
                 return nm != null && nm.isNetworkActive;
             }
         }
+
+        /// <summary>
+        /// 单机式推进：没有网络会话，或者骑龙的 NetworkIdentity 没有作为场景
+        /// 同步对象注册（netId==0，联机框架下这是默认状态）。此时 Command 会被
+        /// 静默丢弃，必须由本机自己跑完整段体验。
+        /// </summary>
+        private bool LocalSolo => StandaloneMode && (!HasNetwork || netId == 0);
+
+        /// <summary>本机是否负责推进飞行状态机</summary>
+        private bool IsLocalAuthority => isServer || LocalSolo;
 
         /// <summary>
         /// 服务器：推进阶段与龙的运动。全场唯一的真相来源。
@@ -506,9 +526,29 @@ namespace Greatwall.Flight
                 _keyTime = Keyframes.totalTime;
             }
 
+            // 起飞首帧：记录当前位姿作为轨迹原点（只在第一次生效）
+            if (!_routeOffsetReady && Keyframes.frames != null && Keyframes.frames.Count > 0)
+            {
+                _routeOffsetReady = true;
+                _routeRefPos = Keyframes.frames[0].pos;
+                _routeOrigin = transform.position;
+                _routeYawOffset = Mathf.DeltaAngle(Keyframes.frames[0].yaw, transform.eulerAngles.y);
+                if (_routeOrigin != _routeRefPos || Mathf.Abs(_routeYawOffset) > 0.01f)
+                {
+                    Debug.Log($"[Flight] 轨迹原点已对齐到当前龙位姿 {_routeOrigin:F1}，yaw 偏移 {_routeYawOffset:F1}°", this);
+                }
+            }
+
             Vector3 pos;
             float yaw, roll, pitch;
             Keyframes.SampleFull(_keyTime, out pos, out yaw, out pitch, out roll);
+
+            // 把绝对坐标的 K 帧搬到当前起点（平移 + 偏航）
+            if (_routeOffsetReady)
+            {
+                pos = _routeOrigin + Quaternion.Euler(0f, _routeYawOffset, 0f) * (pos - _routeRefPos);
+                yaw += _routeYawOffset;
+            }
 
             // ★ 关键：K 帧表的坐标是「烘焙时龙根节点的世界位置」。
             //   龙根节点下方有模型偏移（SKM_Dragon 在本地 (0, 7.19, 24.53)），
@@ -947,7 +987,10 @@ namespace Greatwall.Flight
         /// </summary>
         public void ReportSeated()
         {
-            if (isServer || (StandaloneMode && !HasNetwork))
+            // ★ netId == 0：骑龙的 NetworkIdentity 没有作为场景同步对象注册
+            //   （团队 10-27 联机版的默认状态）。这时 Command 会被静默丢弃，
+            //   段落永远停在 WaitingForPlayers，必须在本地直接起飞。
+            if (IsLocalAuthority)
             {
                 TryLaunch();
             }
@@ -989,7 +1032,7 @@ namespace Greatwall.Flight
                 expected = 1;
             }
 
-            if (StandaloneMode && !HasNetwork)
+            if (LocalSolo)
             {
                 // 单机调试：不计人数，直接起飞
                 NetSeatedCount = 1;
@@ -1020,6 +1063,7 @@ namespace Greatwall.Flight
             _phaseStartPos = GetVisualCenter();
             _takeOffForward = transform.forward;
             _keyTime = 0f;
+            _routeOffsetReady = false;   // 以当前龙位姿重新取轨迹原点
             // ★ 平滑 pitch 同步到轨迹起点俯仰角，避免复位后残余追赶
             if (Keyframes != null && Keyframes.frames != null
                 && Keyframes.frames.Count > 0)
@@ -1040,7 +1084,9 @@ namespace Greatwall.Flight
         /// </summary>
         public void ResetFlight()
         {
-            if (Application.isPlaying && !(isServer || (StandaloneMode && !HasNetwork)))
+            // netId == 0 与 ReportSeated 同理：未作为场景同步对象注册时没有服务器可言，
+            // 本机就是唯一的执行者。
+            if (Application.isPlaying && !IsLocalAuthority)
             {
                 Debug.LogWarning("[Flight] ResetFlight 仅服务器/单机可调。", this);
                 return;
@@ -1058,10 +1104,18 @@ namespace Greatwall.Flight
                 && Keyframes.frames.Count > 0)
             {
                 var f0 = Keyframes.frames[0];
-                SetPositionWithCenterOffset(f0.pos);
+                Vector3 startPos = f0.pos;
+                float startYaw = f0.yaw;
+                if (_routeOffsetReady)
+                {
+                    startPos = _routeOrigin + Quaternion.Euler(0f, _routeYawOffset, 0f) * (f0.pos - _routeRefPos);
+                    startYaw = f0.yaw + _routeYawOffset;
+                }
+                SetPositionWithCenterOffset(startPos);
                 transform.rotation = Quaternion.Euler(
-                    0f, f0.yaw - ModelYawOffset, 0f);
-                FlightYaw = f0.yaw;
+                    0f, startYaw - ModelYawOffset, 0f);
+                FlightYaw = startYaw;
+                _routeOffsetReady = false;
             }
 
             // 骨骼动画对时归零
@@ -1086,7 +1140,7 @@ namespace Greatwall.Flight
                 Debug.LogWarning("[Flight] 需在运行模式下使用。", this);
                 return;
             }
-            if (isServer || (StandaloneMode && !HasNetwork))
+            if (IsLocalAuthority)
             {
                 TryLaunch();
             }
