@@ -74,10 +74,20 @@ namespace Greatwall.VRAnimation.Timeline
             if (!isNetworkPlayerBody && !isXRPlayerBody && !isXRPlayerHead)
                 return;
 
+            BeginListening();
+        }
+
+        /// <summary>
+        /// 供其他玩家检测脚本或 Inspector 的 UnityEvent 调用。
+        /// 与碰撞盒检测共用一次性注册及完成后锁定逻辑。
+        /// </summary>
+        public void BeginListening()
+        {
+            if (!Application.isPlaying || !isActiveAndEnabled || completed || waitingForRepair) return;
             if (!RegisterListener()) return;
+
             waitingForRepair = true;
-            Debug.Log($"[CrackRepairTrigger] 玩家进入（{other.name} / {other.GetType().Name}），" +
-                      "已开始监听裂缝修复完成。", this);
+            Debug.Log("[CrackRepairTrigger] 已开始监听裂缝修复完成。", this);
         }
 
         private bool RegisterListener()
