@@ -12,7 +12,6 @@ namespace Greatwall.VRAnimation.Timeline
         public float stateCrossFadeSeconds = 0.2f;
         public float layerFadeSeconds = 0.25f;
         public float referenceAnimationLength = 0f;
-        public bool followAnimatorSpeed;
 
         private bool triggered;
         private CharacterTimelineAnimator controller;
@@ -67,12 +66,13 @@ namespace Greatwall.VRAnimation.Timeline
                 triggered = true;
             }
 
-            if (!followAnimatorSpeed && referenceAnimationLength > 0f)
+            // 运行时只在片段开始时指定起播位置（包含 Clip In）。
+            // 后续由 Animator 的状态速度/Speed 参数推进，不能每帧用 Timeline
+            // 时间强制采样，否则会覆盖移动速度同步，并打断 CrossFade。
+            // 编辑模式保留采样，用于拖动 Timeline 预览。
+            if (!Application.isPlaying && referenceAnimationLength > 0f)
             {
-                float normalizedTime =
-                    Mathf.Repeat(localTime, referenceAnimationLength)
-                    / referenceAnimationLength;
-
+                float normalizedTime = Mathf.Repeat(localTime, referenceAnimationLength) / referenceAnimationLength;
                 controller.SampleBodyState(statePath, normalizedTime);
             }
         }
@@ -86,7 +86,7 @@ namespace Greatwall.VRAnimation.Timeline
             {
                 if (controller != null && command == BodyActionCommand.PlayState)
                 {
-                    controller.ReleaseBodyAction(layerFadeSeconds);
+                    controller.ReleaseBodyAction(layerFadeSeconds, statePath);
                 }
 
                 triggered = false;
