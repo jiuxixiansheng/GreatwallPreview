@@ -35,14 +35,18 @@ public class NetworkMainMenu : MonoBehaviour
     // 点击“作为服务器启动”时执行
     private void OnServerClicked()
     {
-        ConnectionManager.singleton.InitializeAsServer(5678);
+        string ip; ushort port;
+        if (!NetworkFileSettings.TryLoad(out ip, out port)) return;
+        ConnectionManager.singleton.InitializeAsServer(port);
         SceneManager.LoadScene(1);
     }
 
     // 点击“作为客户端连接”时执行
     private void OnClientClicked()
     {
-        ConnectionManager.singleton.InitializeAsClient("192.168.31.12", 5678);
+        string ip; ushort port;
+        if (!NetworkFileSettings.TryLoad(out ip, out port)) return;
+        ConnectionManager.singleton.InitializeAsClient(ip, port);
         SceneManager.LoadScene(1);
     }
 

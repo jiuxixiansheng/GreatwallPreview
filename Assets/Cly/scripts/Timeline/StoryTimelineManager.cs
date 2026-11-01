@@ -23,6 +23,9 @@ namespace Greatwall.VRAnimation.Timeline
         public PlayableDirector director;
         public GameObject sceneRoot;
         public Transform characterSpawnPoint;
+
+        [Tooltip("勾选时本章节显示小龙，取消勾选时隐藏 Dragon_root。")]
+        public bool showDragon = true;
     }
 
     [DisallowMultipleComponent]
@@ -101,6 +104,7 @@ namespace Greatwall.VRAnimation.Timeline
         private void Start()
         {
             if (NetworkGameplayCoordinator.IsManaged) return;
+            ApplyCharacterVisibility(currentChapterIndex);
             SubscribeToChapterCompletionEvents();
 
             if (playStartingChapterOnStart && chapters.Count > 0)
@@ -249,6 +253,7 @@ namespace Greatwall.VRAnimation.Timeline
             }
 
             currentChapterIndex = pendingChapterIndex;
+            ApplyCharacterVisibility(currentChapterIndex);
             pendingChapterIndex = -1;
 
             if (waitForBlackScreenHold && blackScreenHoldSeconds > 0f)
@@ -318,6 +323,27 @@ namespace Greatwall.VRAnimation.Timeline
 
             ActivateOnlyChapterSceneRoot(chapterIndex);
             PlaceCharacterAt(chapter.characterSpawnPoint);
+            ApplyCharacterVisibility(chapterIndex);
+        }
+
+        private void ApplyCharacterVisibility(int chapterIndex)
+        {
+            var chapter = GetChapter(chapterIndex);
+            if (chapter == null) return;
+            GameObject root = characterAgent != null ? characterAgent.gameObject : null;
+            if (root == null)
+            {
+                foreach (var candidate in Resources.FindObjectsOfTypeAll<GameObject>())
+                {
+                    if (candidate.name == "Dragon_root" && candidate.scene == gameObject.scene)
+                    {
+                        root = candidate;
+                        break;
+                    }
+                }
+            }
+            if (root != null && root.activeSelf != chapter.showDragon)
+                root.SetActive(chapter.showDragon);
         }
 
         private void PauseCurrentChapterAnimationAndAudio()
