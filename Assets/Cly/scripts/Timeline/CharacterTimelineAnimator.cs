@@ -24,6 +24,8 @@ namespace Greatwall.VRAnimation.Timeline
         [SerializeField] private BodyLayerControlMode bodyLayerControlMode = BodyLayerControlMode.SeparateActionLayer;
         [SerializeField] private int bodyActionLayerIndex = 1;
         [SerializeField] private int faceLayerIndex = 2;
+        [Tooltip("新增的上半身 Override 层序号，从 0 开始计数。请按实际 Animator Layers 顺序填写，不要与身体或面部层重复。")]
+        [SerializeField] private int upperBodyLayerIndex = -1;
         [Tooltip("单身体层模式下，Release To Base Layer 命令要返回的完整状态路径。")]
         [SerializeField] private string singleLayerIdleStatePath = "Base Layer.Idle";
         [SerializeField] private bool resetBodyActionLayerOnAwake = true;
@@ -32,6 +34,9 @@ namespace Greatwall.VRAnimation.Timeline
         [SerializeField, Min(0f)] private float defaultBodyLayerFadeSeconds = 0.25f;
 
         private Coroutine bodyLayerFadeRoutine;
+        private Coroutine upperBodyLayerFadeRoutine;
+        private int requestedBodyStateHash;
+        private double bodyCrossFadeEndsAt;
 
         private void Reset()
         {
@@ -48,6 +53,98 @@ namespace Greatwall.VRAnimation.Timeline
             {
                 animator.SetLayerWeight(bodyActionLayerIndex, 0f);
             }
+
+            if (IsValidUpperBodyLayer())
+                animator.SetLayerWeight(upperBodyLayerIndex, 0f);
+        }
+
+        // 上半身状态的 Speed 使用固定值 1，不绑定 MoveAnimationSpeed 等移动倍率参数。
+        // 此接口不修改 Animator.speed，也不修改身体层的移动速度参数。
+        public void PlayUpperBodyState(
+            string fullStatePath, float crossFadeSeconds, float layerFadeSeconds,
+            float stateStartTimeSeconds = 0f)
+        {
+            if (!ValidateUpperBodyLayer() ||
+                !TryGetStateHash(upperBodyLayerIndex, fullStatePath, out int stateHash)) return;
+
+            animator.CrossFadeInFixedTime(
+                stateHash, Mathf.Max(0f, crossFadeSeconds), upperBodyLayerIndex,
+                Mathf.Max(0f, stateStartTimeSeconds));
+            LogUpperBodyStatus($"开始播放 {fullStatePath}，起播秒数={stateStartTimeSeconds:F2}");
+            FadeUpperBodyLayer(1f, Mathf.Max(0f, layerFadeSeconds));
+        }
+
+        // 由上半身轨道混合器在空白、停止或结束时调用。
+        public void ReleaseUpperBody(float layerFadeSeconds)
+        {
+            if (ValidateUpperBodyLayer())
+                FadeUpperBodyLayer(0f, Mathf.Max(0f, layerFadeSeconds));
+        }
+
+        private bool IsValidUpperBodyLayer()
+        {
+            return IsValidLayer(upperBodyLayerIndex) &&
+                   upperBodyLayerIndex > bodyActionLayerIndex &&
+                   upperBodyLayerIndex != faceLayerIndex;
+        }
+
+        private bool ValidateUpperBodyLayer()
+        {
+            if (IsValidUpperBodyLayer()) return true;
+            Debug.LogError(
+                "CharacterTimelineAnimator: 请设置 Upper Body Layer Index。上半身层必须位于身体层之后，且不能与 Face Layer 重复。", this);
+            return false;
+        }
+
+        private void FadeUpperBodyLayer(float targetWeight, float seconds)
+        {
+            if (upperBodyLayerFadeRoutine != null)
+            {
+                StopCoroutine(upperBodyLayerFadeRoutine);
+                upperBodyLayerFadeRoutine = null;
+            }
+
+            if (seconds <= 0f || !isActiveAndEnabled)
+            {
+                animator.SetLayerWeight(upperBodyLayerIndex, targetWeight);
+                LogUpperBodyStatus($"权重设置完成，目标={targetWeight:F2}");
+                return;
+            }
+
+            upperBodyLayerFadeRoutine = StartCoroutine(FadeUpperBodyLayerRoutine(targetWeight, seconds));
+        }
+
+        private IEnumerator FadeUpperBodyLayerRoutine(float targetWeight, float seconds)
+        {
+            float startWeight = animator.GetLayerWeight(upperBodyLayerIndex);
+            float elapsed = 0f;
+            while (elapsed < seconds)
+            {
+                elapsed += Time.deltaTime;
+                animator.SetLayerWeight(upperBodyLayerIndex,
+                    Mathf.Lerp(startWeight, targetWeight, Mathf.Clamp01(elapsed / seconds)));
+                yield return null;
+            }
+
+            animator.SetLayerWeight(upperBodyLayerIndex, targetWeight);
+            LogUpperBodyStatus($"淡入/淡出完成，目标={targetWeight:F2}");
+            upperBodyLayerFadeRoutine = null;
+        }
+
+        // 临时诊断：只在编辑器记录开始和淡变结束，不逐帧刷日志，不进入设备构建。
+        [System.Diagnostics.Conditional("UNITY_EDITOR")]
+        private void LogUpperBodyStatus(string message)
+        {
+            if (!IsValidUpperBodyLayer()) return;
+            AnimatorStateInfo state = animator.GetCurrentAnimatorStateInfo(upperBodyLayerIndex);
+            AnimatorStateInfo next = animator.GetNextAnimatorStateInfo(upperBodyLayerIndex);
+            Debug.Log(
+                $"[UpperBody诊断] {message}；角色={name}；Animator={animator.name}；" +
+                $"层={upperBodyLayerIndex}:{animator.GetLayerName(upperBodyLayerIndex)}；" +
+                $"实际权重={animator.GetLayerWeight(upperBodyLayerIndex):F2}；" +
+                $"Animator全局速度={animator.speed:F2}；状态Speed={state.speed:F2}；" +
+                $"状态速度倍率={state.speedMultiplier:F2}；过渡中={animator.IsInTransition(upperBodyLayerIndex)}；" +
+                $"下一状态速度倍率={next.speedMultiplier:F2}", this);
         }
 
         public void PlayBodyState(
@@ -61,6 +158,9 @@ namespace Greatwall.VRAnimation.Timeline
             if (bodyLayerControlMode == BodyLayerControlMode.SeparateActionLayer)
                 FadeBodyActionLayer(1f, ResolveFadeSeconds(layerFadeSeconds));
 
+            requestedBodyStateHash = stateHash;
+            // CrossFade 的请求帧中 IsInTransition 可能尚未更新，因此同时保护这段时间。
+            bodyCrossFadeEndsAt = Time.timeAsDouble + Mathf.Max(0f, crossFadeSeconds);
             animator.CrossFadeInFixedTime(
                 stateHash,
                 Mathf.Max(0f, crossFadeSeconds),
@@ -68,8 +168,12 @@ namespace Greatwall.VRAnimation.Timeline
                 Mathf.Max(0f, stateStartTimeSeconds));
         }
 
-        public void ReleaseBodyAction(float layerFadeSeconds)
+        public void ReleaseBodyAction(float layerFadeSeconds, string expectedStatePath = null)
         {
+            // 重叠片段中，上一段的结束回调不能释放已经由下一段接管的身体层。
+            if (Application.isPlaying && expectedStatePath != null &&
+                requestedBodyStateHash != Animator.StringToHash(expectedStatePath)) return;
+
             float fadeSeconds = ResolveFadeSeconds(layerFadeSeconds);
 
             if (bodyLayerControlMode == BodyLayerControlMode.SingleBodyLayer)
@@ -77,6 +181,8 @@ namespace Greatwall.VRAnimation.Timeline
                 if (!TryGetStateHash(bodyActionLayerIndex, singleLayerIdleStatePath, out int idleStateHash))
                     return;
 
+                requestedBodyStateHash = idleStateHash;
+                bodyCrossFadeEndsAt = Time.timeAsDouble + fadeSeconds;
                 animator.CrossFadeInFixedTime(
                     idleStateHash,
                     fadeSeconds,
@@ -85,6 +191,7 @@ namespace Greatwall.VRAnimation.Timeline
                 return;
             }
 
+            requestedBodyStateHash = 0;
             FadeBodyActionLayer(0f, fadeSeconds);
         }
 
@@ -179,6 +286,15 @@ namespace Greatwall.VRAnimation.Timeline
         public void SampleBodyState(string fullStatePath, float normalizedTime)
         {
             if (!TryGetStateHash(bodyActionLayerIndex, fullStatePath, out int stateHash)) return;
+
+            if (Application.isPlaying)
+            {
+                // Play 会直接打断 CrossFade。过渡结束前让 Animator 自己完成混合。
+                // 同时排除重叠区内旧片段继续采样、把姿势拉回旧动作的情况。
+                if (stateHash != requestedBodyStateHash ||
+                    Time.timeAsDouble < bodyCrossFadeEndsAt ||
+                    animator.IsInTransition(bodyActionLayerIndex)) return;
+            }
 
             if (bodyLayerControlMode == BodyLayerControlMode.SeparateActionLayer)
             {

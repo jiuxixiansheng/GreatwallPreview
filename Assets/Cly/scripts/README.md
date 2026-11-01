@@ -5,7 +5,9 @@
 - `Character/`：角色自身效果脚本。
 - `Navigation/`：NavMesh 移动、移动动画同步、视觉转向。
 - `Navigation/Timeline/`：Timeline 的移动和转向轨道。
-- `Timeline/`：身体、面部、章节切换与 Timeline 完成事件。
+- `Timeline/`：身体、上半身、面部、章节切换与 Timeline 完成事件。
+
+上半身轨道配置见 `Assets/Cly/上半身轨道操作说明.md`。
 
 ## Backup
 

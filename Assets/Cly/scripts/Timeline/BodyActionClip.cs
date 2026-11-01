@@ -32,11 +32,7 @@ namespace Greatwall.VRAnimation.Timeline
             behaviour.stateCrossFadeSeconds = stateCrossFadeSeconds;
             behaviour.layerFadeSeconds = layerFadeSeconds;
             behaviour.referenceAnimationLength = referenceAnimationClip != null ? referenceAnimationClip.length : 0f;
-            behaviour.followAnimatorSpeed = followAnimatorSpeed;
             return playable;
         }
-
-        [Tooltip("走路动作勾选：使用 Animator 状态的速度倍率播放；其他动作不勾选。")]
-        public bool followAnimatorSpeed;
     }
 }
