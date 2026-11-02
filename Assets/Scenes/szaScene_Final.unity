@@ -3003,7 +3003,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3471611059370044658, guid: d3e76c42b2868a94cbe4b53f604e324e, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0.068
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3471611059370044658, guid: d3e76c42b2868a94cbe4b53f604e324e, type: 3}
       propertyPath: m_LocalPosition.z
@@ -24465,7 +24465,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7713095082227187494, guid: ea4f5fd2d0a4daf4891773e069d88acb, type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8285214982141737599, guid: ea4f5fd2d0a4daf4891773e069d88acb, type: 3}
       propertyPath: m_LocalPosition.x
@@ -35865,8 +35865,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f05b3bacd03140b68ebc281da325688e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  triggerObjects:
-  - {fileID: 1083301446}
+  triggerObjects: []
+  automaticallyDetectPlayers: 1
   completionEventName: "\u88C2\u7F1D\u4FEE\u590D\u5B8C\u6210"
   timelineToResume: {fileID: 105682926}
 --- !u!54 &1822775025
