@@ -35865,6 +35865,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f05b3bacd03140b68ebc281da325688e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  triggerObjects:
+  - {fileID: 1083301446}
   completionEventName: "\u88C2\u7F1D\u4FEE\u590D\u5B8C\u6210"
   timelineToResume: {fileID: 105682926}
 --- !u!54 &1822775025

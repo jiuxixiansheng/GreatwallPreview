@@ -1,6 +1,5 @@
 using UnityEngine;
 using UnityEngine.Playables;
-using Unity.XR.CoreUtils;
 
 namespace Greatwall.VRAnimation.Timeline
 {
@@ -8,6 +7,10 @@ namespace Greatwall.VRAnimation.Timeline
     [RequireComponent(typeof(BoxCollider), typeof(Rigidbody))]
     public sealed class CrackRepairTrigger : MonoBehaviour
     {
+        [Header("允许触发监听的物体")]
+        [Tooltip("在编辑模式下拖入场景物体。任意一个物体自身或子物体的碰撞体进入盒子后，开始监听；数组为空时不触发。")]
+        [SerializeField] private GameObject[] triggerObjects = new GameObject[0];
+
         [Header("修复完成事件（必须与发送端一致）")]
         [SerializeField] private string completionEventName = "裂缝修复完成";
 
@@ -51,7 +54,7 @@ namespace Greatwall.VRAnimation.Timeline
 
         private void OnTriggerStay(Collider other)
         {
-            // 兼容组件启用时玩家已经在盒内，不依赖再次跨过边界。
+            // 兼容组件启用时目标物体已经在盒内，不依赖再次跨过边界。
             TryBeginWaiting(other);
         }
 
@@ -59,35 +62,25 @@ namespace Greatwall.VRAnimation.Timeline
         {
             if (!isActiveAndEnabled || completed || waitingForRepair) return;
 
-            // 复用多人玩家身体设置；单机场景也接受 XR 身体和现有头部碰撞体。
-            PlayerNetworkSetup player = other.GetComponentInParent<PlayerNetworkSetup>();
-            bool isNetworkPlayerBody = player != null && player.playerCollider == other;
-            XROrigin origin = other.GetComponentInParent<XROrigin>();
-            bool isXRPlayerBody = other is CharacterController &&
-                                  origin != null;
-            // 项目现有 head 是 Main Camera 的直接子物体，带非 Trigger 的 SphereCollider。
-            // 按组件和层级识别所有 Rig，不依赖 head 或玩家物体的名称。
-            bool isXRPlayerHead = origin != null && origin.Camera != null &&
-                                  other is SphereCollider && !other.isTrigger &&
-                                  (other.transform == origin.Camera.transform ||
-                                   other.transform.parent == origin.Camera.transform);
-            if (!isNetworkPlayerBody && !isXRPlayerBody && !isXRPlayerHead)
-                return;
-
-            BeginListening();
-        }
-
-        /// <summary>
-        /// 供其他玩家检测脚本或 Inspector 的 UnityEvent 调用。
-        /// 与碰撞盒检测共用一次性注册及完成后锁定逻辑。
-        /// </summary>
-        public void BeginListening()
-        {
-            if (!Application.isPlaying || !isActiveAndEnabled || completed || waitingForRepair) return;
+            if (!MatchesTriggerObject(other)) return;
             if (!RegisterListener()) return;
 
             waitingForRepair = true;
             Debug.Log("[CrackRepairTrigger] 已开始监听裂缝修复完成。", this);
+        }
+
+        private bool MatchesTriggerObject(Collider other)
+        {
+            if (triggerObjects == null) return false;
+
+            foreach (GameObject target in triggerObjects)
+            {
+                if (target == null) continue;
+                if (other.transform == target.transform || other.transform.IsChildOf(target.transform))
+                    return true;
+            }
+
+            return false;
         }
 
         private bool RegisterListener()
