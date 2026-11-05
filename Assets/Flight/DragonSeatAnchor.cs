@@ -275,6 +275,7 @@ namespace Greatwall.Flight
 
             Vector3 targetPos = SeatWorldPosition;
             Quaternion targetRot = SeatWorldRotation;
+            var rider = target.GetComponent<DragonRideController>();
 
             // 位置：零滞后硬锁（不分模式）
             // 朝向：UseSmoothing=true 时限制角速度，过滤骨骼动画抖动
@@ -284,11 +285,13 @@ namespace Greatwall.Flight
                 Quaternion next = Quaternion.RotateTowards(
                     cur, targetRot, 240f * Time.deltaTime);
                 // 位置硬锁 + 朝向平滑：位置与朝向分离设置
-                target.SetPositionAndRotation(targetPos, next);
+                if (rider != null) rider.ApplySeatPose(targetPos, next);
+                else target.SetPositionAndRotation(targetPos, next);
             }
             else
             {
-                target.SetPositionAndRotation(targetPos, targetRot);
+                if (rider != null) rider.ApplySeatPose(targetPos, targetRot);
+                else target.SetPositionAndRotation(targetPos, targetRot);
                 if (!_initialized)
                 {
                     _initialized = true;

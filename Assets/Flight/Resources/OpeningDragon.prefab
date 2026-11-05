@@ -52,6 +52,18 @@ PrefabInstance:
       propertyPath: m_UpdateWhenOffscreen
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: -2735505361812183171, guid: c9f8961ab31a7e241a3ef008b3b587b8, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 6aad14ae582c6364190bcec94d14a037, type: 2}
+    - target: {fileID: -2735505361812183171, guid: c9f8961ab31a7e241a3ef008b3b587b8, type: 3}
+      propertyPath: 'm_Materials.Array.data[1]'
+      value: 
+      objectReference: {fileID: 2100000, guid: b4cb98b4423639243a6db87f97adeddb, type: 2}
+    - target: {fileID: -2735505361812183171, guid: c9f8961ab31a7e241a3ef008b3b587b8, type: 3}
+      propertyPath: 'm_Materials.Array.data[2]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 55a2e77ca71fcc247821307f75b7efd2, type: 2}
     - target: {fileID: 919132149155446097, guid: c9f8961ab31a7e241a3ef008b3b587b8, type: 3}
       propertyPath: m_Name
       value: OpeningDragon

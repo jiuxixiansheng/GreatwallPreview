@@ -14,6 +14,8 @@ public class DragonBehaviorV2 : MonoBehaviour
     private Renderer[] renderers;
     private MaterialPropertyBlock propertyBlock;
     private Coroutine distanceCoroutine;
+    private bool timelineSampling;
+    private bool sampledVfxPlaying;
 
     private void Awake()
     {
@@ -24,7 +26,10 @@ public class DragonBehaviorV2 : MonoBehaviour
 
     private void OnEnable()
     {
+        timelineSampling = false;
+        sampledVfxPlaying = false;
         Initialize();
+        if (transitionVfx != null) transitionVfx.pause = false;
         SetDistance(0f);
         SetVfxRate(0f);
 
@@ -33,6 +38,8 @@ public class DragonBehaviorV2 : MonoBehaviour
 
     private void OnDisable()
     {
+        timelineSampling = false;
+        sampledVfxPlaying = false;
         EventDispatcher.Instance.RemoveListener<float>("小龙特效转场", PlayDistance);
 
         if (distanceCoroutine != null)
@@ -60,8 +67,25 @@ public class DragonBehaviorV2 : MonoBehaviour
         }
     }
 
+    // OpeningDragon 在运行时生成；仅替换目标网格，保留小龙的 Skinned Mesh Source。
+    public void BindTransitionTarget(SkinnedMeshRenderer target)
+    {
+        Initialize();
+
+        if (transitionVfx == null || target == null) return;
+
+        if (!transitionVfx.HasSkinnedMeshRenderer("Skinned Mesh"))
+        {
+            Debug.LogWarning("DragonBehaviorV2: 转场 VFX 缺少 Skinned Mesh 属性。", this);
+            return;
+        }
+
+        transitionVfx.SetSkinnedMeshRenderer("Skinned Mesh", target);
+    }
+
     private void PlayDistance(float duration)
     {
+        if (timelineSampling) return;
         Initialize();
 
         if (distanceCoroutine != null)
@@ -70,6 +94,28 @@ public class DragonBehaviorV2 : MonoBehaviour
         }
 
         distanceCoroutine = StartCoroutine(AnimateDistance(duration));
+    }
+
+    // 直接按导演时间采样，暂停、客户端校时和晚加入都不会重新开始计时。
+    public void SampleTransition(float elapsed, float duration, bool paused = false)
+    {
+        if (propertyBlock == null || renderers == null) Initialize();
+        timelineSampling = true;
+        if (distanceCoroutine != null)
+        {
+            StopCoroutine(distanceCoroutine);
+            distanceCoroutine = null;
+        }
+
+        float progress = duration <= 0f ? 1f : Mathf.Clamp01(elapsed / duration);
+        SetDistance(Mathf.Lerp(0f, 1.01f, progress));
+        if (transitionVfx != null && progress < 1f && !sampledVfxPlaying)
+        {
+            transitionVfx.Play();
+            sampledVfxPlaying = true;
+        }
+        if (transitionVfx != null) transitionVfx.pause = paused;
+        SetVfxRate(CalculateVfxRate(progress));
     }
 
     private IEnumerator AnimateDistance(float duration)

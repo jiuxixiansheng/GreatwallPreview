@@ -16,6 +16,36 @@ public sealed class NetworkGameplayCoordinator : MonoBehaviour
     public static bool IsFollower => IsManaged && NetworkClient.active && !NetworkServer.active;
     public static bool IsApplyingSnapshot => IsManaged && Instance.applyingSnapshot;
 
+    public bool DragonTransformationStarted { get; private set; }
+    public bool DragonTransformationCompleted { get; private set; }
+    public double DragonTransformationTimelineTime { get; private set; }
+    public float DragonTransformationDuration { get; private set; }
+
+    public void RecordDragonTransformation(float duration)
+    {
+        if (!NetworkServer.active || story == null || story.CurrentDirector == null ||
+            story.IsTransitionPending || DragonTransformationStarted) return;
+        DragonTransformationStarted = true;
+        DragonTransformationTimelineTime = story.CurrentDirector.time;
+        DragonTransformationDuration = Mathf.Max(0f, duration);
+        Broadcast();
+    }
+
+    public void CompleteDragonTransformation()
+    {
+        if (!NetworkServer.active || !DragonTransformationStarted || DragonTransformationCompleted) return;
+        DragonTransformationCompleted = true;
+        Broadcast();
+    }
+
+    private void ResetDragonTransformation()
+    {
+        DragonTransformationStarted = false;
+        DragonTransformationCompleted = false;
+        DragonTransformationTimelineTime = 0d;
+        DragonTransformationDuration = 0f;
+    }
+
     [Header("剧情和修墙")]
     public StoryTimelineManager story;
     public BrickDropZone[] brickZones = Array.Empty<BrickDropZone>();
@@ -31,6 +61,7 @@ public sealed class NetworkGameplayCoordinator : MonoBehaviour
     public bool allowClientDebugSolve;
 
     private bool serverInitialized, previousServer, previousClient;
+    private bool sceneInteractablesPrepared;
     private bool applyingServerAction, applyingSnapshot, hasSnapshot, mismatchReported;
     private bool[] serverSolved;
     private uint configuration, sequence, acceptedSequence;
@@ -38,6 +69,7 @@ public sealed class NetworkGameplayCoordinator : MonoBehaviour
     private GameplaySnapshotMessage latest;
     private MaterialPropertyBlock block;
     private BuildUpController[] buildOwners;
+    private ObjectDisappear[] disappearOwners;
     private readonly Dictionary<int, double> requestTimes = new Dictionary<int, double>();
     private Behaviour locomotion;
     private bool locomotionWasEnabled;
@@ -50,6 +82,7 @@ public sealed class NetworkGameplayCoordinator : MonoBehaviour
         Instance = this;
         block = new MaterialPropertyBlock();
         buildOwners = Array.ConvertAll(persistentRenderers, r => r != null ? r.GetComponentInParent<BuildUpController>() : null);
+        disappearOwners = Array.ConvertAll(persistentRenderers, r => r != null ? r.GetComponentInParent<ObjectDisappear>(true) : null);
         configuration = CalculateConfiguration();
         serverSolved = new bool[brickZones.Length];
         if (characterAgent != null)
@@ -57,6 +90,63 @@ public sealed class NetworkGameplayCoordinator : MonoBehaviour
                 if (b.GetType().Name == "DragonLocomotionAnimator")
                 { locomotion = b; locomotionWasEnabled = b.enabled; }
         RegisterMessages();
+    }
+
+    private void Start()
+    {
+        PrepareSceneNetworkObjects();
+    }
+
+    /// <summary>
+    /// Mirror may receive a SpawnMessage before a chapter's parent is enabled.
+    /// Initialize scene grabbables once before connecting so their NetworkIdentity
+    /// and grab/transform components have completed Awake even in hidden chapters.
+    /// </summary>
+    public void PrepareSceneNetworkObjects()
+    {
+        if (sceneInteractablesPrepared || !Application.isPlaying) return;
+        var scene = story != null ? story.gameObject.scene : UnityEngine.SceneManagement.SceneManager.GetActiveScene();
+        int prepared = 0;
+        foreach (var grabbable in Resources.FindObjectsOfTypeAll<NetworkGrabbable>())
+        {
+            if (grabbable == null || grabbable.gameObject.scene != scene) continue;
+            var identity = grabbable.GetComponent<NetworkIdentity>();
+            if (identity == null || identity.sceneId == 0 || identity.netId != 0 ||
+                identity.NetworkBehaviours != null) continue;
+
+            var obj = grabbable.gameObject;
+            var t = obj.transform;
+            var parent = t.parent;
+            int sibling = t.GetSiblingIndex();
+            Vector3 position = t.localPosition;
+            Quaternion rotation = t.localRotation;
+            Vector3 scale = t.localScale;
+            bool active = obj.activeSelf;
+            bool detached = parent != null && !parent.gameObject.activeInHierarchy;
+            try
+            {
+                // Activate only the interactable, never the entire chapter.
+                if (detached) t.SetParent(null, true);
+                obj.SetActive(true);
+                if (identity.NetworkBehaviours == null)
+                    throw new InvalidOperationException("Network interactable failed to initialize: " + obj.name);
+                prepared++;
+            }
+            finally
+            {
+                if (!active) obj.SetActive(false);
+                if (detached)
+                {
+                    t.SetParent(parent, false);
+                    t.SetLocalPositionAndRotation(position, rotation);
+                    t.localScale = scale;
+                    t.SetSiblingIndex(sibling);
+                }
+                if (obj.activeSelf != active) obj.SetActive(active);
+            }
+        }
+        sceneInteractablesPrepared = true;
+        Debug.Log("[联机剧情] 隐藏章节网络交互物体初始化完成：" + prepared, this);
     }
 
     private void RegisterMessages()
@@ -82,6 +172,7 @@ public sealed class NetworkGameplayCoordinator : MonoBehaviour
             for (int i = 0; i < serverSolved.Length; i++) serverSolved[i] = brickZones[i] != null && brickZones[i].IsSolved;
             requestTimes.Clear();
             sequence = 0;
+            ResetDragonTransformation();
             RunServerAction(() => story.InitializeNetworkChapter());
         }
         if (IsFollower && NetworkClient.isConnected && NetworkClient.localPlayer != null &&
@@ -97,17 +188,26 @@ public sealed class NetworkGameplayCoordinator : MonoBehaviour
     {
         if (NetworkServer.active && serverInitialized)
         {
-            // Chapter/Activation Tracks can make previously inactive scene bricks available.
-            foreach (var b in bricks)
-                if (b != null && b.gameObject.activeInHierarchy && b.GetComponent<NetworkIdentity>().netId == 0)
-                    NetworkServer.Spawn(b.gameObject);
             for (int i = 0; i < serverSolved.Length; i++)
                 if (serverSolved[i] && brickZones[i] != null) brickZones[i].ApplySolvedState(false);
-            if (NetworkTime.time >= nextBroadcast)
+
+            bool pendingSpawn = false;
+            foreach (var b in bricks)
+                if (b != null && b.gameObject.activeInHierarchy && b.GetComponent<NetworkIdentity>().netId == 0)
+                {
+                    pendingSpawn = true;
+                    break;
+                }
+
+            // Reliable ordering: activate the chapter on clients before spawning its bricks.
+            if (pendingSpawn || NetworkTime.time >= nextBroadcast)
             {
                 nextBroadcast = NetworkTime.time + snapshotInterval;
                 Broadcast();
             }
+            foreach (var b in bricks)
+                if (b != null && b.gameObject.activeInHierarchy && b.GetComponent<NetworkIdentity>().netId == 0)
+                    NetworkServer.Spawn(b.gameObject);
         }
         else if (IsFollower && hasSnapshot)
         {
@@ -218,6 +318,7 @@ public sealed class NetworkGameplayCoordinator : MonoBehaviour
         if (kind == GameplayRequestKind.Chapter)
         {
             if (argument < 0 || argument >= story.ChapterCount || story.IsTransitionPending) return;
+            if (argument != story.CurrentChapterIndex) ResetDragonTransformation();
             RunServerAction(() => story.SwitchToChapterByIndex(argument));
         }
         else if (!story.IsTransitionPending && kind == GameplayRequestKind.Pause)
@@ -253,6 +354,7 @@ public sealed class NetworkGameplayCoordinator : MonoBehaviour
             bool restore = block.HasFloat(RestoreId) || (material != null && material.HasProperty(RestoreId));
             visuals[i] = new GameplayVisualState {
                 distanceSet = distance, restoreSet = restore, shadows = (int)r.shadowCastingMode,
+                disappearQueueApplied = disappearOwners[i] != null && disappearOwners[i].IsRenderQueueApplied,
                 distance = block.HasFloat(DistanceId) ? block.GetFloat(DistanceId) : distance ? material.GetFloat(DistanceId) : 0,
                 restore = block.HasFloat(RestoreId) ? block.GetFloat(RestoreId) : restore ? material.GetFloat(RestoreId) : 0
             };
@@ -273,7 +375,11 @@ public sealed class NetworkGameplayCoordinator : MonoBehaviour
             transitioning = story.IsTransitionPending, solved = (bool[])serverSolved.Clone(), objectActive = active,
             visuals = visuals, characterPosition = characterAgent != null ? characterAgent.transform.position : Vector3.zero,
             characterRotation = characterAgent != null ? characterAgent.transform.rotation : Quaternion.identity,
-            parameters = parameters.ToArray()
+            parameters = parameters.ToArray(),
+            dragonTransformationStarted = DragonTransformationStarted,
+            dragonTransformationCompleted = DragonTransformationCompleted,
+            dragonTransformationTimelineTime = DragonTransformationTimelineTime,
+            dragonTransformationDuration = DragonTransformationDuration
         };
     }
 
@@ -291,6 +397,10 @@ public sealed class NetworkGameplayCoordinator : MonoBehaviour
         bool initial = !hasSnapshot;
         bool changedChapter = story.CurrentChapterIndex != message.chapter;
         latest = message; acceptedSequence = message.sequence; hasSnapshot = true;
+        DragonTransformationStarted = message.dragonTransformationStarted;
+        DragonTransformationCompleted = message.dragonTransformationCompleted;
+        DragonTransformationTimelineTime = message.dragonTransformationTimelineTime;
+        DragonTransformationDuration = message.dragonTransformationDuration;
         applyingSnapshot = true;
         try
         {
@@ -329,6 +439,8 @@ public sealed class NetworkGameplayCoordinator : MonoBehaviour
             r.shadowCastingMode = (UnityEngine.Rendering.ShadowCastingMode)v.shadows;
             var build = buildOwners != null ? buildOwners[i] : null;
             if (build != null && v.distanceSet) build.SetDistance(block.GetFloat(DistanceId));
+            var disappear = disappearOwners != null ? disappearOwners[i] : null;
+            if (disappear != null && v.distanceSet) disappear.ApplyNetworkRenderQueue(v.disappearQueueApplied);
         }
     }
 
