@@ -16,7 +16,7 @@ AvatarMask:
   - m_Path: root
     m_Weight: 0
   - m_Path: root/root_x
-    m_Weight: 0
+    m_Weight: 1
   - m_Path: root/root_x/c_tail_00_x
     m_Weight: 0
   - m_Path: root/root_x/c_tail_00_x/c_tail_01_x
