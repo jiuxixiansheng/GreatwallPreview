@@ -56,7 +56,9 @@ public class CommandTerminal : MonoBehaviour
 
     public void ZhuanChang04(float time)
     {
-        if (NetworkGameplayCoordinator.IsApplyingSnapshot) return;
+        if (NetworkGameplayCoordinator.IsApplyingSnapshot || NetworkGameplayCoordinator.IsFollower) return;
+        if (NetworkGameplayCoordinator.IsManaged)
+            NetworkGameplayCoordinator.Instance.RecordDragonTransformation(time);
         EventDispatcher.Instance.Dispatch("小龙特效转场",time);
         EventDispatcher.Instance.Dispatch<float>("大龙特效转场", time);
     }

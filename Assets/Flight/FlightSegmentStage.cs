@@ -8,14 +8,14 @@ namespace Greatwall.Flight
     /// <summary>
     /// 骑龙段落的正式接入点（挂在 part3/上龙传送门 上）。
     ///
-    /// 触发：StoryTimelineManager 进入 chapter3 的那一帧（按章节索引监听；
-    /// timeline_03 所在根节点未激活、播不起来时也能生效），
+    /// 触发：StoryTimelineManager 进入 chapter3 后，先准备隐藏的大龙，
+    /// 等 timeline_03 的变身信号和材质显现完成，再交接盘旋与上龙。
     /// 本组件接管整段演出：
-    ///   1. 停掉 timeline_03 —— 段落内容全部由本组件驱动；
-    ///      提前 Stop 不会触发 TimelineCompletionRelay（invokeWhenStoppedEarly = false），
+    ///   1. 保留 timeline_03 的变身信号和配音，变身结束后接管飞行；
+    ///      第三章关闭播完自动切章，配音播完仍等待玩家上龙，
     ///      所以章节不会在 27s 后被绕回 chapter0；
     ///   2. 玩家位置完全不动（段落布景固定在场景里，不跟随玩家）；
-    ///   3. 隐藏 part2-2 交接下来的剧情龙（Dragon_root），避免和开场龙同框；
+    ///   3. 小龙粒子和大龙显现完成后再隐藏 Dragon_root；
     ///   4. 骑龙保持隐藏，只在玩家踩上传送板那一刻由 DragonBoardingGate 激活并对齐到龙头；
     ///   5. 生成「龙环绕飞行3」的开场龙：盘旋 → 前飞 → 悬浮，并交给传送门计时。
     ///
@@ -42,7 +42,7 @@ namespace Greatwall.Flight
         [Tooltip("骑龙飞行的龙根（part3/骑龙飞上天空），整段保持隐藏。")]
         public Transform RideDragon;
 
-        [Tooltip("章节系统留下的剧情龙（Dragon_root）。接管后整段隐藏。")]
+        [Tooltip("章节系统留下的剧情龙（Dragon_root）。变身完成后隐藏。")]
         public Transform StoryDragon;
 
         [Header("舞台基准")]
@@ -108,6 +108,23 @@ namespace Greatwall.Flight
         private const string BackdropPartRoot = "part2-2";
         private static readonly string[] PrecedingPartRoots = { "part0", "part1", "Part2" };
 
+        [Header("小龙变身衔接")]
+        [Tooltip("收到 Timeline 的变身信号后，大龙延迟多少秒开始显现。")]
+        [Min(0f)] public float OpeningDragonRevealDelay = 1f;
+
+        private bool _preparing;
+        private bool _transitionRequested;
+        private double _transitionStartTime;
+        private float _transitionDuration;
+        private float _transitionLocalStart;
+        private OpeningDragon _openingDragon;
+        private Renderer[] _openingRenderers;
+        private MaterialPropertyBlock _openingPropertyBlock;
+        private DragonBehaviorV2[] _storyDragonBehaviors;
+        private bool _gateWasEnabled;
+        private EventDispatcher _eventDispatcher;
+        private static readonly int TransitionDistanceId = Shader.PropertyToID("_distance");
+
         private bool _started;
         private bool _everMounted;
         private DragonRideController _rider;
@@ -129,19 +146,37 @@ namespace Greatwall.Flight
                 Debug.LogWarning($"[FlightStage] 没找到章节导演 '{ChapterDirectorName}'，只按章节索引触发。", this);
         }
 
+        private void OnEnable()
+        {
+            _eventDispatcher = EventDispatcher.Instance;
+            _eventDispatcher.AddListener<float>("小龙特效转场", HandleTransformationSignal);
+        }
+
+        private void OnDisable()
+        {
+            if (_eventDispatcher != null)
+                _eventDispatcher.RemoveListener<float>("小龙特效转场", HandleTransformationSignal);
+            _eventDispatcher = null;
+            ResetSegment();
+        }
+
         private void Update()
         {
+            if (!_chapterResolved) ResolveChapterManager();
+
+            bool chapterActive = IsTargetChapterActive() ||
+                (ChapterDirector != null && ChapterDirector.state == PlayState.Playing);
+            if (!chapterActive)
+            {
+                if (_preparing || _started) ResetSegment();
+                return;
+            }
+
             if (!_started)
             {
-                if (!_chapterResolved) ResolveChapterManager();
-
-                // 章节索引是主触发：part2-2（timeline_03 的父级）未激活时
-                // timeline_03 根本播不起来，只靠 director.state 会漏触发；
-                // director 正在播放则作为兜底（例如手动播放 timeline_03）。
-                if (IsTargetChapterActive() ||
-                    (ChapterDirector != null && ChapterDirector.state == PlayState.Playing))
-                    EnterSegment();
-                return;
+                PrepareSegment();
+                if (!SampleTransformation()) return;
+                EnterSegment();
             }
 
             if (EnsureRider() == null) return;
@@ -231,29 +266,127 @@ namespace Greatwall.Flight
         }
 
         /// <summary>
-        /// 接管 chapter3：停掉 timeline_03，摆好观众机位 / 开场龙 / 骑龙，
+        /// 接管 chapter3 的飞行，timeline_03 保留配音，
         /// 之后交给 DragonBoardingGate。
         /// </summary>
         public void EnterSegment()
         {
             if (_started) return;
+            PrepareSegment();
             _started = true;
-
-            EnsureBackdropPart();
-
-            if (ChapterDirector != null && ChapterDirector.state == PlayState.Playing)
-                ChapterDirector.Stop();
 
             if (StoryDragon != null)
                 StoryDragon.gameObject.SetActive(false);
 
-            // 防 timeline_03 的激活轨抢先打开骑龙（Stop 会还原，这里再兜一层）
-            if (RideDragon != null)
-                RideDragon.gameObject.SetActive(false);
+            SetOpeningDragonDistance(0f);
+            if (_openingDragon != null)
+            {
+                _openingDragon.enabled = true;
+                _openingDragon.Play();
+                if (Gate != null)
+                {
+                    Gate.BeginWithOpeningDragon(_openingDragon.gameObject);
+                    Gate.enabled = _gateWasEnabled;
+                }
+            }
+            if (NetworkGameplayCoordinator.IsManaged)
+                NetworkGameplayCoordinator.Instance.CompleteDragonTransformation();
+            // timeline_03 继续播放配音；上龙和飞行独立接管，不停止导演。
+        }
 
+        private void PrepareSegment()
+        {
+            if (_preparing) return;
+            _preparing = true;
+
+            EnsureBackdropPart();
+            _storyDragonBehaviors = StoryDragon != null
+                ? StoryDragon.GetComponentsInChildren<DragonBehaviorV2>(true)
+                : new DragonBehaviorV2[0];
+            if (Gate != null)
+            {
+                _gateWasEnabled = Gate.enabled;
+                Gate.enabled = false;
+                Gate.OpeningDragon = null;
+                if (Gate.PadVisual != null) Gate.PadVisual.SetActive(false);
+                if (Gate.PadLabel != null) Gate.PadLabel.SetActive(false);
+            }
             ApplyCloudOverrides();
             PlaceRideDragon();
             SpawnOpeningDragon();
+        }
+
+        private void HandleTransformationSignal(float duration)
+        {
+            if (_transitionRequested) return;
+            _transitionRequested = true;
+            _transitionStartTime = ChapterDirector != null ? ChapterDirector.time : 0d;
+            _transitionDuration = Mathf.Max(0f, duration);
+            _transitionLocalStart = Time.time;
+        }
+
+        private bool SampleTransformation()
+        {
+            double start = _transitionStartTime;
+            float duration = _transitionDuration;
+            bool completed = false;
+            if (NetworkGameplayCoordinator.IsManaged &&
+                (Mirror.NetworkServer.active || Mirror.NetworkClient.active))
+            {
+                var sync = NetworkGameplayCoordinator.Instance;
+                if (!sync.DragonTransformationStarted) return false;
+                start = sync.DragonTransformationTimelineTime;
+                duration = sync.DragonTransformationDuration;
+                completed = sync.DragonTransformationCompleted;
+            }
+            else if (!_transitionRequested) return false;
+
+            float elapsed = ChapterDirector != null
+                ? Mathf.Max(0f, (float)(ChapterDirector.time - start))
+                : Mathf.Max(0f, Time.time - _transitionLocalStart);
+            if (completed) elapsed = Mathf.Max(elapsed, Mathf.Max(0f, OpeningDragonRevealDelay) + duration);
+            foreach (var behavior in _storyDragonBehaviors)
+                if (behavior != null) behavior.SampleTransition(elapsed, duration,
+                    ChapterDirector != null && ChapterDirector.state != PlayState.Playing);
+
+            float revealDelay = Mathf.Max(0f, OpeningDragonRevealDelay);
+            float reveal = duration <= 0f
+                ? (elapsed >= revealDelay ? 1f : 0f)
+                : Mathf.Clamp01((elapsed - revealDelay) / duration);
+            SetOpeningDragonDistance(Mathf.Lerp(1.01f, 0f, reveal));
+            return elapsed >= Mathf.Max(duration, revealDelay + duration);
+        }
+
+        private void SetOpeningDragonDistance(float distance)
+        {
+            if (_openingRenderers == null) return;
+            if (_openingPropertyBlock == null) _openingPropertyBlock = new MaterialPropertyBlock();
+            foreach (var renderer in _openingRenderers)
+            {
+                if (renderer == null) continue;
+                renderer.GetPropertyBlock(_openingPropertyBlock);
+                _openingPropertyBlock.SetFloat(TransitionDistanceId, distance);
+                renderer.SetPropertyBlock(_openingPropertyBlock);
+            }
+        }
+
+        private void ResetSegment()
+        {
+            if (Gate != null && _preparing)
+            {
+                Gate.OpeningDragon = null;
+                Gate.enabled = _gateWasEnabled;
+                if (Gate.PadVisual != null) Gate.PadVisual.SetActive(false);
+                if (Gate.PadLabel != null) Gate.PadLabel.SetActive(false);
+            }
+            if (_openingDragon != null) Destroy(_openingDragon.gameObject);
+            _openingDragon = null;
+            _openingRenderers = null;
+            _storyDragonBehaviors = null;
+            _preparing = false;
+            _started = false;
+            _everMounted = false;
+            _transitionRequested = false;
         }
 
         /// <summary>
@@ -333,14 +466,34 @@ namespace Greatwall.Flight
             // 悬浮龙头钉到固定落点，龙头朝向 = 观众反方向偏 DragonYawOffset
             Vector3 dragonForward = Quaternion.Euler(0f, DragonYawOffset, 0f) * (-forward);
             comp.AlignHoverHeadTo(HoverHeadWorldPos, dragonForward);
+            BindOpeningDragonTransitionVfx(go);
 
-            if (Gate != null)
-                Gate.BeginWithOpeningDragon(go);
-            else
-                Debug.LogWarning("[FlightStage] 没有 DragonBoardingGate，传送板不会亮起。", this);
-
+            _openingDragon = comp;
+            _openingRenderers = go.GetComponentsInChildren<Renderer>(true);
             comp.Play();
-            Debug.Log($"[FlightStage] 已接管骑龙段落：悬浮龙头 {HoverHeadWorldPos:F2}，舞台朝向 {StageYaw:F1}°（不跟随玩家）");
+            comp.enabled = false;
+            foreach (var animator in go.GetComponentsInChildren<Animator>(true))
+            {
+                animator.speed = 0f;
+                animator.Update(0f);
+            }
+            SetOpeningDragonDistance(1.01f);
+        }
+
+        private void BindOpeningDragonTransitionVfx(GameObject openingDragon)
+        {
+            if (StoryDragon == null) return;
+
+            var target = openingDragon.GetComponentInChildren<SkinnedMeshRenderer>(true);
+            if (target == null)
+            {
+                Debug.LogWarning("[FlightStage] OpeningDragon 没有蒙皮网格，无法绑定变身特效。", this);
+                return;
+            }
+
+            // 剧情龙此时可能已隐藏，仍需给它的 VFX 绑定本次生成的大龙实例。
+            foreach (var behavior in StoryDragon.GetComponentsInChildren<DragonBehaviorV2>(true))
+                behavior.BindTransitionTarget(target);
         }
 
         /// <summary>

@@ -57,6 +57,16 @@ namespace Greatwall.Flight
         [Tooltip("关闭自动放置时，传送区使用的固定位置。")]
         public Transform FixedAnchor;
 
+        [Header("大空间上龙起点")]
+        [InspectorName("使用指定触发位置")]
+        [Tooltip("启用后，将传送区放在下面输入的世界坐标；优先于玩家前方放置和 Fixed Anchor。")]
+        public bool UseBoardingWorldPosition;
+
+        [InspectorName("触发位置（世界坐标）")]
+        [Tooltip("上龙触发区域的中心坐标，Y 填触发区域所在的地面高度，不能填头显高度。\n" +
+                 "玩家上龙时会自动补偿头显实际站位与 XR Origin 原点之间的偏移。")]
+        public Vector3 BoardingWorldPosition;
+
         [Tooltip("亮起时的淡入时长（缩放 + 由暗到亮）。")]
         [Range(0f, 3f)] public float AppearDuration = 0.6f;
 
@@ -169,6 +179,7 @@ namespace Greatwall.Flight
         {
             get
             {
+                if (Rider != null && Rider.TrackedHead != null) return Rider.TrackedHead;
                 var cam = Camera.main;
                 if (cam != null && cam.transform.IsChildOf(PlayerTransform != null ? PlayerTransform : cam.transform))
                     return cam.transform;
@@ -214,7 +225,14 @@ namespace Greatwall.Flight
             //   ③ 都不设：★ 完全使用场景里摆好的位置，运行时不动它
             bool reposition = PlaceInFrontOfPlayer && player != null;
 
-            if (reposition)
+            if (UseBoardingWorldPosition)
+            {
+                Vector3 delta = BoardingWorldPosition - PadVisual.transform.position;
+                PadVisual.transform.position = BoardingWorldPosition;
+                if (PadLabel != null && !PadLabel.transform.IsChildOf(PadVisual.transform))
+                    PadLabel.transform.position += delta;
+            }
+            else if (reposition)
             {
                 var head = HeadTransform;
                 Vector3 forward = head != null ? head.forward : player.forward;
@@ -335,7 +353,8 @@ namespace Greatwall.Flight
             // ★ 2) 把大龙材质从「完全透明」显出来，否则骑龙全程看不见龙
             if (RevealDragonOnBoard) StartCoroutine(RevealDragonCoroutine());
 
-            Rider.Mount();
+            Rider.MountFromWorldPosition(PadVisual != null
+                ? PadVisual.transform.position : BoardingWorldPosition);
             Debug.Log("[BoardingGate] 玩家走上传送区 → 上龙。", this);
         }
 
@@ -389,7 +408,8 @@ namespace Greatwall.Flight
         {
             if (PadVisual == null) return;
             Gizmos.color = new Color(0.2f, 0.8f, 1f, 0.6f);
-            Gizmos.DrawWireSphere(PadVisual.transform.position, TriggerRadius);
+            Gizmos.DrawWireSphere(UseBoardingWorldPosition
+                ? BoardingWorldPosition : PadVisual.transform.position, TriggerRadius);
         }
     }
 }
