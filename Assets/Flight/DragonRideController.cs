@@ -42,6 +42,14 @@ namespace Greatwall.Flight
         [Tooltip("飞行总控。拖入龙根物体上的 FlightDirector。")]
         public FlightDirector Director;
 
+        [Header("大空间站位补偿")]
+        [Tooltip("上龙时记录头显相对 XR Origin 的实际站位，扣除大空间走动产生的偏移。\n" +
+                 "只在上龙时记录一次，飞行中仍可正常转头、探身和小幅移动。")]
+        public bool CompensateRoomScaleOffset = true;
+
+        [Tooltip("本机玩家的头显。留空时自动使用本 XR Origin 的 Camera，不能绑定其他玩家的相机。")]
+        public Transform TrackingReference;
+
         [Header("移动控制")]
         [Tooltip("上龙后需要禁用的移动组件（DynamicMoveProvider / TeleportationProvider 等）。\n" +
                  "留空则不处理。飞行中玩家不该能自己走动。")]
@@ -81,10 +89,25 @@ namespace Greatwall.Flight
         private float _mountTimer;
         private Vector3 _unmountPosition;
         private Quaternion _unmountRotation;
+        private Vector3 _mountReferenceLocalPosition;
+        private Vector3 _mountStartReferencePosition;
         private bool[] _behaviourEnabledCache;
 
         /// <summary>玩家是否已上龙</summary>
         public bool IsMounted => _mounted;
+
+        /// <summary>Only resolve a tracked head belonging to this player's rig.</summary>
+        public Transform TrackedHead
+        {
+            get
+            {
+                if (TrackingReference != null && TrackingReference.IsChildOf(transform))
+                    return TrackingReference;
+                var origin = GetComponent<Unity.XR.CoreUtils.XROrigin>();
+                var camera = origin != null ? origin.Camera : GetComponentInChildren<Camera>(true);
+                return camera != null && camera.transform.IsChildOf(transform) ? camera.transform : null;
+            }
+        }
 
         private void Update()
         {
@@ -187,6 +210,15 @@ namespace Greatwall.Flight
         [ContextMenu("上龙")]
         public void Mount()
         {
+            MountFromWorldPosition(transform.position);
+        }
+
+        /// <summary>
+        /// 从上龙区域的世界坐标登龙。水平站位取本机头显的实际位置，
+        /// 地面高度取入口坐标，因此走到区域边缘也能正确对齐座位。
+        /// </summary>
+        public void MountFromWorldPosition(Vector3 boardingWorldPosition)
+        {
             if (_mounted || _mounting || SeatAnchor == null)
             {
                 return;
@@ -194,6 +226,8 @@ namespace Greatwall.Flight
 
             _unmountPosition = transform.position;
             _unmountRotation = transform.rotation;
+            CaptureBoardingReference(boardingWorldPosition);
+            _mountStartReferencePosition = transform.TransformPoint(_mountReferenceLocalPosition);
             _mounting = true;
             _mountTimer = 0f;
 
@@ -224,7 +258,7 @@ namespace Greatwall.Flight
             if (TeleportOnMount)
             {
                 // ★ 瞬移：一帧完成，随后进入正常的座位跟随
-                transform.SetPositionAndRotation(
+                ApplySeatPose(
                     SeatAnchor.SeatWorldPosition,
                     SeatAnchor.SeatWorldRotation);
                 _mounting = false;
@@ -259,6 +293,7 @@ namespace Greatwall.Flight
 
             // 缓慢回到原位，而不是瞬移
             transform.SetPositionAndRotation(_unmountPosition, _unmountRotation);
+            _mountReferenceLocalPosition = Vector3.zero;
 
             if (DisableMovementOnMount)
             {
@@ -275,8 +310,9 @@ namespace Greatwall.Flight
             Vector3 seatPos = SeatAnchor.SeatWorldPosition;
             Quaternion seatRot = SeatAnchor.SeatWorldRotation;
 
-            transform.position = Vector3.Lerp(_unmountPosition, seatPos, eased);
-            transform.rotation = Quaternion.Slerp(_unmountRotation, seatRot, eased);
+            ApplySeatPose(
+                Vector3.Lerp(_mountStartReferencePosition, seatPos, eased),
+                Quaternion.Slerp(_unmountRotation, seatRot, eased));
 
             if (t >= 1f)
             {
@@ -290,6 +326,28 @@ namespace Greatwall.Flight
                     Director.ReportSeated();
                 }
             }
+        }
+
+        private void CaptureBoardingReference(Vector3 boardingWorldPosition)
+        {
+            _mountReferenceLocalPosition = Vector3.zero;
+            if (!CompensateRoomScaleOffset) return;
+
+            Transform head = TrackedHead;
+            Vector3 reference = head != null ? head.position : boardingWorldPosition;
+            reference.y = boardingWorldPosition.y;
+            _mountReferenceLocalPosition = transform.InverseTransformPoint(reference);
+        }
+
+        /// <summary>
+        /// Align the captured standing point, rather than the tracking-space origin.
+        /// DragonSeatAnchor also uses this path when FlightDirector follows the seat.
+        /// </summary>
+        public void ApplySeatPose(Vector3 referenceWorldPosition, Quaternion rotation)
+        {
+            Vector3 localReference = _mounted || _mounting ? _mountReferenceLocalPosition : Vector3.zero;
+            transform.rotation = rotation;
+            transform.position += referenceWorldPosition - transform.TransformPoint(localReference);
         }
 
         private void DisableMovement(bool disable)

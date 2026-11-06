@@ -1139,8 +1139,9 @@ MonoBehaviour:
   animator: {fileID: 7407734235163555464}
   bodyLayerControlMode: 0
   bodyActionLayerIndex: 0
-  faceLayerIndex: 1
-  singleLayerIdleStatePath: Base Layer.Idle
+  faceLayerIndex: 2
+  upperBodyLayerIndex: 1
+  singleLayerIdleStatePath: BaseLayer.Idle
   resetBodyActionLayerOnAwake: 1
   defaultBodyLayerFadeSeconds: 0.25
 --- !u!4 &4537570705604976234 stripped
