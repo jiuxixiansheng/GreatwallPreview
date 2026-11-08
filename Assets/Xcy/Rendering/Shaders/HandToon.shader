@@ -87,7 +87,11 @@ Shader "Xcy/Hand Toon"
             half brightness = WhiteLightBrightness(light.color * light.distanceAttenuation, _LightIntensityLimit);
             return tint * brightness;
         }
-        half4 Frag(Varyings input) : SV_Target
+        void Frag(Varyings input, out half4 outColor : SV_Target0
+            #ifdef _WRITE_RENDERING_LAYERS
+                , out float4 outRenderingLayers : SV_Target1
+            #endif
+        )
         {
             UNITY_SETUP_INSTANCE_ID(input);
             UNITY_SETUP_STEREO_EYE_INDEX_POST_VERTEX(input);
@@ -125,7 +129,10 @@ Shader "Xcy/Hand Toon"
             half rim = pow(saturate(1 - dot(normal, view)), _RimPower);
             half3 color = albedo * lighting + _RimColor.rgb * rim * _RimStrength;
             color = LimitBrightness(color, _MaxBrightness);
-            return half4(MixFog(color, input.fog), 1);
+            outColor = half4(MixFog(color, input.fog), 1);
+            #ifdef _WRITE_RENDERING_LAYERS
+                outRenderingLayers = float4(EncodeMeshRenderingLayer(GetMeshRenderingLayer()), 0, 0, 0);
+            #endif
         }
         half4 DepthFrag(Varyings input) : SV_Target
         {
@@ -143,6 +150,7 @@ Shader "Xcy/Hand Toon"
             #pragma target 3.5
             #pragma vertex Vert
             #pragma fragment Frag
+            #include_with_pragmas "Packages/com.unity.render-pipelines.universal/ShaderLibrary/RenderingLayers.hlsl"
             #pragma multi_compile_instancing
             #pragma multi_compile _ STEREO_INSTANCING_ON STEREO_MULTIVIEW_ON
             #pragma multi_compile _ _MAIN_LIGHT_SHADOWS _MAIN_LIGHT_SHADOWS_CASCADE _MAIN_LIGHT_SHADOWS_SCREEN
@@ -206,19 +214,27 @@ Shader "Xcy/Hand Toon"
             #pragma target 3.5
             #pragma vertex Vert
             #pragma fragment NormalFrag
+            #include_with_pragmas "Packages/com.unity.render-pipelines.universal/ShaderLibrary/RenderingLayers.hlsl"
             #pragma multi_compile_instancing
             #pragma multi_compile _ STEREO_INSTANCING_ON STEREO_MULTIVIEW_ON
             #pragma multi_compile_fragment _ _GBUFFER_NORMALS_OCT
-            half4 NormalFrag(Varyings input) : SV_Target
+            void NormalFrag(Varyings input, out half4 outNormal : SV_Target0
+                #ifdef _WRITE_RENDERING_LAYERS
+                    , out float4 outRenderingLayers : SV_Target1
+                #endif
+            )
             {
                 UNITY_SETUP_INSTANCE_ID(input);
                 UNITY_SETUP_STEREO_EYE_INDEX_POST_VERTEX(input);
                 float3 normal = normalize(input.normalWS);
                 #if defined(_GBUFFER_NORMALS_OCT)
                     float2 oct = PackNormalOctQuadEncode(normal);
-                    return half4(PackFloat2To888(saturate(oct * 0.5 + 0.5)), 0);
+                    outNormal = half4(PackFloat2To888(saturate(oct * 0.5 + 0.5)), 0);
                 #else
-                    return half4(normal, 0);
+                    outNormal = half4(normal, 0);
+                #endif
+                #ifdef _WRITE_RENDERING_LAYERS
+                    outRenderingLayers = float4(EncodeMeshRenderingLayer(GetMeshRenderingLayer()), 0, 0, 0);
                 #endif
             }
             ENDHLSL

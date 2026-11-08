@@ -25,6 +25,13 @@ namespace Xcy.CrackRepair
         private bool repaired;
 
         public bool IsRepaired => repaired;
+        public bool IsRepairing => repairing;
+        public bool CanStartRepair => isActiveAndEnabled && unlocked && !repairing && !repaired && projector != null;
+        public double RepairStartedAt { get; private set; }
+        public event System.Action<CrackRepairDecal> RepairStarted;
+        public event System.Action<CrackRepairDecal> RepairStopped;
+        private bool reportCompletion;
+        private float initialElapsed;
 
         private void Awake()
         {
@@ -51,6 +58,10 @@ namespace Xcy.CrackRepair
         private void OnDisable()
         {
             if (interactable != null) interactable.selectEntered.RemoveListener(OnSelected);
+            StopAllCoroutines();
+            if (repairing) RepairStopped?.Invoke(this);
+            repairing = false;
+            if (particles != null) particles.Clear();
         }
 
         private void CaptureFullProjectorState()
@@ -64,6 +75,7 @@ namespace Xcy.CrackRepair
         public void ResetRepair()
         {
             StopAllCoroutines();
+            if (repairing) RepairStopped?.Invoke(this);
             if (particles != null) particles.Clear();
             unlocked = false;
             repairing = false;
@@ -89,17 +101,59 @@ namespace Xcy.CrackRepair
         [ContextMenu("Start Repair")]
         public void StartRepair()
         {
-            if (!Application.isPlaying || !unlocked || repairing || repaired || projector == null) return;
+            if (!Application.isPlaying || !CanStartRepair) return;
+            if (Xcy.Audio.NetworkInteractionAudioRelay.RouteCrackRepair(this)) return;
+            StartRepairFromAuthority();
+        }
+
+        public void StartRepairFromAuthority()
+        {
+            if (!Application.isPlaying || !CanStartRepair || NetworkGameplayCoordinator.IsFollower) return;
+            BeginRepair(0f, true);
+        }
+
+        private void BeginRepair(float elapsed, bool notifyCoordinator)
+        {
             repairing = true;
             unlocked = false;
+            initialElapsed = Mathf.Clamp(elapsed, 0f, repairDuration);
+            RepairStartedAt = Mirror.NetworkTime.time - initialElapsed;
+            reportCompletion = notifyCoordinator;
             if (interactable != null) interactable.enabled = false;
             if (particles != null) particles.Begin();
+            RepairStarted?.Invoke(this);
             StartCoroutine(AnimateRepair());
+        }
+
+        public void ApplyNetworkRepairState(byte state, double startedAt, bool repairUnlocked)
+        {
+            if (!NetworkGameplayCoordinator.IsFollower || !isActiveAndEnabled) return;
+            if (state == 2)
+            {
+                StopAllCoroutines();
+                if (repairing) RepairStopped?.Invoke(this);
+                repairing = false;
+                repaired = true;
+                unlocked = false;
+                if (particles != null) particles.Clear();
+                maskAnimator?.SetProgress(1f);
+                if (projector != null) projector.enabled = false;
+                if (interactable != null) interactable.enabled = false;
+            }
+            else if (state == 1 && !repairing && !repaired)
+            {
+                if (projector != null) BeginRepair((float)System.Math.Max(0d, Mirror.NetworkTime.time - startedAt), false);
+            }
+            else if (state == 0)
+            {
+                if (repairing || repaired) ResetRepair();
+                if (repairUnlocked) Unlock();
+            }
         }
 
         private IEnumerator AnimateRepair()
         {
-            float elapsed = 0f;
+            float elapsed = initialElapsed;
             while (elapsed < repairDuration)
             {
                 elapsed += Time.deltaTime;
@@ -114,7 +168,8 @@ namespace Xcy.CrackRepair
             projector.enabled = false;
             repairing = false;
             repaired = true;
-            coordinator?.NotifyRepairCompleted(this);
+            RepairStopped?.Invoke(this);
+            if (reportCompletion) coordinator?.NotifyRepairCompleted(this);
         }
 
     }
