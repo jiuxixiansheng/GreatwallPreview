@@ -23,6 +23,12 @@ namespace Xcy.CrackRepair
         private bool repairUnlocked;
         private bool repairCompleted;
         private bool advancing;
+        public IReadOnlyList<CrackRepairDecal> Cracks => cracks;
+        public bool IsRepairUnlocked => repairUnlocked;
+        public bool IsRepairCompleted => repairCompleted;
+        public int IndexOf(CrackRepairDecal crack) => System.Array.IndexOf(cracks, crack);
+        public event System.Action RepairUnlocked;
+        public event System.Action RepairFinished;
 
 #if UNITY_EDITOR && ENABLE_INPUT_SYSTEM
         private void Update()
@@ -72,6 +78,7 @@ namespace Xcy.CrackRepair
 
         private void OnPart2TimelineCompleted()
         {
+            if (NetworkGameplayCoordinator.IsFollower) return;
             // 修复后先播完本章剩余内容，再切下一章。
             if (!repairCompleted || advancing) return;
             advancing = true;
@@ -94,10 +101,12 @@ namespace Xcy.CrackRepair
                         trigger.PrepareForRepair();
             foreach (CrackRepairDecal crack in cracks)
                 if (crack != null) crack.Unlock();
+            RepairUnlocked?.Invoke();
         }
 
         public void NotifyRepairCompleted(CrackRepairDecal crack)
         {
+            if (NetworkGameplayCoordinator.IsFollower) return;
             if (!repairUnlocked || repairCompleted || crack == null || System.Array.IndexOf(cracks, crack) < 0)
                 return;
 
@@ -105,7 +114,15 @@ namespace Xcy.CrackRepair
             if (completed.Count != cracks.Length || cracks.Length != 4) return;
 
             repairCompleted = true;
+            RepairFinished?.Invoke();
             EventDispatcher.Instance.Dispatch("裂缝修复完成");
+        }
+
+        public void ApplyNetworkRepairState(bool unlocked, bool complete)
+        {
+            if (!NetworkGameplayCoordinator.IsFollower) return;
+            repairUnlocked = unlocked;
+            repairCompleted = complete;
         }
     }
 }

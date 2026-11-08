@@ -13,6 +13,8 @@ public class BrickDropZone : MonoBehaviour
     private bool isSolved;
     public bool IsSolved => isSolved;
     public int CurrentBrickCount => bricksInside.Count;
+    public event System.Action<BrickDropZone, Rigidbody> BrickAccepted;
+    public event System.Action<BrickDropZone> Solved;
 
     private bool CanJudge => !NetworkGameplayCoordinator.IsManaged || NetworkServer.active;
 
@@ -27,6 +29,7 @@ public class BrickDropZone : MonoBehaviour
         {
             colliders = new HashSet<Collider>();
             bricksInside.Add(brick, colliders);
+            BrickAccepted?.Invoke(this, brick);
         }
         colliders.Add(other);
         Debug.Log($"[修墙] 当前砖块：{bricksInside.Count}/{targetBrickCount}", this);
@@ -59,6 +62,7 @@ public class BrickDropZone : MonoBehaviour
     {
         bool firstApplication = !isSolved;
         isSolved = true;
+        if (firstApplication && dispatchEvent) Solved?.Invoke(this);
         if (firstApplication && dispatchEvent) EventDispatcher.Instance.Dispatch("修复城墙结束");
         foreach (var obj in targetObjects) if (obj != null) obj.SetActive(false);
         gameObject.SetActive(false);
