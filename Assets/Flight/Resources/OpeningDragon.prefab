@@ -48,6 +48,18 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: c9f8961ab31a7e241a3ef008b3b587b8, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 1.5
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: c9f8961ab31a7e241a3ef008b3b587b8, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 1.5
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: c9f8961ab31a7e241a3ef008b3b587b8, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 1.5
+      objectReference: {fileID: 0}
     - target: {fileID: -2735505361812183171, guid: c9f8961ab31a7e241a3ef008b3b587b8, type: 3}
       propertyPath: m_UpdateWhenOffscreen
       value: 1
@@ -120,7 +132,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   YawOffset: -90
   HoverCenterOffset: {x: 0, y: 0, z: 0}
-  HoverHeadOffset: {x: 9.724149, y: 4.398603, z: 15.49058}
+  HoverHeadOffset: {x: 14.586223, y: 6.597905, z: 23.23587}
   OrbitRelocate: {x: 0, y: 0, z: 0}
   CircleDuration: 7.4333
   TransitionDuration: 1.9667
