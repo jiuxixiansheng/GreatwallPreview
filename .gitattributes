@@ -37,3 +37,4 @@
 
 # 确保 Unity 的 .meta 文件永远作为普通文本处理
 *.meta text
+Assets/Flight/Anim/Opening.anim filter=lfs diff=lfs merge=lfs -text
