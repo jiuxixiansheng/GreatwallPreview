@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEngine.Rendering.Universal;
@@ -8,9 +9,34 @@ namespace Xcy.CrackRepair
     [DisallowMultipleComponent]
     public sealed class CrackRepairParticles : MonoBehaviour
     {
-        private const float DustPerSecond = 18f;
-        private const float ChipsPerSecond = 4f;
+        private const int FrontBucketCount = 64;
         private static readonly RaycastHit[] WallHits = new RaycastHit[16];
+
+        [Header("Dust")]
+        [SerializeField, Min(0f)] private float dustPerSecond = 18f;
+        [SerializeField] private Color dustColor = new Color(0.72f, 0.68f, 0.59f, 1f);
+        [SerializeField] private Vector2 dustAlphaRange = new Vector2(0.18f, 0.35f);
+        [SerializeField] private Vector2 dustSizeRange = new Vector2(0.025f, 0.055f);
+        [SerializeField] private Vector2 dustLifetimeRange = new Vector2(0.35f, 0.65f);
+        [SerializeField] private Vector2 dustNormalSpeedRange = new Vector2(0.035f, 0.11f);
+        [SerializeField] private Vector2 dustUpSpeedRange = new Vector2(0.02f, 0.09f);
+        [SerializeField, Min(0f)] private float dustScatterSpeed = 0.025f;
+        [SerializeField, Min(0f)] private float dustGravity = 0.09f;
+
+        [Header("Chips")]
+        [SerializeField, Min(0f)] private float chipsPerSecond = 4f;
+        [SerializeField] private Color chipColor = new Color(0.42f, 0.39f, 0.34f, 0.8f);
+        [SerializeField] private Vector2 chipSizeRange = new Vector2(0.006f, 0.015f);
+        [SerializeField] private Vector2 chipLifetimeRange = new Vector2(0.4f, 0.75f);
+        [SerializeField] private Vector2 chipNormalSpeedRange = new Vector2(0.07f, 0.16f);
+        [SerializeField] private Vector2 chipUpSpeedRange = new Vector2(0.02f, 0.08f);
+        [SerializeField, Min(0f)] private float chipScatterSpeed = 0.045f;
+        [SerializeField, Min(0f)] private float chipGravity = 0.65f;
+
+        [Header("Placement")]
+        [SerializeField, Min(0f)] private float surfaceOffset = 0.012f;
+        [SerializeField, Min(0f)] private float dustJitter = 0.018f;
+        [SerializeField, Min(0f)] private float chipJitter = 0.012f;
 
         private static Material particleMaterial;
         private static Texture2D softParticleTexture;
@@ -19,19 +45,40 @@ namespace Xcy.CrackRepair
         private ParticleSystem dust;
         private ParticleSystem chips;
         private Vector3 fullSize;
+        private List<Vector2>[] frontBuckets;
         private float dustRemainder;
         private float chipRemainder;
 
-        public void Initialize(DecalProjector target, Vector3 initialSize)
+        public void Initialize(DecalProjector target, Vector3 initialSize, Texture2D repairOrderMap)
         {
             projector = target;
             fullSize = initialSize;
-            if (projector == null) return;
+            if (projector == null || repairOrderMap == null || !repairOrderMap.isReadable)
+            {
+                Debug.LogError("Crack repair particles need a readable repair order map.", this);
+                return;
+            }
+            BuildFrontBuckets(repairOrderMap);
 
             EnsureMaterial();
             if (particleMaterial == null) return;
-            dust = CreateSystem("Repair Dust", 48, 0.09f);
-            chips = CreateSystem("Repair Chips", 16, 0.65f);
+            dust = CreateSystem("Repair Dust", 96, dustGravity);
+            chips = CreateSystem("Repair Chips", 32, chipGravity);
+        }
+
+        private void BuildFrontBuckets(Texture2D map)
+        {
+            frontBuckets = new List<Vector2>[FrontBucketCount];
+            for (int i = 0; i < frontBuckets.Length; i++) frontBuckets[i] = new List<Vector2>();
+            Color32[] pixels = map.GetPixels32();
+            for (int y = 0; y < map.height; y += 2)
+            for (int x = 0; x < map.width; x += 2)
+            {
+                Color32 pixel = pixels[y * map.width + x];
+                if (pixel.g < 64) continue;
+                int bucket = Mathf.Min(FrontBucketCount - 1, pixel.r * FrontBucketCount / 256);
+                frontBuckets[bucket].Add(new Vector2((x + 0.5f) / map.width, (y + 0.5f) / map.height));
+            }
         }
 
         public void Clear()
@@ -51,38 +98,49 @@ namespace Xcy.CrackRepair
 
         public void EmitAt(float progress, float deltaTime)
         {
-            if (projector == null || dust == null || chips == null) return;
-
-            float lowerFront = 0.5f * (1f - progress);
-            float upperFront = 0.5f * (1f + progress);
-            Vector3 lowerPoint = FindWallPoint(lowerFront, out Vector3 lowerNormal);
-            Vector3 upperPoint = FindWallPoint(upperFront, out Vector3 upperNormal);
-            dustRemainder += DustPerSecond * deltaTime;
-            chipRemainder += ChipsPerSecond * deltaTime;
+            if (projector == null || dust == null || chips == null || frontBuckets == null) return;
+            dustRemainder += dustPerSecond * deltaTime;
+            chipRemainder += chipsPerSecond * deltaTime;
 
             while (dustRemainder >= 1f)
             {
                 dustRemainder -= 1f;
-                bool upper = Random.value < 0.5f;
-                EmitDust(upper ? upperPoint : lowerPoint, upper ? upperNormal : lowerNormal);
+                if (TryGetFrontUV(progress, out Vector2 uv))
+                    EmitDust(FindWallPoint(uv, out Vector3 normal), normal);
             }
 
             while (chipRemainder >= 1f)
             {
                 chipRemainder -= 1f;
-                bool upper = Random.value < 0.5f;
-                EmitChip(upper ? upperPoint : lowerPoint, upper ? upperNormal : lowerNormal);
+                if (TryGetFrontUV(progress, out Vector2 uv))
+                    EmitChip(FindWallPoint(uv, out Vector3 normal), normal);
             }
         }
 
-        private Vector3 FindWallPoint(float progress, out Vector3 normal)
+        private bool TryGetFrontUV(float progress, out Vector2 uv)
         {
-            // Approximate the main branch in 1_alpha.png at this vertical position.
-            float x = Mathf.Lerp(0.65f, 0.42f, progress) + 0.025f * Mathf.Sin(progress * 10f);
-            Vector3 localPoint = new Vector3((x - 0.5f) * fullSize.x,
-                (progress - 0.5f) * fullSize.y, 0f);
+            int center = Mathf.Clamp(Mathf.FloorToInt(progress * FrontBucketCount), 0, FrontBucketCount - 1);
+            for (int attempt = 0; attempt < 6; attempt++)
+            {
+                int bucket = Mathf.Clamp(center + Random.Range(-1, 2), 0, FrontBucketCount - 1);
+                List<Vector2> candidates = frontBuckets[bucket];
+                if (candidates.Count == 0) continue;
+                uv = candidates[Random.Range(0, candidates.Count)];
+                return true;
+            }
+            uv = default;
+            return false;
+        }
+
+        private Vector3 FindWallPoint(Vector2 uv, out Vector3 normal)
+        {
+            Vector3 localPoint = new Vector3((uv.x - 0.5f) * fullSize.x,
+                (uv.y - 0.5f) * fullSize.y, 0f);
             Transform decalTransform = projector.transform;
-            Vector3 projectedPoint = decalTransform.TransformPoint(localPoint);
+            // ScaleInvariant decals ignore the Transform scale, so particle positions must too.
+            Vector3 projectedPoint = projector.scaleMode == DecalScaleMode.ScaleInvariant
+                ? decalTransform.position + decalTransform.rotation * localPoint
+                : decalTransform.TransformPoint(localPoint);
             Vector3 intoWall = decalTransform.forward;
             normal = -intoWall;
 
@@ -104,19 +162,23 @@ namespace Xcy.CrackRepair
                 normal = hit.normal;
             }
 
-            return wallPoint + normal * 0.012f;
+            return wallPoint + normal * surfaceOffset;
         }
+
+        private static float RandomInRange(Vector2 range) =>
+            Random.Range(Mathf.Min(range.x, range.y), Mathf.Max(range.x, range.y));
 
         private void EmitDust(Vector3 point, Vector3 normal)
         {
             var particle = new ParticleSystem.EmitParams
             {
-                position = point + Random.insideUnitSphere * 0.018f,
-                velocity = normal * Random.Range(0.035f, 0.11f) +
-                    Vector3.up * Random.Range(0.02f, 0.09f) + Random.insideUnitSphere * 0.025f,
-                startLifetime = Random.Range(0.35f, 0.65f),
-                startSize = Random.Range(0.025f, 0.055f),
-                startColor = new Color(0.72f, 0.68f, 0.59f, Random.Range(0.18f, 0.35f))
+                position = point + Random.insideUnitSphere * dustJitter,
+                velocity = normal * RandomInRange(dustNormalSpeedRange) +
+                    Vector3.up * RandomInRange(dustUpSpeedRange) + Random.insideUnitSphere * dustScatterSpeed,
+                startLifetime = Mathf.Max(0.01f, RandomInRange(dustLifetimeRange)),
+                startSize = Mathf.Max(0.001f, RandomInRange(dustSizeRange)),
+                startColor = new Color(dustColor.r, dustColor.g, dustColor.b,
+                    dustColor.a * Mathf.Clamp01(RandomInRange(dustAlphaRange)))
             };
             dust.Emit(particle, 1);
         }
@@ -125,12 +187,12 @@ namespace Xcy.CrackRepair
         {
             var particle = new ParticleSystem.EmitParams
             {
-                position = point + Random.insideUnitSphere * 0.012f,
-                velocity = normal * Random.Range(0.07f, 0.16f) +
-                    Vector3.up * Random.Range(0.02f, 0.08f) + Random.insideUnitSphere * 0.045f,
-                startLifetime = Random.Range(0.4f, 0.75f),
-                startSize = Random.Range(0.006f, 0.015f),
-                startColor = new Color(0.42f, 0.39f, 0.34f, 0.8f)
+                position = point + Random.insideUnitSphere * chipJitter,
+                velocity = normal * RandomInRange(chipNormalSpeedRange) +
+                    Vector3.up * RandomInRange(chipUpSpeedRange) + Random.insideUnitSphere * chipScatterSpeed,
+                startLifetime = Mathf.Max(0.01f, RandomInRange(chipLifetimeRange)),
+                startSize = Mathf.Max(0.001f, RandomInRange(chipSizeRange)),
+                startColor = chipColor
             };
             chips.Emit(particle, 1);
         }
@@ -140,6 +202,8 @@ namespace Xcy.CrackRepair
             var child = new GameObject(systemName);
             child.transform.SetParent(transform, false);
             var system = child.AddComponent<ParticleSystem>();
+            // A newly added system can already be playing before playOnAwake is changed.
+            system.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
             var main = system.main;
             main.playOnAwake = false;
             main.loop = false;
