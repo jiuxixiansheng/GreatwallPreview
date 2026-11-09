@@ -26,7 +26,9 @@ namespace Greatwall.Navigation
         [SerializeField] private bool useInitialAgentSpeedAsReference = true;
         [Tooltip("动画以 1 倍速度播放时，视觉上对应的角色移动速度。")]
         [SerializeField, Min(0.01f)] private float referenceMovementSpeed = 1.5f;
-        [SerializeField] private Vector2 animationSpeedRange = new Vector2(0.75f, 1.25f);
+        [Tooltip("1 保持原来的步速匹配比例；大于 1 时相同移动速度下脚步更快，小于 1 时更慢。0 暂停走路动画，不改变移动速度或独立上半身动作。")]
+        [SerializeField, Min(0f), InspectorName("步速匹配倍率")]
+        private float animationSpeedMultiplier = 1f;
 
         private float runtimeReferenceMovementSpeed;
 
@@ -76,11 +78,11 @@ namespace Greatwall.Navigation
 
             if (!synchronizeAnimationSpeed) return;
 
-            float multiplier = isMoving ? actualSpeed / runtimeReferenceMovementSpeed : 1f;
-            multiplier = Mathf.Clamp(
-                multiplier,
-                Mathf.Min(animationSpeedRange.x, animationSpeedRange.y),
-                Mathf.Max(animationSpeedRange.x, animationSpeedRange.y));
+            // 只缩放移动状态的步频，不再把结果限制在固定倍率范围内。
+            // 静止时保持 1 倍，避免影响共用此参数的非移动状态。
+            float multiplier = isMoving
+                ? actualSpeed / runtimeReferenceMovementSpeed * animationSpeedMultiplier
+                : 1f;
 
             animator.SetFloat(
                 animationSpeedFloat,

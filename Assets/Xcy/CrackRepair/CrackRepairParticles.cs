@@ -202,6 +202,8 @@ namespace Xcy.CrackRepair
             var child = new GameObject(systemName);
             child.transform.SetParent(transform, false);
             var system = child.AddComponent<ParticleSystem>();
+            // A newly added system can already be playing before playOnAwake is changed.
+            system.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
             var main = system.main;
             main.playOnAwake = false;
             main.loop = false;

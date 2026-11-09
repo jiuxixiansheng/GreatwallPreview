@@ -1,3 +1,4 @@
+using Mirror;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -7,7 +8,8 @@ namespace Xcy.Boundary
     public sealed class PartBoundaryEffect : MonoBehaviour
     {
         [Header("References")]
-        [SerializeField] private Camera playerCamera;
+        [SerializeField, Tooltip("联机时自动绑定本机玩家的头显相机，可留空；单机场景可手动指定。")]
+        private Camera playerCamera;
         [SerializeField] private PartBoundaryZone[] zones;
         [SerializeField] private Material blackoutMaterial;
         [SerializeField] private Material guideMaterial;
@@ -51,25 +53,65 @@ namespace Xcy.Boundary
         private PartBoundaryZone activeZone;
         private bool outside;
         private float fade;
+        private Camera configuredCamera;
 
         private void Awake()
         {
-            if (playerCamera == null) playerCamera = Camera.main;
-            if (playerCamera == null || blackoutMaterial == null || guideMaterial == null || proximityWarningMaterial == null)
+            configuredCamera = playerCamera;
+            playerCamera = null;
+            if (blackoutMaterial == null || guideMaterial == null || proximityWarningMaterial == null)
             {
-                Debug.LogError("PartBoundaryEffect: 请在 Inspector 中绑定玩家相机和三种材质。", this);
+                Debug.LogError("PartBoundaryEffect: 请在 Inspector 中绑定三种边界材质。玩家相机会在生成后自动绑定。", this);
                 enabled = false;
                 return;
             }
 
             runtimeBlackoutMaterial = new Material(blackoutMaterial);
-            CreateBlackoutSphere();
-            CreatePrompt();
             SetVisuals(0f);
         }
 
-        private void Update()
+        private Camera ResolvePlayerCamera()
         {
+            // A scene camera or another player's camera must never drive the local boundary.
+            // Keep waiting before connection, on a dedicated server, and between respawns.
+            if (NetworkClient.active || NetworkServer.active || NetworkManager.singleton != null)
+            {
+                var localPlayer = NetworkClient.localPlayer;
+                if (localPlayer == null || !localPlayer.isLocalPlayer) return null;
+                var setup = localPlayer.GetComponent<PlayerNetworkSetup>();
+                Camera camera = setup != null && setup.localCamera != null
+                    ? setup.localCamera : localPlayer.GetComponentInChildren<Camera>(true);
+                return camera != null && camera.isActiveAndEnabled &&
+                    camera.transform.IsChildOf(localPlayer.transform) ? camera : null;
+            }
+
+            Camera fallback = configuredCamera != null ? configuredCamera : Camera.main;
+            if (fallback == null || !fallback.isActiveAndEnabled) return null;
+            var identity = fallback.GetComponentInParent<NetworkIdentity>();
+            return identity == null || identity.isLocalPlayer ? fallback : null;
+        }
+
+        private bool BindPlayerCamera()
+        {
+            Camera next = ResolvePlayerCamera();
+            if (next != null && next == playerCamera && blackoutRenderer != null && promptCanvas != null)
+                return true;
+
+            if (playerCamera != null || blackoutRenderer != null || promptCanvas != null ||
+                activeZone != null || fade > 0f)
+                ClearCameraVisuals();
+            if (next == null) return false;
+
+            playerCamera = next;
+            CreateBlackoutSphere();
+            CreatePrompt();
+            SetVisuals(0f);
+            return true;
+        }
+
+        private void LateUpdate()
+        {
+            if (!BindPlayerCamera()) return;
             PartBoundaryZone nextZone = null;
             if (zones != null)
             {
@@ -205,10 +247,14 @@ namespace Xcy.Boundary
             textRect.offsetMin = Vector2.zero;
             textRect.offsetMax = Vector2.zero;
             promptText = textObject.GetComponent<Text>();
-            runtimePromptFont = promptFont == null
-                ? Font.CreateDynamicFontFromOSFont(new[] { "Microsoft YaHei", "Noto Sans CJK SC", "Arial" }, 72)
-                : null;
-            promptText.font = promptFont != null ? promptFont : runtimePromptFont;
+            Font font = promptFont != null ? promptFont : Resources.Load<Font>("NotoSansSC-Guide");
+            if (font == null)
+            {
+                if (runtimePromptFont == null)
+                    runtimePromptFont = Font.CreateDynamicFontFromOSFont(new[] { "Microsoft YaHei", "Noto Sans CJK SC", "Arial" }, 72);
+                font = runtimePromptFont;
+            }
+            promptText.font = font;
             promptText.fontSize = 42;
             promptText.alignment = TextAnchor.MiddleCenter;
             promptText.horizontalOverflow = HorizontalWrapMode.Overflow;
@@ -244,8 +290,30 @@ namespace Xcy.Boundary
             return image;
         }
 
+        private void ClearCameraVisuals()
+        {
+            activeZone = null;
+            outside = false;
+            fade = 0f;
+            SetVisuals(0f);
+            if (blackoutRenderer != null) Destroy(blackoutRenderer.gameObject);
+            if (promptCanvas != null) Destroy(promptCanvas.gameObject);
+            blackoutRenderer = null;
+            promptCanvas = null;
+            promptText = null;
+            arrowRoot = null;
+            arrowPieces = null;
+            playerCamera = null;
+        }
+
+        private void OnDisable()
+        {
+            ClearCameraVisuals();
+        }
+
         private void OnDestroy()
         {
+            ClearCameraVisuals();
             if (runtimeBlackoutMaterial != null) Destroy(runtimeBlackoutMaterial);
             if (runtimePromptFont != null) Destroy(runtimePromptFont);
         }

@@ -93,12 +93,16 @@ namespace Xcy.Boundary
 
         public void SetGuide(Material material, Color color, float opacity, float edgeSoftness)
         {
+            if (opacity <= 0.001f || !IsAvailable)
+            {
+                if (guideRenderer != null) guideRenderer.enabled = false;
+                return;
+            }
+
             if (guideRenderer == null) CreateGuide(material);
             if (guideRenderer == null) return;
 
-            bool visible = opacity > 0.001f && IsAvailable;
-            guideRenderer.enabled = visible;
-            if (!visible) return;
+            guideRenderer.enabled = true;
 
             BoxCollider box = Volume;
             Transform guide = guideRenderer.transform;
