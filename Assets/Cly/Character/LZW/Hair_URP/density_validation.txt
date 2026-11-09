@@ -1,0 +1,2 @@
+TotalTriangles=48492
+Source=Original Groom LOD0 cards + depth-displaced detailed backing

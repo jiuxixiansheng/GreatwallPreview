@@ -1,0 +1,2953 @@
+{
+  "mesh": "/Game/MetaHumans/Blender_assemble/LZW_Assembled.LZW_Assembled",
+  "slots": [
+    {
+      "index": 0,
+      "slot": "MI_Body_Baked_VT",
+      "material": "/Game/MetaHumans/LZW/Material/M_body.M_body",
+      "class": "Material",
+      "textures": {},
+      "scalars": {},
+      "vectors": {},
+      "parents": []
+    },
+    {
+      "index": 1,
+      "slot": "MI_Face_Skin_Baked_LOD0_VT",
+      "material": "/Game/MetaHumans/LZW/MC_LZW_MaterialsExport/Face/Materials/MI_Face_Skin_LOD0.MI_Face_Skin_LOD0",
+      "class": "MaterialInstanceConstant",
+      "textures": {
+        "Blood Mask VT": {
+          "path": "/MetaHumanCharacter/Lookdev_UHM/Common/Textures/Placeholders/T_Flat_Black_M_VT.T_Flat_Black_M_VT",
+          "class": "Texture2D",
+          "srgb": false,
+          "compression": "<TextureCompressionSettings.TC_MASKS: 2>"
+        },
+        "Blood Mask": {
+          "path": "/MetaHumanCharacter/Lookdev_UHM/Common/Textures/Placeholders/T_Flat_Black_M.T_Flat_Black_M",
+          "class": "Texture2D",
+          "srgb": false,
+          "compression": "<TextureCompressionSettings.TC_MASKS: 2>"
+        },
+        "Basecolor VT": {
+          "path": "/MetaHumanCharacter/Lookdev_UHM/Common/Textures/Placeholders/T_Flat_Grey_C_VT.T_Flat_Grey_C_VT",
+          "class": "Texture2D",
+          "srgb": true,
+          "compression": "<TextureCompressionSettings.TC_DEFAULT: 0>"
+        },
+        "Normal VT": {
+          "path": "/MetaHumanCharacter/Lookdev_UHM/Common/Textures/Placeholders/T_Flat_N_VT.T_Flat_N_VT",
+          "class": "Texture2D",
+          "srgb": false,
+          "compression": "<TextureCompressionSettings.TC_NORMALMAP: 1>"
+        },
+        "Roughness VT": {
+          "path": "/MetaHumanCharacter/Lookdev_UHM/Common/Textures/Placeholders/T_Flat_Grey_M_VT.T_Flat_Grey_M_VT",
+          "class": "Texture2D",
+          "srgb": false,
+          "compression": "<TextureCompressionSettings.TC_MASKS: 2>"
+        },
+        "Basecolor": {
+          "path": "/Game/1_LZW/ChatGPT_Image_2026年6月29日_13_41_52.ChatGPT_Image_2026年6月29日_13_41_52",
+          "class": "Texture2D",
+          "srgb": true,
+          "compression": "<TextureCompressionSettings.TC_EDITOR_ICON: 7>"
+        },
+        "Roughness": {
+          "path": "/MetaHumanCharacter/Lookdev_UHM/Common/Textures/Placeholders/T_Flat_Grey_M.T_Flat_Grey_M",
+          "class": "Texture2D",
+          "srgb": false,
+          "compression": "<TextureCompressionSettings.TC_MASKS: 2>"
+        },
+        "Normal": {
+          "path": "/Game/MetaHumans/LZW/MC_LZW_MaterialsExport/Face/Textures/T_Face_Normal.T_Face_Normal",
+          "class": "Texture2D",
+          "srgb": false,
+          "compression": "<TextureCompressionSettings.TC_NORMALMAP: 1>"
+        },
+        "Makeup Blusher Mask VT": {
+          "path": "/MetaHumanCharacter/Lookdev_UHM/Common/Textures/Placeholders/T_Flat_Black_M_VT.T_Flat_Black_M_VT",
+          "class": "Texture2D",
+          "srgb": false,
+          "compression": "<TextureCompressionSettings.TC_MASKS: 2>"
+        },
+        "Makeup EyeMask VT": {
+          "path": "/MetaHumanCharacter/Lookdev_UHM/Common/Textures/Placeholders/T_Flat_Black_M_VT.T_Flat_Black_M_VT",
+          "class": "Texture2D",
+          "srgb": false,
+          "compression": "<TextureCompressionSettings.TC_MASKS: 2>"
+        },
+        "Makeup Lipstick Mask VT": {
+          "path": "/MetaHumanCharacter/Lookdev_UHM/Common/Textures/Placeholders/T_Flat_Black_M_VT.T_Flat_Black_M_VT",
+          "class": "Texture2D",
+          "srgb": false,
+          "compression": "<TextureCompressionSettings.TC_MASKS: 2>"
+        },
+        "Makeup FoundationConcealer Mask VT": {
+          "path": "/MetaHumanCharacter/Lookdev_UHM/Common/Textures/Placeholders/T_Flat_Black_M_VT.T_Flat_Black_M_VT",
+          "class": "Texture2D",
+          "srgb": false,
+          "compression": "<TextureCompressionSettings.TC_MASKS: 2>"
+        },
+        "Makeup Blusher Mask": {
+          "path": "/MetaHumanCharacter/Textures/ArtistDelights/BlushMakeup/T_BlushMakeup_HighCurve.T_BlushMakeup_HighCurve",
+          "class": "Texture2D",
+          "srgb": false,
+          "compression": "<TextureCompressionSettings.TC_MASKS: 2>"
+        },
+        "Makeup FoundationConcealer Mask": {
+          "path": "/MetaHumanCharacter/Lookdev_UHM/Common/Textures/Placeholders/T_Flat_Black_M.T_Flat_Black_M",
+          "class": "Texture2D",
+          "srgb": false,
+          "compression": "<TextureCompressionSettings.TC_MASKS: 2>"
+        },
+        "Makeup EyeMask": {
+          "path": "/MetaHumanCharacter/Textures/ArtistDelights/EyeMakeup/T_EyeMakeup_PandaSmudge.T_EyeMakeup_PandaSmudge",
+          "class": "Texture2D",
+          "srgb": false,
+          "compression": "<TextureCompressionSettings.TC_MASKS: 2>"
+        },
+        "Makeup Lipstick Mask": {
+          "path": "/MetaHumanCharacter/Textures/ArtistDelights/LipsMakeup/T_LipsMakeup_Hollywood.T_LipsMakeup_Hollywood",
+          "class": "Texture2D",
+          "srgb": false,
+          "compression": "<TextureCompressionSettings.TC_MASKS: 2>"
+        },
+        "Dirt Mask VT": {
+          "path": "/MetaHumanCharacter/Lookdev_UHM/Common/Textures/Placeholders/T_Flat_Black_M_VT.T_Flat_Black_M_VT",
+          "class": "Texture2D",
+          "srgb": false,
+          "compression": "<TextureCompressionSettings.TC_MASKS: 2>"
+        },
+        "Dirt Normal VT": {
+          "path": "/MetaHumanCharacter/Lookdev_UHM/Common/Textures/Placeholders/T_Flat_N_VT.T_Flat_N_VT",
+          "class": "Texture2D",
+          "srgb": false,
+          "compression": "<TextureCompressionSettings.TC_NORMALMAP: 1>"
+        },
+        "Dirt Color VT": {
+          "path": "/MetaHumanCharacter/Lookdev_UHM/Common/Textures/Placeholders/T_Flat_Grey_C_VT.T_Flat_Grey_C_VT",
+          "class": "Texture2D",
+          "srgb": true,
+          "compression": "<TextureCompressionSettings.TC_DEFAULT: 0>"
+        },
+        "Dirt Mask": {
+          "path": "/MetaHumanCharacter/Lookdev_UHM/Common/Textures/Placeholders/T_Flat_Black_M.T_Flat_Black_M",
+          "class": "Texture2D",
+          "srgb": false,
+          "compression": "<TextureCompressionSettings.TC_MASKS: 2>"
+        },
+        "Dirt Normal": {
+          "path": "/MetaHumanCharacter/Lookdev_UHM/Common/Textures/Placeholders/T_Flat_N_VT.T_Flat_N_VT",
+          "class": "Texture2D",
+          "srgb": false,
+          "compression": "<TextureCompressionSettings.TC_NORMALMAP: 1>"
+        },
+        "Dirt Color": {
+          "path": "/MetaHumanCharacter/Lookdev_UHM/Common/Textures/Placeholders/T_Flat_Grey_C_VT.T_Flat_Grey_C_VT",
+          "class": "Texture2D",
+          "srgb": true,
+          "compression": "<TextureCompressionSettings.TC_DEFAULT: 0>"
+        },
+        "Wet Mask VT": {
+          "path": "/MetaHumanCharacter/Lookdev_UHM/Skin/Textures/Skin_Regions/T_region_face_wet_default.T_region_face_wet_default",
+          "class": "Texture2D",
+          "srgb": false,
+          "compression": "<TextureCompressionSettings.TC_MASKS: 2>"
+        },
+        "Wet Mask": {
+          "path": "/MetaHumanCharacter/Lookdev_UHM/Skin/Textures/Skin_Regions/Regular/T_region_face_wet_default.T_region_face_wet_default",
+          "class": "Texture2D",
+          "srgb": false,
+          "compression": "<TextureCompressionSettings.TC_MASKS: 2>"
+        },
+        "Cavity VT": {
+          "path": "/MetaHumanCharacter/Lookdev_UHM/Common/Textures/Placeholders/T_Flat_Black_M_VT.T_Flat_Black_M_VT",
+          "class": "Texture2D",
+          "srgb": false,
+          "compression": "<TextureCompressionSettings.TC_MASKS: 2>"
+        },
+        "Cavity": {
+          "path": "/Game/MetaHumans/LZW/MC_LZW_MaterialsExport/Face/Textures/T_Face_Cavity.T_Face_Cavity",
+          "class": "Texture2D",
+          "srgb": false,
+          "compression": "<TextureCompressionSettings.TC_MASKS: 2>"
+        },
+        "Cavity_Chest": {
+          "path": "/Game/MetaHumans/LZW/MC_LZW_MaterialsExport/Body/Textures/T_Body_Chest_Cavity.T_Body_Chest_Cavity",
+          "class": "Texture2D",
+          "srgb": false,
+          "compression": "<TextureCompressionSettings.TC_MASKS: 2>"
+        },
+        "Normal Animated Delta wm1": {
+          "path": "/Game/MetaHumans/LZW/MC_LZW_MaterialsExport/Face/Textures/T_Face_Normal_Animated_WM1.T_Face_Normal_Animated_WM1",
+          "class": "Texture2D",
+          "srgb": false,
+          "compression": "<TextureCompressionSettings.TC_DEFAULT: 0>"
+        },
+        "Normal Animated Delta wm2": {
+          "path": "/Game/MetaHumans/LZW/MC_LZW_MaterialsExport/Face/Textures/T_Face_Normal_Animated_WM2.T_Face_Normal_Animated_WM2",
+          "class": "Texture2D",
+          "srgb": false,
+          "compression": "<TextureCompressionSettings.TC_DEFAULT: 0>"
+        },
+        "Normal Animated Delta wm3": {
+          "path": "/Game/MetaHumans/LZW/MC_LZW_MaterialsExport/Face/Textures/T_Face_Normal_Animated_WM3.T_Face_Normal_Animated_WM3",
+          "class": "Texture2D",
+          "srgb": false,
+          "compression": "<TextureCompressionSettings.TC_DEFAULT: 0>"
+        },
+        "Basecolor Animated Delta cm1": {
+          "path": "/Game/MetaHumans/LZW/MC_LZW_MaterialsExport/Face/Textures/T_Face_Basecolor_Animated_CM1.T_Face_Basecolor_Animated_CM1",
+          "class": "Texture2D",
+          "srgb": false,
+          "compression": "<TextureCompressionSettings.TC_HDR_COMPRESSED: 10>"
+        },
+        "Basecolor Animated Delta cm2": {
+          "path": "/Game/MetaHumans/LZW/MC_LZW_MaterialsExport/Face/Textures/T_Face_Basecolor_Animated_CM2.T_Face_Basecolor_Animated_CM2",
+          "class": "Texture2D",
+          "srgb": false,
+          "compression": "<TextureCompressionSettings.TC_HDR_COMPRESSED: 10>"
+        },
+        "Basecolor Animated Delta cm3": {
+          "path": "/Game/MetaHumans/LZW/MC_LZW_MaterialsExport/Face/Textures/T_Face_Basecolor_Animated_CM3.T_Face_Basecolor_Animated_CM3",
+          "class": "Texture2D",
+          "srgb": false,
+          "compression": "<TextureCompressionSettings.TC_HDR_COMPRESSED: 10>"
+        },
+        "Basecolor Original VT": {
+          "path": "/MetaHumanCharacter/Lookdev_UHM/Common/Textures/Placeholders/T_Flat_White_C_VT.T_Flat_White_C_VT",
+          "class": "Texture2D",
+          "srgb": true,
+          "compression": "<TextureCompressionSettings.TC_DEFAULT: 0>"
+        },
+        "Basecolor Original": {
+          "path": "/MetaHumanCharacter/Lookdev_UHM/Common/Textures/Placeholders/T_Flat_White_C.T_Flat_White_C",
+          "class": "Texture2D",
+          "srgb": true,
+          "compression": "<TextureCompressionSettings.TC_DEFAULT: 0>"
+        },
+        "Basecolor Animated cm1 VT": {
+          "path": "/MetaHumanCharacter/Lookdev_UHM/Common/Textures/Placeholders/T_Flat_White_C_VT.T_Flat_White_C_VT",
+          "class": "Texture2D",
+          "srgb": true,
+          "compression": "<TextureCompressionSettings.TC_DEFAULT: 0>"
+        },
+        "Basecolor Animated cm1": {
+          "path": "/MetaHumanCharacter/Lookdev_UHM/Common/Textures/Placeholders/T_Flat_White_C.T_Flat_White_C",
+          "class": "Texture2D",
+          "srgb": true,
+          "compression": "<TextureCompressionSettings.TC_DEFAULT: 0>"
+        },
+        "Basecolor Animated cm2 VT": {
+          "path": "/MetaHumanCharacter/Lookdev_UHM/Common/Textures/Placeholders/T_Flat_White_C_VT.T_Flat_White_C_VT",
+          "class": "Texture2D",
+          "srgb": true,
+          "compression": "<TextureCompressionSettings.TC_DEFAULT: 0>"
+        },
+        "Basecolor Animated cm2": {
+          "path": "/MetaHumanCharacter/Lookdev_UHM/Common/Textures/Placeholders/T_Flat_White_C.T_Flat_White_C",
+          "class": "Texture2D",
+          "srgb": true,
+          "compression": "<TextureCompressionSettings.TC_DEFAULT: 0>"
+        },
+        "Basecolor Animated cm3 VT": {
+          "path": "/MetaHumanCharacter/Lookdev_UHM/Common/Textures/Placeholders/T_Flat_White_C_VT.T_Flat_White_C_VT",
+          "class": "Texture2D",
+          "srgb": true,
+          "compression": "<TextureCompressionSettings.TC_DEFAULT: 0>"
+        },
+        "Basecolor Animated cm3": {
+          "path": "/MetaHumanCharacter/Lookdev_UHM/Common/Textures/Placeholders/T_Flat_White_C.T_Flat_White_C",
+          "class": "Texture2D",
+          "srgb": true,
+          "compression": "<TextureCompressionSettings.TC_DEFAULT: 0>"
+        },
+        "Normal Original VT": {
+          "path": "/MetaHumanCharacter/Lookdev_UHM/Common/Textures/Placeholders/T_Flat_N_VT.T_Flat_N_VT",
+          "class": "Texture2D",
+          "srgb": false,
+          "compression": "<TextureCompressionSettings.TC_NORMALMAP: 1>"
+        },
+        "Normal Original": {
+          "path": "/MetaHumanCharacter/Lookdev_UHM/Common/Textures/Placeholders/T_Flat_N.T_Flat_N",
+          "class": "Texture2D",
+          "srgb": false,
+          "compression": "<TextureCompressionSettings.TC_NORMALMAP: 1>"
+        },
+        "Normal Animated wm1 VT": {
+          "path": "/MetaHumanCharacter/Lookdev_UHM/Common/Textures/Placeholders/T_Flat_N_VT.T_Flat_N_VT",
+          "class": "Texture2D",
+          "srgb": false,
+          "compression": "<TextureCompressionSettings.TC_NORMALMAP: 1>"
+        },
+        "Normal Animated wm1": {
+          "path": "/MetaHumanCharacter/Lookdev_UHM/Common/Textures/Placeholders/T_Flat_N.T_Flat_N",
+          "class": "Texture2D",
+          "srgb": false,
+          "compression": "<TextureCompressionSettings.TC_NORMALMAP: 1>"
+        },
+        "Normal Animated wm2 VT": {
+          "path": "/MetaHumanCharacter/Lookdev_UHM/Common/Textures/Placeholders/T_Flat_N_VT.T_Flat_N_VT",
+          "class": "Texture2D",
+          "srgb": false,
+          "compression": "<TextureCompressionSettings.TC_NORMALMAP: 1>"
+        },
+        "Normal Animated wm2": {
+          "path": "/MetaHumanCharacter/Lookdev_UHM/Common/Textures/Placeholders/T_Flat_N.T_Flat_N",
+          "class": "Texture2D",
+          "srgb": false,
+          "compression": "<TextureCompressionSettings.TC_NORMALMAP: 1>"
+        },
+        "Normal Animated wm3 VT": {
+          "path": "/MetaHumanCharacter/Lookdev_UHM/Common/Textures/Placeholders/T_Flat_N_VT.T_Flat_N_VT",
+          "class": "Texture2D",
+          "srgb": false,
+          "compression": "<TextureCompressionSettings.TC_NORMALMAP: 1>"
+        },
+        "Normal Animated wm3": {
+          "path": "/MetaHumanCharacter/Lookdev_UHM/Common/Textures/Placeholders/T_Flat_N.T_Flat_N",
+          "class": "Texture2D",
+          "srgb": false,
+          "compression": "<TextureCompressionSettings.TC_NORMALMAP: 1>"
+        },
+        "Micro Skin Details Normal": {
+          "path": "/MetaHumanCharacter/Lookdev_UHM/Skin/Textures/T_SkinMicro3_N.T_SkinMicro3_N",
+          "class": "Texture2D",
+          "srgb": false,
+          "compression": "<TextureCompressionSettings.TC_NORMALMAP: 1>"
+        },
+        "Micro Skin Details Cavity": {
+          "path": "/MetaHumanCharacter/Lookdev_UHM/Skin/Textures/T_skinMicro3_CAV.T_skinMicro3_CAV",
+          "class": "Texture2D",
+          "srgb": false,
+          "compression": "<TextureCompressionSettings.TC_MASKS: 2>"
+        },
+        "Micro Skin Details Mask": {
+          "path": "/MetaHumanCharacter/Optional/BodyTextures/T_Skin_Microtiling_M.T_Skin_Microtiling_M",
+          "class": "Texture2D",
+          "srgb": false,
+          "compression": "<TextureCompressionSettings.TC_MASKS: 2>"
+        },
+        "Bent Normal": {
+          "path": "/MetaHumanCharacter/Lookdev_UHM/Common/Textures/T_MH_BentNormal_AO.T_MH_BentNormal_AO",
+          "class": "Texture2D",
+          "srgb": false,
+          "compression": "<TextureCompressionSettings.TC_BC7: 11>"
+        },
+        "Hair Mask": {
+          "path": "/MetaHumanCharacter/Lookdev_UHM/Common/Textures/Placeholders/T_Flat_Black_M.T_Flat_Black_M",
+          "class": "Texture2D",
+          "srgb": false,
+          "compression": "<TextureCompressionSettings.TC_MASKS: 2>"
+        },
+        "Basecolor Baked": {
+          "path": "/MetaHumanCharacter/Lookdev_UHM/Common/Textures/Placeholders/T_Flat_Grey_C.T_Flat_Grey_C",
+          "class": "Texture2D",
+          "srgb": true,
+          "compression": "<TextureCompressionSettings.TC_DEFAULT: 0>"
+        },
+        "Basecolor Baked VT": {
+          "path": "/MetaHumanCharacter/Lookdev_UHM/Common/Textures/Placeholders/T_Flat_Grey_C_VT.T_Flat_Grey_C_VT",
+          "class": "Texture2D",
+          "srgb": true,
+          "compression": "<TextureCompressionSettings.TC_DEFAULT: 0>"
+        },
+        "SRMF Baked": {
+          "path": "/MetaHumanCharacter/Lookdev_UHM/Common/Textures/Placeholders/T_Flat_Black_M.T_Flat_Black_M",
+          "class": "Texture2D",
+          "srgb": false,
+          "compression": "<TextureCompressionSettings.TC_MASKS: 2>"
+        },
+        "SRMF Baked VT": {
+          "path": "/MetaHumanCharacter/Lookdev_UHM/Common/Textures/Placeholders/T_Flat_Black_M_VT.T_Flat_Black_M_VT",
+          "class": "Texture2D",
+          "srgb": false,
+          "compression": "<TextureCompressionSettings.TC_MASKS: 2>"
+        },
+        "Normal Baked": {
+          "path": "/MetaHumanCharacter/Lookdev_UHM/Common/Textures/Placeholders/T_Flat_N.T_Flat_N",
+          "class": "Texture2D",
+          "srgb": false,
+          "compression": "<TextureCompressionSettings.TC_NORMALMAP: 1>"
+        },
+        "Normal Baked VT": {
+          "path": "/MetaHumanCharacter/Lookdev_UHM/Common/Textures/Placeholders/T_Flat_N_VT.T_Flat_N_VT",
+          "class": "Texture2D",
+          "srgb": false,
+          "compression": "<TextureCompressionSettings.TC_NORMALMAP: 1>"
+        },
+        "Scatter Baked": {
+          "path": "/MetaHumanCharacter/Lookdev_UHM/Common/Textures/Placeholders/T_Flat_White_C.T_Flat_White_C",
+          "class": "Texture2D",
+          "srgb": true,
+          "compression": "<TextureCompressionSettings.TC_DEFAULT: 0>"
+        },
+        "Scatter Baked VT": {
+          "path": "/MetaHumanCharacter/Lookdev_UHM/Common/Textures/Placeholders/T_Flat_White_C_VT.T_Flat_White_C_VT",
+          "class": "Texture2D",
+          "srgb": true,
+          "compression": "<TextureCompressionSettings.TC_DEFAULT: 0>"
+        },
+        "Normal LOD Baked": {
+          "path": "/MetaHumanCharacter/Lookdev_UHM/Common/Textures/Placeholders/T_Flat_N.T_Flat_N",
+          "class": "Texture2D",
+          "srgb": false,
+          "compression": "<TextureCompressionSettings.TC_NORMALMAP: 1>"
+        },
+        "Color_CHEST": {
+          "path": "/Game/MetaHumans/LZW/MC_LZW_MaterialsExport/Body/Textures/T_Body_Chest_Basecolor.T_Body_Chest_Basecolor",
+          "class": "Texture2D",
+          "srgb": false,
+          "compression": "<TextureCompressionSettings.TC_DEFAULT: 0>"
+        },
+        "Normal_CHEST": {
+          "path": "/Game/MetaHumans/LZW/MC_LZW_MaterialsExport/Body/Textures/T_Body_Chest_Normal.T_Body_Chest_Normal",
+          "class": "Texture2D",
+          "srgb": false,
+          "compression": "<TextureCompressionSettings.TC_NORMALMAP: 1>"
+        },
+        "Underwear_Body_BaseColor": {
+          "path": "/MetaHumanCharacter/Textures/Shared/1K/T_Chr0000_Body_Underwear_BC.T_Chr0000_Body_Underwear_BC",
+          "class": "Texture2D",
+          "srgb": true,
+          "compression": "<TextureCompressionSettings.TC_DEFAULT: 0>"
+        },
+        "Underwear_Chest_BaseColor": {
+          "path": "/Game/MetaHumans/LZW/MC_LZW_MaterialsExport/Body/Textures/T_Body_Chest_Underwear_Basecolor.T_Body_Chest_Underwear_Basecolor",
+          "class": "Texture2D",
+          "srgb": true,
+          "compression": "<TextureCompressionSettings.TC_DEFAULT: 0>"
+        },
+        "Underwear_Body_Normal": {
+          "path": "/MetaHumanCharacter/Textures/Shared/1K/T_Chr0000_Body_Underwear_N.T_Chr0000_Body_Underwear_N",
+          "class": "Texture2D",
+          "srgb": false,
+          "compression": "<TextureCompressionSettings.TC_NORMALMAP: 1>"
+        },
+        "Underwear_Chest_Normal": {
+          "path": "/Game/MetaHumans/LZW/MC_LZW_MaterialsExport/Body/Textures/T_Body_Chest_Underwear_Normal.T_Body_Chest_Underwear_Normal",
+          "class": "Texture2D",
+          "srgb": false,
+          "compression": "<TextureCompressionSettings.TC_NORMALMAP: 1>"
+        },
+        "Underwear_Mask": {
+          "path": "/Game/MetaHumans/LZW/MC_LZW_MaterialsExport/Body/Textures/T_Body_Body_Underwear_Mask.T_Body_Body_Underwear_Mask",
+          "class": "Texture2D",
+          "srgb": false,
+          "compression": "<TextureCompressionSettings.TC_MASKS: 2>"
+        },
+        "FrecklesMask": {
+          "path": "/MetaHumanCharacter/Lookdev_UHM/Common/Textures/Placeholders/T_Flat_Grey_linear_C.T_Flat_Grey_linear_C",
+          "class": "Texture2D",
+          "srgb": false,
+          "compression": "<TextureCompressionSettings.TC_DEFAULT: 0>"
+        },
+        "HighlightsMask": {
+          "path": "/MetaHumanCharacter/Lookdev_UHM/Common/Textures/Placeholders/T_Flat_Black_C.T_Flat_Black_C",
+          "class": "Texture2D",
+          "srgb": true,
+          "compression": "<TextureCompressionSettings.TC_DEFAULT: 0>"
+        },
+        "HairAttributeMap": {
+          "path": "/MetaHumanCharacter/Lookdev_UHM/Skin/Textures/T_BakedGroomDefault.T_BakedGroomDefault",
+          "class": "Texture2D",
+          "srgb": false,
+          "compression": "<TextureCompressionSettings.TC_HDR: 6>"
+        },
+        "BeardAttributeMap": {
+          "path": "/MetaHumanCharacter/Lookdev_UHM/Skin/Textures/T_BakedGroomDefault.T_BakedGroomDefault",
+          "class": "Texture2D",
+          "srgb": false,
+          "compression": "<TextureCompressionSettings.TC_HDR: 6>"
+        },
+        "MustacheAttributeMap": {
+          "path": "/MetaHumanCharacter/Lookdev_UHM/Skin/Textures/T_BakedGroomDefault.T_BakedGroomDefault",
+          "class": "Texture2D",
+          "srgb": false,
+          "compression": "<TextureCompressionSettings.TC_HDR: 6>"
+        },
+        "EyebrowsAttributeMap": {
+          "path": "/MetaHumanCharacter/Lookdev_UHM/Skin/Textures/T_BakedGroomDefault.T_BakedGroomDefault",
+          "class": "Texture2D",
+          "srgb": false,
+          "compression": "<TextureCompressionSettings.TC_HDR: 6>"
+        },
+        "SecondaryColorsTexture": {
+          "path": "/MetaHumanCharacter/Lookdev_UHM/Common/Textures/Placeholders/T_Flat_Black_C.T_Flat_Black_C",
+          "class": "Texture2D",
+          "srgb": true,
+          "compression": "<TextureCompressionSettings.TC_DEFAULT: 0>"
+        },
+        "PreBakedGroomColor": {
+          "path": "/MetaHumanCharacter/Lookdev_UHM/Common/Textures/Placeholders/T_Flat_Black_Transparent_C.T_Flat_Black_Transparent_C",
+          "class": "Texture2D",
+          "srgb": false,
+          "compression": "<TextureCompressionSettings.TC_DEFAULT: 0>"
+        },
+        "PreBakedGroomNSR": {
+          "path": "/MetaHumanCharacter/Materials/T_Black_Linear.T_Black_Linear",
+          "class": "Texture2D",
+          "srgb": false,
+          "compression": "<TextureCompressionSettings.TC_DEFAULT: 0>"
+        },
+        "HideMaskTexture": {
+          "path": "/MetaHumanCharacter/Lookdev_UHM/Common/Textures/Placeholders/T_Flat_White_C.T_Flat_White_C",
+          "class": "Texture2D",
+          "srgb": true,
+          "compression": "<TextureCompressionSettings.TC_DEFAULT: 0>"
+        }
+      },
+      "scalars": {
+        "Scatter Anisotropy (PT)": 0.0,
+        "Fuzz Fresnel Exponent": 2.0,
+        "Fuzz Opacity": 0.0,
+        "Fuzz Roughness Offset": 0.10000000149011612,
+        "Blood Normal Strength": 0.15000000596046448,
+        "Blood Roughness Value": 0.05000000074505806,
+        "Blood Concentration": 0.75,
+        "Blood Concentration Amount": 0.20000000298023224,
+        "Blood Spread": 0.800000011920929,
+        "Blood Dryness": 0.15000000596046448,
+        "Blood Cavity Amount": 1.0,
+        "Blood Normal Thickness": 0.05000000074505806,
+        "Scatter Distance Base": 0.5,
+        "Scatter Distance Face Frontal Main": 1.0,
+        "Scatter Distance Face Frontal BetweenBrows": 1.0,
+        "Scatter Distance Face Orbital Main": 1.0,
+        "Scatter Distance Face Orbital Brows": 1.0,
+        "Scatter Distance Face Orbital Eyelids Upper": 1.0,
+        "Scatter Distance Face Orbital Eyelids Lower": 1.0,
+        "Scatter Distance Face Orbital Eyelids Edge": 1.0,
+        "Scatter Distance Face Orbital Carenculas": 1.0,
+        "Scatter Distance Face Orbital Eyebags": 1.0,
+        "Scatter Distance Face Orbital Crowsfeet": 1.0,
+        "Scatter Distance Face Nasal Main": 1.0,
+        "Scatter Distance Face Nasal Bridge": 1.0,
+        "Scatter Distance Face Nasal Nostrils": 1.0,
+        "Scatter Distance Face Nasal Tip": 1.0,
+        "Scatter Distance Face Nasal Creases": 1.0,
+        "Scatter Distance Face Nasal Holes": 1.0,
+        "Scatter Distance Face Oral Main": 1.0,
+        "Scatter Distance Face Oral Mustache": 1.0,
+        "Scatter Distance Face Oral Lip Upper": 1.0,
+        "Scatter Distance Face Oral Lip Lower": 1.0,
+        "Scatter Distance Face Oral Corners": 1.0,
+        "Scatter Distance Face Auricular Main": 1.0,
+        "Scatter Distance Face Auricular Inner": 1.0,
+        "Scatter Distance Face Auricular Outer": 1.0,
+        "Scatter Distance Face Temporal Main": 1.0,
+        "Scatter Distance Face Temporal Beard": 1.0,
+        "Scatter Distance Face Temporal Temples": 1.0,
+        "Scatter Distance Face Temporal Chin": 1.0,
+        "Scatter Distance Face Scalp": 1.0,
+        "Scatter Distance Body Head": 1.0,
+        "Scatter Distance Body Neck Main": 1.0,
+        "Scatter Distance Body Neck Throat": 1.0,
+        "Scatter Distance Body Neck Back": 1.0,
+        "Scatter Distance Body Chest": 1.0,
+        "Scatter Distance Body Arms Main": 1.0,
+        "Scatter Distance Body Arms Top": 1.0,
+        "Scatter Distance Body Hands Main": 1.0,
+        "Scatter Distance Body Hands Palm": 1.0,
+        "Scatter Distance Body Hand Nails": 1.0,
+        "Scatter Distance Body Legs": 1.0,
+        "Scatter Distance Body Feet Main": 1.0,
+        "Scatter Distance Body Feet Sole": 1.0,
+        "Scatter Distance Body Feet Nails": 1.0,
+        "Scatter Distance Noise Low": 1.0,
+        "Scatter Distance Noise Mid": 1.0,
+        "Scatter Distance Noise High": 1.0,
+        "Scatter Distance Extra A Red": 1.0,
+        "Scatter Distance Extra A Green": 1.0,
+        "Scatter Distance Extra A Blue": 1.0,
+        "Scatter Distance Extra A Alpha": 1.0,
+        "Scatter Distance Extra B Red": 1.0,
+        "Scatter Distance Extra B Green": 1.0,
+        "Scatter Distance Extra B Blue": 1.0,
+        "Scatter Distance Extra B Alpha": 1.0,
+        "Scatter Distance Face Oral Inner": 1.0,
+        "Scatter Distance Face Temporal Cheeks": 1.0,
+        "Specular Face Frontal Main": 0.8999999761581421,
+        "Specular Face Frontal BetweenBrows": 0.824999988079071,
+        "Specular Face Orbital Main": 0.8999999761581421,
+        "Specular Face Orbital Brows": 0.75,
+        "Specular Face Orbital Eyelids Upper": 0.8999999761581421,
+        "Specular Face Orbital Eyelids Lower": 0.949999988079071,
+        "Specular Face Orbital Eyelids Edge": 0.949999988079071,
+        "Specular Face Orbital Carenculas": 0.0,
+        "Specular Face Orbital Eyebags": 0.949999988079071,
+        "Specular Face Orbital Crowsfeet": 0.949999988079071,
+        "Specular Face Nasal Main": 0.75,
+        "Specular Face Nasal Bridge": 0.824999988079071,
+        "Specular Face Nasal Nostrils": 0.75,
+        "Specular Face Nasal Tip": 0.75,
+        "Specular Face Nasal Creases": 0.44999998807907104,
+        "Specular Face Nasal Holes": 0.44999998807907104,
+        "Specular Face Oral Main": 0.8999999761581421,
+        "Specular Face Oral Mustache": 0.949999988079071,
+        "Specular Face Oral Lip Upper": 0.8999999761581421,
+        "Specular Face Oral Lip Lower": 0.8999999761581421,
+        "Specular Face Oral Corners": 0.6000000238418579,
+        "Specular Face Auricular Main": 0.8999999761581421,
+        "Specular Face Auricular Inner": 0.8999999761581421,
+        "Specular Face Auricular Outer": 0.8999999761581421,
+        "Specular Face Temporal Main": 0.824999988079071,
+        "Specular Face Temporal Beard": 0.75,
+        "Specular Face Temporal Temples": 0.8999999761581421,
+        "Specular Face Temporal Chin": 0.824999988079071,
+        "Specular Face Scalp": 0.8999999761581421,
+        "Specular Body": 0.8999999761581421,
+        "Specular Body Neck Main": 0.8999999761581421,
+        "Specular Body Neck Throat": 0.8999999761581421,
+        "Specular Body Neck Back": 0.8999999761581421,
+        "Specular Body Chest": 0.8999999761581421,
+        "Specular Body Arms Main": 0.8999999761581421,
+        "Specular Body Arms Top": 0.8999999761581421,
+        "Specular Body Hands Main": 0.8999999761581421,
+        "Specular Body Hands Palm": 0.8999999761581421,
+        "Specular Body Hands Nails": 0.8999999761581421,
+        "Specular Body Legs": 0.8999999761581421,
+        "Specular Body Feet Main": 0.8999999761581421,
+        "Specular Body Feet Sole": 0.8999999761581421,
+        "Specular Body Feet Nails": 0.8999999761581421,
+        "Specular Noise Low Multiply": 0.800000011920929,
+        "Specular Noise Mid Multiply": 0.6499999761581421,
+        "Specular Noise High Multiply": 0.5,
+        "Specular Extra A Red": 1.0,
+        "Specular Extra A Green": 1.0,
+        "Specular Extra A Blue": 1.0,
+        "Specular Extra A Alpha": 1.0,
+        "Specular Extra B Red": 1.0,
+        "Specular Extra B Green": 1.0,
+        "Specular Extra B Blue": 1.0,
+        "Specular Extra B Alpha": 1.0,
+        "Specular Base": 0.800000011920929,
+        "Specular Face Oral Inner": 0.800000011920929,
+        "Specular Face Temporal Cheeks": 0.824999988079071,
+        "Roughness Base": 0.6499999761581421,
+        "Roughness Face Frontal Main": 0.5799999833106995,
+        "Roughness Face Frontal BetweenBrows": 0.550000011920929,
+        "Roughness Face Orbital Main": 0.6499999761581421,
+        "Roughness Face Orbital Brows": 0.6499999761581421,
+        "Roughness Face Orbital Eyelids Upper": 0.550000011920929,
+        "Roughness Face Orbital Eyelids Lower": 0.550000011920929,
+        "Roughness Face Orbital Eyelids Edge": 0.009999999776482582,
+        "Roughness Face Orbital Carenculas": 0.009999999776482582,
+        "Roughness Face Orbital Eyebags": 0.6000000238418579,
+        "Roughness Face Orbital Crowsfeet": 0.6499999761581421,
+        "Roughness Face Nasal Main": 0.550000011920929,
+        "Roughness Face Nasal Bridge": 0.5400000214576721,
+        "Roughness Face Nasal Nostrils": 0.49000000953674316,
+        "Roughness Face Nasal Tip": 0.46000000834465027,
+        "Roughness Face Nasal Creases": 0.800000011920929,
+        "Roughness Face Nasal Holes": 0.6499999761581421,
+        "Roughness Face Oral Main": 0.6499999761581421,
+        "Roughness Face Oral Mustache": 0.75,
+        "Roughness Face Oral Lip Upper": 0.6200000047683716,
+        "Roughness Face Oral Lip Lower": 0.6000000238418579,
+        "Roughness Face Oral Corners": 0.699999988079071,
+        "Roughness Face Auricular Main": 0.699999988079071,
+        "Roughness Face Auricular Inner": 0.3499999940395355,
+        "Roughness Face Auricular Outer": 0.699999988079071,
+        "Roughness Face Temporal Main": 0.6000000238418579,
+        "Roughness Face Temporal Beard": 0.6499999761581421,
+        "Roughness Face Temporal Temples": 0.6299999952316284,
+        "Roughness Face Temporal Chin": 0.6499999761581421,
+        "Roughness Face Scalp": 0.6000000238418579,
+        "Roughness Body": 0.6000000238418579,
+        "Roughness Body Neck Main": 0.75,
+        "Roughness Body Neck Throat": 0.75,
+        "Roughness Body Neck Back": 0.6499999761581421,
+        "Roughness Body Chest": 0.699999988079071,
+        "Roughness Body Arms Main": 0.6499999761581421,
+        "Roughness Body Arms Top": 0.6499999761581421,
+        "Roughness Body Hands Main": 0.6499999761581421,
+        "Roughness Body Hands Palm": 0.6499999761581421,
+        "Roughness Body Hands Nails": 0.6499999761581421,
+        "Roughness Body Legs": 0.6499999761581421,
+        "Roughness Body Feet Main": 0.6499999761581421,
+        "Roughness Body Feet Sole": 0.6499999761581421,
+        "Roughness Body Feet Nails": 0.6499999761581421,
+        "Roughness Noise Low Multiply": 1.0,
+        "Roughness Noise Mid Multiply": 0.8999999761581421,
+        "Roughness Noise High Multiply": 0.699999988079071,
+        "Roughness Extra A Red": 1.0,
+        "Roughness Extra A Green": 1.0,
+        "Roughness Extra A Blue": 1.0,
+        "Roughness Extra A Alpha": 1.0,
+        "Roughness Extra B Red": 1.0,
+        "Roughness Extra B Green": 1.0,
+        "Roughness Extra B Blue": 1.0,
+        "Roughness Extra B Alpha": 1.0,
+        "Roughness Face Oral Inner": 0.5,
+        "Roughness Face Temporal Cheeks": 0.6399999856948853,
+        "Roughness Map Face Frontal Main": 1.0,
+        "Roughness Map Face Frontal BetweenBrows": 1.0,
+        "Roughness Map Face Orbital Main": 1.0,
+        "Roughness Map Face Orbital Brows": 1.0,
+        "Roughness Map Face Orbital Eyelids Upper": 1.0,
+        "Roughness Map Face Orbital Eyelids Lower": 1.0,
+        "Roughness Map Face Orbital Eyelids Edge": 1.0,
+        "Roughness Map Face Orbital Carenculas": 1.0,
+        "Roughness Map Face Orbital Eyebags": 1.0,
+        "Roughness Map Face Orbital Crowsfeet": 1.0,
+        "Roughness Map Face Nasal Main": 1.0,
+        "Roughness Map Face Nasal Bridge": 1.0,
+        "Roughness Map Face Nasal Nostrils": 1.0,
+        "Roughness Map Face Nasal Tip": 1.0,
+        "Roughness Map Face Nasal Creases": 1.0,
+        "Roughness Map Face Nasal Holes": 1.0,
+        "Roughness Map Face Oral Main": 1.0,
+        "Roughness Map Face Oral Mustache": 1.0,
+        "Roughness Map Face Oral Lip Upper": 1.0,
+        "Roughness Map Face Oral Lip Lower": 1.0,
+        "Roughness Map Face Oral Corners": 1.0,
+        "Roughness Map Face Auricular Main": 1.0,
+        "Roughness Map Face Auricular Inner": 1.0,
+        "Roughness Map Face Auricular Outer": 1.0,
+        "Roughness Map Face Temporal Main": 1.0,
+        "Roughness Map Face Temporal Beard": 1.0,
+        "Roughness Map Face Temporal Temples": 1.0,
+        "Roughness Map Face Temporal Chin": 1.0,
+        "Roughness Map Face Scalp": 1.0,
+        "Roughness Map Body": 1.0,
+        "Roughness Map Body Neck Main": 1.0,
+        "Roughness Map Body Neck Throat": 1.0,
+        "Roughness Map Body Neck Back": 1.0,
+        "Roughness Map Body Chest": 1.0,
+        "Roughness Map Body Arms Main": 1.0,
+        "Roughness Map Body Arms Top": 1.0,
+        "Roughness Map Body Hands Main": 1.0,
+        "Roughness Map Body Hands Palm": 1.0,
+        "Roughness Map Body Hands Nails": 1.0,
+        "Roughness Map Body Legs": 1.0,
+        "Roughness Map Body Feet Main": 1.0,
+        "Roughness Map Body Feet Sole": 1.0,
+        "Roughness Map Body Feet Nails": 1.0,
+        "Roughness Map Noise Low Multiply": 1.0,
+        "Roughness Map Noise Mid Multiply": 1.0,
+        "Roughness Map Noise High Multiply": 1.0,
+        "Roughness Map Extra A Red": 1.0,
+        "Roughness Map Extra A Green": 1.0,
+        "Roughness Map Extra A Blue": 1.0,
+        "Roughness Map Extra A Alpha": 1.0,
+        "Roughness Map Extra B Red": 1.0,
+        "Roughness Map Extra B Green": 1.0,
+        "Roughness Map Extra B Blue": 1.0,
+        "Roughness Map Extra B Alpha": 1.0,
+        "Roughness Map Face Oral Inner": 1.0,
+        "Roughness Map Face Temporal Cheeks": 1.0,
+        "Normal Face Frontal Main": 1.0,
+        "Normal Face Frontal BetweenBrows": 1.0,
+        "Normal Face Orbital Main": 1.0,
+        "Normal Face Orbital Brows": 1.0,
+        "Normal Face Orbital Eyelids Upper": 1.0,
+        "Normal Face Orbital Eyelids Lower": 1.0,
+        "Normal Face Orbital Eyelids Edge": 1.0,
+        "Normal Face Orbital Carenculas": 1.0,
+        "Normal Face Orbital Eyebags": 1.0,
+        "Normal Face Orbital Crowsfeet": 1.0,
+        "Normal Face Nasal Main": 1.0,
+        "Normal Face Nasal Bridge": 1.0,
+        "Normal Face Nasal Nostrils": 1.0,
+        "Normal Face Nasal Tip": 1.0,
+        "Normal Face Nasal Creases": 1.0,
+        "Normal Face Nasal Holes": 1.0,
+        "Normal Face Oral Main": 1.0,
+        "Normal Face Oral Mustache": 1.0,
+        "Normal Face Oral Lip Upper": 1.0,
+        "Normal Face Oral Lip Lower": 1.0,
+        "Normal Face Oral Corners": 1.0,
+        "Normal Face Auricular Main": 1.0,
+        "Normal Face Auricular Inner": 1.0,
+        "Normal Face Auricular Outer": 1.0,
+        "Normal Face Temporal Main": 1.0,
+        "Normal Face Temporal Beard": 1.0,
+        "Normal Face Temporal Temples": 1.0,
+        "Normal Face Temporal Chin": 1.0,
+        "Normal Face Scalp": 1.0,
+        "Normal Body": 1.0,
+        "Normal Body Neck Main": 1.0,
+        "Normal Body Neck Throat": 1.0,
+        "Normal Body Neck Back": 1.0,
+        "Normal Body Chest": 1.0,
+        "Normal Body Arms Main": 1.0,
+        "Normal Body Arms Top": 1.0,
+        "Normal Body Hands Main": 1.0,
+        "Normal Body Hands Palm": 1.0,
+        "Normal Body Hands Nails": 1.0,
+        "Normal Body Legs": 1.0,
+        "Normal Body Feet Main": 1.0,
+        "Normal Body Feet Sole": 1.0,
+        "Normal Body Feet Nails": 1.0,
+        "Normal Noise Low Multiply": 1.0,
+        "Normal Noise Mid Multiply": 1.0,
+        "Normal Noise High Multiply": 1.0,
+        "Normal Extra A Red": 1.0,
+        "Normal Extra A Green": 1.0,
+        "Normal Extra A Blue": 1.0,
+        "Normal Extra A Alpha": 1.0,
+        "Normal Extra B Red": 1.0,
+        "Normal Extra B Green": 1.0,
+        "Normal Extra B Blue": 1.0,
+        "Normal Extra B Alpha": 1.0,
+        "Normal Face Oral Inner": 1.0,
+        "Normal Face Temporal Cheeks": 1.0,
+        "UDIM": 1001.0,
+        "Basecolor Global Hue": 0.0,
+        "Basecolor Global Value": 1.0,
+        "Basecolor Global Saturation": 0.0,
+        "Scatter Distance Global Offset": 0.0,
+        "Scatter Distance Global Multiply": 0.5,
+        "Specular Global Offset": 0.0,
+        "Specular Global Multiply": 1.0,
+        "Roughness Global Offset": 0.0,
+        "Roughness Global Multiply": 1.0,
+        "Normal Global Strength": 1.0,
+        "Fuzz Face Frontal Main": 1.0,
+        "Fuzz Face Frontal BetweenBrows": 1.0,
+        "Fuzz Face Orbital Main": 1.0,
+        "Fuzz Face Orbital Brows": 1.0,
+        "Fuzz Face Orbital Eyelids Upper": 0.0,
+        "Fuzz Face Orbital Eyelids Lower": 0.0,
+        "Fuzz Face Orbital Eyelids Edge": 0.0,
+        "Fuzz Face Orbital Carenculas": 0.0,
+        "Fuzz Face Orbital Eyebags": 0.0,
+        "Fuzz Face Orbital Crowsfeet": 0.0,
+        "Fuzz Face Nasal Main": 1.0,
+        "Fuzz Face Nasal Bridge": 1.0,
+        "Fuzz Face Nasal Nostrils": 1.0,
+        "Fuzz Face Nasal Tip": 1.0,
+        "Fuzz Face Nasal Creases": 1.0,
+        "Fuzz Face Nasal Holes": 1.0,
+        "Fuzz Face Oral Main": 1.0,
+        "Fuzz Face Oral Mustache": 1.0,
+        "Fuzz Face Oral Lip Upper": 0.0,
+        "Fuzz Face Oral Lip Lower": 0.0,
+        "Fuzz Face Oral Corners": 0.0,
+        "Fuzz Face Auricular Main": 1.0,
+        "Fuzz Face Auricular Inner": 1.0,
+        "Fuzz Face Auricular Outer": 1.0,
+        "Fuzz Face Temporal Main": 1.0,
+        "Fuzz Face Temporal Beard": 1.0,
+        "Fuzz Face Temporal Temples": 1.0,
+        "Fuzz Face Temporal Chin": 1.0,
+        "Fuzz Face Scalp": 1.0,
+        "Fuzz Body": 1.0,
+        "Fuzz Body Neck Main": 1.0,
+        "Fuzz Body Neck Throat": 1.0,
+        "Fuzz Body Neck Back": 1.0,
+        "Fuzz Body Chest": 1.0,
+        "Fuzz Body Arms Main": 1.0,
+        "Fuzz Body Arms Top": 1.0,
+        "Fuzz Body Hands Main": 1.0,
+        "Fuzz Body Hands Palm": 0.0,
+        "Fuzz Body Hands Nails": 0.0,
+        "Fuzz Body Legs": 1.0,
+        "Fuzz Body Feet Main": 1.0,
+        "Fuzz Body Feet Sole": 0.0,
+        "Fuzz Body Feet Nails": 0.0,
+        "Fuzz Noise Low Multiply": 0.699999988079071,
+        "Fuzz Noise Mid Multiply": 0.800000011920929,
+        "Fuzz Noise High Multiply": 0.6000000238418579,
+        "Fuzz Extra A Red": 1.0,
+        "Fuzz Extra A Green": 1.0,
+        "Fuzz Extra A Blue": 1.0,
+        "Fuzz Extra A Alpha": 1.0,
+        "Fuzz Extra B Red": 1.0,
+        "Fuzz Extra B Green": 1.0,
+        "Fuzz Extra B Blue": 1.0,
+        "Fuzz Extra B Alpha": 1.0,
+        "Fuzz Face Oral Inner": 0.0,
+        "Fuzz Face Temporal Cheeks": 1.0,
+        "Makeup Foundation Opacity": 0.5,
+        "Makeup Concealer Opacity": 0.5699999928474426,
+        "Makeup Blusher Opacity": 0.10818252712488174,
+        "Makeup Foundation Roughness": 0.6499999761581421,
+        "Makeup Foundation Specular": 0.800000011920929,
+        "Makeup Foundation Scatter": 1.0,
+        "Makeup Foundation Normal": 1.0,
+        "Makeup Concealer Roughness": 0.6000000238418579,
+        "Makeup Concealer Specular": 0.800000011920929,
+        "Makeup Concealer Scatter": 1.0,
+        "Makeup Concealer Normal": 1.0,
+        "Makeup Blusher Roughness": 0.6000000238418579,
+        "Makeup Blusher Specular": 0.800000011920929,
+        "Makeup Blusher Scatter": 1.0,
+        "Makeup Blusher Normal": 1.0,
+        "Makeup Eye Primary Opacity": 0.44698286056518555,
+        "Makeup Eye Primary Roughness": 0.75,
+        "Makeup Eye Primary Specular": 0.800000011920929,
+        "Makeup Eye Primary Scatter": 1.0,
+        "Makeup Eye Primary Normal": 1.0,
+        "Makeup Eye Primary Metallic": 0.0,
+        "Makeup Eye Secondary Opacity": 0.44698286056518555,
+        "Makeup Eye Secondary Roughness": 0.75,
+        "Makeup Eye Secondary Specular": 0.800000011920929,
+        "Makeup Eye Secondary Scatter": 1.0,
+        "Makeup Eye Secondary Normal": 1.0,
+        "Makeup Eye Secondary Metallic": 0.0,
+        "Makeup Lipstick Opacity": 0.4162618815898895,
+        "Makeup Lipstick Roughness": 0.4327298402786255,
+        "Makeup Lipstick Specular": 0.800000011920929,
+        "Makeup Lipstick Scatter": 1.0,
+        "Makeup Lipstick Normal": 1.0,
+        "Makeup Lipstick Metallic": 0.7648482918739319,
+        "Dirt Normal Strength": 1.0,
+        "Dirt Specular Multiply": 0.5,
+        "Dirt Specular Value": 0.30000001192092896,
+        "Dirt Roughness Multiply": 1.5,
+        "Dirt Roughness Value": 0.8500000238418579,
+        "Wet Normal Strength": 0.3499999940395355,
+        "Wet Specular Value": 0.5,
+        "Wet Roughness Value": 0.20000000298023224,
+        "Specular Concavity Multiply": 0.6000000238418579,
+        "Specular Convexity Multiply": 1.2000000476837158,
+        "Roughness Concavity Multiply": 1.100000023841858,
+        "Roughness Convexity Multiply": 0.8500000238418579,
+        "Specular Micro Cavity Multiply": 0.800000011920929,
+        "Roughness Micro Cavity Multiply": 1.350000023841858,
+        "Use Texture Override": 0.0,
+        "head_wm1_normal_head_wm1_blink_L": 0.0,
+        "head_wm1_normal_head_wm1_blink_R": 0.0,
+        "head_wm1_normal_head_wm1_browsRaiseInner_R": 0.0,
+        "head_wm1_normal_head_wm1_browsRaiseInner_L": 0.0,
+        "head_wm1_normal_head_wm1_browsRaiseOuter_R": 0.0,
+        "head_wm1_normal_head_wm1_browsRaiseOuter_L": 0.0,
+        "head_wm1_normal_head_wm1_chinRaise_R": 0.0,
+        "head_wm1_normal_head_wm1_chinRaise_L": 0.0,
+        "head_wm1_normal_head_wm1_jawOpen": 0.0,
+        "head_wm1_normal_head_wm1_purse_DL": 0.0,
+        "head_wm1_normal_head_wm1_purse_DR": 0.0,
+        "head_wm1_normal_head_wm1_purse_UL": 0.0,
+        "head_wm1_normal_head_wm13_lips_UR": 0.0,
+        "head_wm1_normal_head_wm13_lips_UL": 0.0,
+        "head_wm1_normal_head_wm13_lips_DR": 0.0,
+        "head_wm1_normal_head_wm13_lips_DL": 0.0,
+        "head_wm1_normal_head_wm1_squintInner_R": 0.0,
+        "head_wm1_normal_head_wm1_squintInner_L": 0.0,
+        "head_wm1_normal_head_wm1_purse_UR": 0.0,
+        "head_wm2_normal_head_wm2_browsDown_L": 0.0,
+        "head_wm2_normal_head_wm2_browsDown_R": 0.0,
+        "head_wm2_normal_head_wm2_browsLateral_L": 0.0,
+        "head_wm2_normal_head_wm2_browsLateral_R": 0.0,
+        "head_wm2_normal_head_wm2_mouthStretch_L": 0.0,
+        "head_wm2_normal_head_wm2_mouthStretch_R": 0.0,
+        "head_wm2_normal_head_wm2_neckStretch_L": 0.0,
+        "head_wm2_normal_head_wm2_neckStretch_R": 0.0,
+        "head_wm2_normal_head_wm2_noseWrinkler_L": 0.0,
+        "head_wm2_normal_head_wm2_noseWrinkler_R": 0.0,
+        "head_wm3_normal_head_wm3_cheekRaiseOuter_R": 0.0,
+        "head_wm3_normal_head_wm3_cheekRaiseOuter_L": 0.0,
+        "head_wm3_normal_head_wm3_cheekRaiseInner_R": 0.0,
+        "head_wm3_normal_head_wm3_cheekRaiseInner_L": 0.0,
+        "head_wm3_normal_head_wm3_cheekRaiseUpper_R": 0.0,
+        "head_wm3_normal_head_wm3_cheekRaiseUpper_L": 0.0,
+        "head_wm3_normal_head_wm3_smile_R": 0.0,
+        "head_wm3_normal_head_wm3_smile_L": 0.0,
+        "head_wm3_normal_head_wm13_lips_UR": 0.0,
+        "head_wm3_normal_head_wm13_lips_UL": 0.0,
+        "head_wm3_normal_head_wm13_lips_DR": 0.0,
+        "head_wm3_normal_head_wm13_lips_DL": 0.0,
+        "Specular Off (no PT)": 0.0,
+        "Clay Basecolor Blend": 0.0,
+        "Min Mip": 2.0,
+        "Max Mip": 5.0,
+        "Texture Size": 4096.0,
+        "Roughness Mipmap Mask Offset": 0.10000000149011612,
+        "Normal Mipmap Mask Strength": 1.5,
+        "Micro Skin Tiling": 44.0,
+        "Micro Skin Normal Strength": 0.699999988079071,
+        "Micro Skin Roughess": 1.0499999523162842,
+        "Micro Skin Cavity Specular Multiply": 0.6000000238418579,
+        "Ruler Min": -0.05000000074505806,
+        "Ruler Max": 0.5,
+        "Micro MaskA Strength": 0.0,
+        "Micro MaskB Strength": 0.0,
+        "Micro MaskC Strength": 1.0,
+        "Micro MaskD Strength": 1.0,
+        "Material AO Power": 1.0,
+        "Basecolor Hair Mask Hair Saturation": 0.5,
+        "Basecolor Hair Mask Eyebrows Saturation": 0.5,
+        "Basecolor Hair Mask Mustache Beard Saturation": 0.5,
+        "Hair Mask Mip Level": 0.0,
+        "Fake SSS MipBias": 1.0,
+        "Fake SSS Strength": 0.800000011920929,
+        "Basecolor Global Hue Post-Bake": 0.0,
+        "Basecolor Global Value Post-Bake": 1.0,
+        "Basecolor Global Saturation Post-Bake": 0.0,
+        "Scatter Distance Global Offset Post-Bake": 0.0,
+        "Scatter Distance Global Multiply Post-Bake": 1.0,
+        "Specular Global Offset Post-Bake": 0.0,
+        "Specular Global Multiply Post-Bake": 1.0,
+        "Roughness Global Offset Post-Bake": 0.0,
+        "Roughness Global Multiply Post-Bake": 1.0,
+        "Normal Global Strength Post-Bake": 1.0,
+        "Eyelashes Shadow": 0.44999998807907104,
+        "Mouth Occlusion": 0.699999988079071,
+        "Fake Spec Attenuation": 0.6000000238418579,
+        "Spec Adjust": 0.8999999761581421,
+        "Normal Flatten": 0.3333300054073334,
+        "Roughness Adjust": 0.949999988079071,
+        "BaseColorAdjust": 1.0,
+        "Fake AO Saturation": 0.699999988079071,
+        "Fake AO Strength": 1.0,
+        "rgain": 33.06474304199219,
+        "ggain": 16.23252296447754,
+        "bgain": 11.594658851623535,
+        "rbias": 135.84051513671875,
+        "gbias": 60.3462028503418,
+        "bbias": 38.95417404174805,
+        "ChestNormalIntensity": 1.0,
+        "GreyValue": 0.23999999463558197,
+        "ClayMaterial": 0.0,
+        "Show Top Underwear": 1.0,
+        "Roughness UI Multiply": 1.059999942779541,
+        "SA_CheeksRedness": 0.5,
+        "SA_CheeksSaturation": 0.5,
+        "SA_CheeksLightness": 0.5,
+        "SA_ChinRedness": 0.5,
+        "SA_ChinSaturation": 0.5,
+        "SA_ChinLightness": 0.5,
+        "SA_EarsRedness": 0.5,
+        "SA_EarsSaturation": 0.5,
+        "SA_EarsLightness": 0.5,
+        "SA_ForeheadRedness": 0.5,
+        "SA_ForeheadSaturation": 0.5,
+        "SA_ForeheadLightness": 0.5,
+        "SA_LipsRedness": 0.5,
+        "SA_LipsSaturation": 0.5,
+        "SA_LipsLightness": 0.5,
+        "SA_UnderEyeRedness": 0.5,
+        "SA_UnderEyeSaturation": 0.5,
+        "SA_UnderEyeLightness": 0.5,
+        "SA_NoseRedness": 0.5,
+        "SA_NoseSaturation": 0.5,
+        "SA_NoseLightness": 0.5,
+        "SA_ScalpRedness": 0.5,
+        "SA_ScalpSaturation": 0.5,
+        "SA_ScalpLightness": 0.5,
+        "FrecklesStrength": 0.20000000298023224,
+        "FrecklesSaturation": 0.6000000238418579,
+        "FrecklesDensity": 0.5,
+        "FrecklesToneShift": 0.6499999761581421,
+        "Freckles": 0.0,
+        "FullShadedBrowStrength": 0.0,
+        "MicrobladeShadedBrowStrength": 0.0,
+        "ShadedEyebrows": 0.0,
+        "ShavedPatterns": 0.0,
+        "Desat": 0.0,
+        "WhiteMelininHigh": 0.05000000074505806,
+        "WhiteMelininLow": 0.15000000596046448,
+        "WhiteMelaninVariation": 0.30000001192092896,
+        "LightAmount": 0.5,
+        "OmbreShift": 0.5,
+        "OmbreContrast": 0.0,
+        "OmbreIntensity": 1.0,
+        "OmbreMelaninVariationFine": 0.5,
+        "OmbreMelanin": 0.28189998865127563,
+        "OmbreRedness": 0.25,
+        "OmbreRedVariation": 0.0,
+        "OmbreMelaninVariationRough": 0.15000000596046448,
+        "HighlightsVariationNumber": 0.0,
+        "HighlightsBlending": 0.5,
+        "HighlightsMelaninVariationFine": 0.5,
+        "HighlightsMelanin": 0.28189998865127563,
+        "HighlightsRedness": 0.25,
+        "HighlightsRedVariation": 0.0,
+        "HighlightsMelaninVariationRough": 0.15000000596046448,
+        "HighlightsIntensity": 0.5,
+        "RegionMelaninVariationFine": 0.5,
+        "RegionMelanin": 0.28189998865127563,
+        "RegionRedness": 0.25,
+        "RegionRedVariation": 0.0,
+        "RegionMelaninVariationRough": 0.15000000596046448,
+        "Ombre": 0.0,
+        "Highlights": 0.0,
+        "Region": 0.0,
+        "HairMelanin": 0.5,
+        "HairRedness": 0.25,
+        "HairWhiteAmount": 0.0,
+        "BeardMelanin": 0.5,
+        "BeardRedness": 0.25,
+        "BeardWhiteAmount": 0.0,
+        "MustacheMelanin": 0.5,
+        "MustacheRedness": 0.25,
+        "MustacheWhiteAmount": 0.0,
+        "EyebrowsMelanin": 0.5,
+        "EyebrowsRedness": 0.25,
+        "EyebrowsWhiteAmount": 0.0,
+        "NormalFlatness": 0.0,
+        "BakedGroomTexturesSpecMax": 0.6000000238418579,
+        "BakedGroomTexturesRoughMin": 0.44999998807907104,
+        "BakedGroomTexturesRoughMax": 0.75,
+        "BakedGroomTexturesSpecMin": 0.30000001192092896,
+        "ShadedEyebrowsMelanin": 0.5,
+        "ShadedEyebrowsRedness": 0.25,
+        "BakedGroomTexturesBlendSeed": 0.5,
+        "BakedGroomTexturesBlendRoot": 0.5,
+        "BakedGroomTexturesScattering": 0.10000000149011612,
+        "HideMaskMaxCullValue": 0.10000000149011612,
+        "HideMaskMinKeepValue": 0.8999999761581421,
+        "HideMaskMaxShrinkDistance": 0.0,
+        "Fingernail Tint Intensity": 0.0,
+        "Palm Tint": 0.5,
+        "Palm Lightness": 0.75,
+        "Fingernail Roughness": 0.5,
+        "Palm Cavity Darkness": 0.15000000596046448,
+        "Toenail Tint Intensity": 0.0,
+        "Toenail Roughness": 0.5,
+        "Fingernail Metallic": 0.0,
+        "Toenail Metallic": 0.0
+      },
+      "vectors": {
+        "Fuzz Color": [
+          0.25,
+          0.23027700185775757,
+          0.17604200541973114,
+          1.0
+        ],
+        "Blood Color Multiply": [
+          0.609375,
+          0.01967800036072731,
+          0.06881900131702423,
+          1.0
+        ],
+        "Blood Color Thin": [
+          0.7089999914169312,
+          0.26892200112342834,
+          0.06343399733304977,
+          1.0
+        ],
+        "Basecolor Face Frontal Main": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "Basecolor Face Frontal BetweenBrows": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "Basecolor Face Orbital Main": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "Basecolor Face Orbital Brows": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "Basecolor Face Orbital Eyelids Upper": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "Basecolor Face Orbital Eyelids Lower": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "Basecolor Face Orbital Eyelids Edge": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "Basecolor Face Orbital Carenculas": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "Basecolor Face Orbital Eyebags": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "Basecolor Face Orbital Crowsfeet": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "Basecolor Face Nasal Main": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "Basecolor Face Nasal Bridge": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "Basecolor Face Nasal Nostrils": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "Basecolor Face Nasal Tip": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "Basecolor Face Nasal Creases": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "Basecolor Face Nasal Holes": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "Basecolor Face Oral Main": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "Basecolor Face Oral Mustache": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "Basecolor Face Oral Lip Upper": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "Basecolor Face Oral Lip Lower": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "Basecolor Face Oral Corners": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "Basecolor Face Auricular Main": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "Basecolor Face Auricular Inner": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "Basecolor Face Auricular Outer": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "Basecolor Face Temporal Main": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "Basecolor Face Temporal Beard": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "Basecolor Face Temporal Temples": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "Basecolor Face Temporal Chin": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "Basecolor Face Scalp": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "Basecolor Body": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "Basecolor Body Neck Main": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "Basecolor Body Neck Throat": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "Basecolor Body Neck Back": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "Basecolor Body Chest": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "Basecolor Body Arms Main": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "Basecolor Body Arms Top": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "Basecolor Body Hands Main": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "Basecolor Body Hands Palm": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "Basecolor Body Hands Nails": [
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "Basecolor Body Left Leg": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "Basecolor Body Left Foot Main": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "Basecolor Body Left Foot Sole": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "Basecolor Body Left Foot Nails": [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ],
+        "Basecolor Noise Low": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "Basecolor Noise Mid": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "Basecolor Noise High": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "Basecolor Extra A Red": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "Basecolor Extra A Green": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "Basecolor Extra A Blue": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "Basecolor Extra A Alpha": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "Basecolor Extra B Red": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "Basecolor Extra B Green": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "Basecolor Extra B Blue": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "Basecolor Extra B Alpha": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "Basecolor Face Temporal Cheeks": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "Basecolor Face Oral Inner": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "Scatter Color Face Frontal Main (PT)": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "Scatter Color Face Frontal BetweenBrows (PT)": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "Scatter Color Face Orbital Main (PT)": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "Scatter Color Face Orbital Brows (PT)": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "Scatter Color Face Orbital Eyelids Upper (PT)": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "Scatter Color Face Orbital Eyelids Lower (PT)": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "Scatter Color Face Orbital Eyelids Edge (PT)": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "Scatter Color Face Orbital Carenculas (PT)": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "Scatter Color Face Orbital Eyebags (PT)": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "Scatter Color Face Orbital Crowsfeet (PT)": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "Scatter Color Face Nasal Main (PT)": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "Scatter Color Face Nasal Bridge (PT)": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "Scatter Color Face Nasal Nostrils (PT)": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "Scatter Color Face Nasal Tip (PT)": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "Scatter Color Face Nasal Creases (PT)": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "Scatter Color Face Nasal Holes": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "Scatter Color Face Oral Main (PT)": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "Scatter Color Face Oral Mustache (PT)": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "Scatter Color Face Oral Lip Upper (PT)": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "Scatter Color Face Oral Lip Lower (PT)": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "Scatter Color Face Oral Corners (PT)": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "Scatter Color Face Auricular Main (PT)": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "Scatter Color Face Auricular Inner (PT)": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "Scatter Color Face Auricular Outer (PT)": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "Scatter Color Face Temporal Main (PT)": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "Scatter Color Face Temporal Beard (PT)": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "Scatter Color Face Temporal Temples (PT)": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "Scatter Color Face Temporal Chin (PT)": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "Scatter Color Face Scalp (PT)": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "Scatter Color Body Head (PT)": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "Scatter Color Body Neck Main (PT)": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "Scatter Color Body Neck Throat (PT)": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "Scatter Color Body Neck Back (PT)": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "Scatter Color Body Chest (PT)": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "Scatter Color Body Arms Main (PT)": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "Scatter Color Body Arms Top (PT)": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "Scatter Color Body Hands Main (PT)": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "Scatter Color Body Hands Palm (PT)": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "Scatter Color Body Hand Nails (PT)": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "Scatter Color Body Legs (PT)": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "Scatter Color Body Feet Main (PT)": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "Scatter Color Body Left Feet Sole (PT)": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "Scatter Color Body Feet Nails (PT)": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "Scatter Color Noise Low (PT)": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "Scatter Color Noise Mid (PT)": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "Scatter Color Noise High (PT)": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "Scatter Color Extra A Red (PT)": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "Scatter Color Extra A Green (PT)": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "Scatter Color Extra A Blue (PT)": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "Scatter Color Extra A Alpha (PT)": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "Scatter Color Extra B Red (PT)": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "Scatter Color Extra B Green (PT)": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "Scatter Color Extra B Blue (PT)": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "Scatter Color Extra B Alpha (PT)": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "Scatter Color Base (PT)": [
+          0.03500000014901161,
+          0.01356200035661459,
+          0.008750000037252903,
+          1.0
+        ],
+        "Scatter Color Face Oral Inner (PT)": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "Scatter Color Face Temporal Cheeks (PT)": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "Basecolor Global Multiply": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "Scatter Color Global Multiply (PT)": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "Makeup Foundation Color": [
+          0.8996747136116028,
+          0.558119535446167,
+          0.41995692253112793,
+          1.0
+        ],
+        "Makeup Concealer Color": [
+          1.0,
+          0.747880220413208,
+          0.562742292881012,
+          1.0
+        ],
+        "Makeup Blusher Color": [
+          0.2240000069141388,
+          0.010999999940395355,
+          0.019999999552965164,
+          1.0
+        ],
+        "Makeup Eye Primary Color": [
+          0.022569021210074425,
+          0.003411593846976757,
+          0.001049722428433597,
+          1.0
+        ],
+        "Makeup Eye Secondary Color": [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ],
+        "Makeup Lipstick Color": [
+          0.5188407301902771,
+          0.08437618613243103,
+          0.03433980420231819,
+          1.0
+        ],
+        "Dirt Constant Color": [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ],
+        "Wet Color Multiply": [
+          0.949999988079071,
+          0.949999988079071,
+          0.949999988079071,
+          1.0
+        ],
+        "Basecolor Concavity Color Multiply": [
+          0.934374988079071,
+          0.934374988079071,
+          0.934374988079071,
+          1.0
+        ],
+        "Basecolor Convexity Color Multiply": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "Basecolor Micro Cavity Color Multiply": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "Basecolor Hair Mask Hair Multiply": [
+          0.8640000224113464,
+          0.8715469837188721,
+          0.8999999761581421,
+          1.0
+        ],
+        "Basecolor Hair Mask Eyebrows Multiply": [
+          0.765999972820282,
+          0.765999972820282,
+          0.765999972820282,
+          1.0
+        ],
+        "Basecolor Hair Mask Mustache Beard Multiply": [
+          0.5583329796791077,
+          0.5583329796791077,
+          0.5583329796791077,
+          1.0
+        ],
+        "Basecolor Global Multiply Post-Bake": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "Scatter Color Global Multiply (PT) Post-Bake": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "OmbrehairDye": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "HighlightshairDye": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "RegionhairDye": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "HairDyeColor": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "MustacheDyeColor": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "BeardDyeColor": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "EyebrowsDyeColor": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "Fingernail Tint Color": [
+          0.0833333358168602,
+          4.967053879312289e-09,
+          0.004664584994316101,
+          1.0
+        ],
+        "Toenail Tint Color": [
+          0.0833333358168602,
+          4.967053879312289e-09,
+          0.004664584994316101,
+          1.0
+        ]
+      },
+      "parents": [
+        "/MetaHumanCharacter/Materials/MI_Skin_Head_UI_LOD0.MI_Skin_Head_UI_LOD0",
+        "/MetaHumanCharacter/Lookdev_UHM/Skin/Materials/MI_skin_unified_MH_preset.MI_skin_unified_MH_preset",
+        "/MetaHumanCharacter/Lookdev_UHM/Skin/Materials/MI_skin_unified.MI_skin_unified",
+        "/MetaHumanCharacter/Lookdev_UHM/Skin/Materials/M_skin_unified_UI.M_skin_unified_UI"
+      ]
+    },
+    {
+      "index": 2,
+      "slot": "MI_Teeth_Baked",
+      "material": "/Game/MetaHumans/LZW/MC_LZW_MaterialsExport/Face/Materials/MI_Face_Teeth.MI_Face_Teeth",
+      "class": "MaterialInstanceConstant",
+      "textures": {
+        "BaseColor": {
+          "path": "/MetaHumanCharacter/Lookdev_UHM/Teeth/Textures/T_Teeth_BaseColor.T_Teeth_BaseColor",
+          "class": "Texture2D",
+          "srgb": true,
+          "compression": "<TextureCompressionSettings.TC_DEFAULT: 0>"
+        },
+        "Normal": {
+          "path": "/MetaHumanCharacter/Lookdev_UHM/Teeth/Textures/T_Teeth_Normal.T_Teeth_Normal",
+          "class": "Texture2D",
+          "srgb": false,
+          "compression": "<TextureCompressionSettings.TC_NORMALMAP: 1>"
+        },
+        "Detail Normal": {
+          "path": "/MetaHumanCharacter/Lookdev_UHM/Teeth/Textures/T_Teeth_DetailNormal.T_Teeth_DetailNormal",
+          "class": "Texture2D",
+          "srgb": false,
+          "compression": "<TextureCompressionSettings.TC_NORMALMAP: 1>"
+        },
+        "Basecolor Baked": {
+          "path": "/MetaHumanCharacter/Lookdev_UHM/Common/Textures/Placeholders/T_Flat_Grey_C.T_Flat_Grey_C",
+          "class": "Texture2D",
+          "srgb": true,
+          "compression": "<TextureCompressionSettings.TC_DEFAULT: 0>"
+        },
+        "SRM Baked": {
+          "path": "/MetaHumanCharacter/Lookdev_UHM/Common/Textures/Placeholders/T_Flat_Black_M.T_Flat_Black_M",
+          "class": "Texture2D",
+          "srgb": false,
+          "compression": "<TextureCompressionSettings.TC_MASKS: 2>"
+        },
+        "Normal Baked": {
+          "path": "/MetaHumanCharacter/Lookdev_UHM/Common/Textures/Placeholders/T_Flat_N.T_Flat_N",
+          "class": "Texture2D",
+          "srgb": false,
+          "compression": "<TextureCompressionSettings.TC_NORMALMAP: 1>"
+        },
+        "Scatter Baked": {
+          "path": "/MetaHumanCharacter/Lookdev_UHM/Common/Textures/Placeholders/T_Flat_White_C.T_Flat_White_C",
+          "class": "Texture2D",
+          "srgb": true,
+          "compression": "<TextureCompressionSettings.TC_DEFAULT: 0>"
+        }
+      },
+      "scalars": {
+        "Teeth Roughness": 0.17000000178813934,
+        "Dim Reflections Range": 0.05000000074505806,
+        "Teeth Micro Normal Tiling": 2.5,
+        "Teeth Micro Normal Strength": 0.20000000298023224,
+        "Gums Normal Strength": 1.0,
+        "Plaque Amount": 0.0,
+        "Gums Roughness": 0.25,
+        "Teeth Sharp Normal Strength": 1.0,
+        "Teeth Detail Normal Strength": 0.5,
+        "Gums Scatter Depth": 1.0,
+        "Teeth Scatter Max Depth": 1.0,
+        "Teeth Specular": 0.09000000357627869,
+        "Gums Specular": 0.3499999940395355,
+        "Dim Reflections Influence": 1.0,
+        "Gums Micro Normal Tiling": 10.0,
+        "Gums Micro Normal Strength": 0.5,
+        "Tongue Roughness": 0.3499999940395355,
+        "Tongue Specular": 0.3499999940395355,
+        "Mouth Occlusion Amount": 1.5,
+        "Depth Offset": 0.20000000298023224,
+        "Tongue Scatter Depth": 1.0,
+        "Teeth Basecolor Hue": 0.0,
+        "Teeth Basecolor Value": 0.75,
+        "Teeth Basecolor Saturation": 0.0,
+        "Gums Basecolor Hue": -0.029999999329447746,
+        "Gums Basecolor Value": 0.6499999761581421,
+        "Gums Basecolor Saturation": 0.029999999329447746,
+        "Tongue Basecolor Hue": 0.0,
+        "Tongue Basecolor Value": 1.0,
+        "Tongue Basecolor Saturation": 0.0,
+        "Teeth Normal Strength": 1.0,
+        "Tongue Normal Strength": 1.0,
+        "Gums Detail Normal Strength": 1.0,
+        "Tongue Detail Normal Strength": 1.0,
+        "Tongue Micro Normal Tiliing": 1.0,
+        "Plaque Roughness Offset": 0.0,
+        "Plaque Basecolor Hue": 0.0,
+        "Plaque Basecolor Value": 1.0,
+        "Plaque Basecolor Saturation": 0.0,
+        "Gum Line Basecolor Hue": 0.0,
+        "Gum Line Basecolor Value": 0.7200000286102295,
+        "Gum Line Basecolor Saturation": 0.0,
+        "Gum Line Roughness Offset": 0.25,
+        "Tongue Micro Normal Strength": 0.5,
+        "Teeth Scatter Min Depth": 1.0
+      },
+      "vectors": {
+        "Teeth Basecolor Multiply": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "Plaque Basecolor Multiply": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "Gum Line Basecolor Multiply": [
+          1.0,
+          0.8054580092430115,
+          0.6499999761581421,
+          1.0
+        ],
+        "Gums Basecolor Multiply": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "Tongue Basecolor Multiply": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "Teeth Edge Color Multiply": [
+          0.846875011920929,
+          0.9101960062980652,
+          1.0,
+          1.0
+        ]
+      },
+      "parents": [
+        "/MetaHumanCharacter/Materials/MI_Teeth_MHC_UI.MI_Teeth_MHC_UI",
+        "/MetaHumanCharacter/Lookdev_UHM/Teeth/Materials/MI_teeth_unified_MH_preset.MI_teeth_unified_MH_preset",
+        "/MetaHumanCharacter/Lookdev_UHM/Teeth/Materials/MI_teeth_unified.MI_teeth_unified",
+        "/MetaHumanCharacter/Lookdev_UHM/Teeth/Materials/M_teeth_unified.M_teeth_unified"
+      ]
+    },
+    {
+      "index": 3,
+      "slot": "M_Hide",
+      "material": "/Game/MetaHumans/LZW/MC_LZW_MaterialsExport/Face/Materials/MI_Face_Teeth.MI_Face_Teeth",
+      "class": "MaterialInstanceConstant",
+      "textures": {
+        "BaseColor": {
+          "path": "/MetaHumanCharacter/Lookdev_UHM/Teeth/Textures/T_Teeth_BaseColor.T_Teeth_BaseColor",
+          "class": "Texture2D",
+          "srgb": true,
+          "compression": "<TextureCompressionSettings.TC_DEFAULT: 0>"
+        },
+        "Normal": {
+          "path": "/MetaHumanCharacter/Lookdev_UHM/Teeth/Textures/T_Teeth_Normal.T_Teeth_Normal",
+          "class": "Texture2D",
+          "srgb": false,
+          "compression": "<TextureCompressionSettings.TC_NORMALMAP: 1>"
+        },
+        "Detail Normal": {
+          "path": "/MetaHumanCharacter/Lookdev_UHM/Teeth/Textures/T_Teeth_DetailNormal.T_Teeth_DetailNormal",
+          "class": "Texture2D",
+          "srgb": false,
+          "compression": "<TextureCompressionSettings.TC_NORMALMAP: 1>"
+        },
+        "Basecolor Baked": {
+          "path": "/MetaHumanCharacter/Lookdev_UHM/Common/Textures/Placeholders/T_Flat_Grey_C.T_Flat_Grey_C",
+          "class": "Texture2D",
+          "srgb": true,
+          "compression": "<TextureCompressionSettings.TC_DEFAULT: 0>"
+        },
+        "SRM Baked": {
+          "path": "/MetaHumanCharacter/Lookdev_UHM/Common/Textures/Placeholders/T_Flat_Black_M.T_Flat_Black_M",
+          "class": "Texture2D",
+          "srgb": false,
+          "compression": "<TextureCompressionSettings.TC_MASKS: 2>"
+        },
+        "Normal Baked": {
+          "path": "/MetaHumanCharacter/Lookdev_UHM/Common/Textures/Placeholders/T_Flat_N.T_Flat_N",
+          "class": "Texture2D",
+          "srgb": false,
+          "compression": "<TextureCompressionSettings.TC_NORMALMAP: 1>"
+        },
+        "Scatter Baked": {
+          "path": "/MetaHumanCharacter/Lookdev_UHM/Common/Textures/Placeholders/T_Flat_White_C.T_Flat_White_C",
+          "class": "Texture2D",
+          "srgb": true,
+          "compression": "<TextureCompressionSettings.TC_DEFAULT: 0>"
+        }
+      },
+      "scalars": {
+        "Teeth Roughness": 0.17000000178813934,
+        "Dim Reflections Range": 0.05000000074505806,
+        "Teeth Micro Normal Tiling": 2.5,
+        "Teeth Micro Normal Strength": 0.20000000298023224,
+        "Gums Normal Strength": 1.0,
+        "Plaque Amount": 0.0,
+        "Gums Roughness": 0.25,
+        "Teeth Sharp Normal Strength": 1.0,
+        "Teeth Detail Normal Strength": 0.5,
+        "Gums Scatter Depth": 1.0,
+        "Teeth Scatter Max Depth": 1.0,
+        "Teeth Specular": 0.09000000357627869,
+        "Gums Specular": 0.3499999940395355,
+        "Dim Reflections Influence": 1.0,
+        "Gums Micro Normal Tiling": 10.0,
+        "Gums Micro Normal Strength": 0.5,
+        "Tongue Roughness": 0.3499999940395355,
+        "Tongue Specular": 0.3499999940395355,
+        "Mouth Occlusion Amount": 1.5,
+        "Depth Offset": 0.20000000298023224,
+        "Tongue Scatter Depth": 1.0,
+        "Teeth Basecolor Hue": 0.0,
+        "Teeth Basecolor Value": 0.75,
+        "Teeth Basecolor Saturation": 0.0,
+        "Gums Basecolor Hue": -0.029999999329447746,
+        "Gums Basecolor Value": 0.6499999761581421,
+        "Gums Basecolor Saturation": 0.029999999329447746,
+        "Tongue Basecolor Hue": 0.0,
+        "Tongue Basecolor Value": 1.0,
+        "Tongue Basecolor Saturation": 0.0,
+        "Teeth Normal Strength": 1.0,
+        "Tongue Normal Strength": 1.0,
+        "Gums Detail Normal Strength": 1.0,
+        "Tongue Detail Normal Strength": 1.0,
+        "Tongue Micro Normal Tiliing": 1.0,
+        "Plaque Roughness Offset": 0.0,
+        "Plaque Basecolor Hue": 0.0,
+        "Plaque Basecolor Value": 1.0,
+        "Plaque Basecolor Saturation": 0.0,
+        "Gum Line Basecolor Hue": 0.0,
+        "Gum Line Basecolor Value": 0.7200000286102295,
+        "Gum Line Basecolor Saturation": 0.0,
+        "Gum Line Roughness Offset": 0.25,
+        "Tongue Micro Normal Strength": 0.5,
+        "Teeth Scatter Min Depth": 1.0
+      },
+      "vectors": {
+        "Teeth Basecolor Multiply": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "Plaque Basecolor Multiply": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "Gum Line Basecolor Multiply": [
+          1.0,
+          0.8054580092430115,
+          0.6499999761581421,
+          1.0
+        ],
+        "Gums Basecolor Multiply": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "Tongue Basecolor Multiply": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "Teeth Edge Color Multiply": [
+          0.846875011920929,
+          0.9101960062980652,
+          1.0,
+          1.0
+        ]
+      },
+      "parents": [
+        "/MetaHumanCharacter/Materials/MI_Teeth_MHC_UI.MI_Teeth_MHC_UI",
+        "/MetaHumanCharacter/Lookdev_UHM/Teeth/Materials/MI_teeth_unified_MH_preset.MI_teeth_unified_MH_preset",
+        "/MetaHumanCharacter/Lookdev_UHM/Teeth/Materials/MI_teeth_unified.MI_teeth_unified",
+        "/MetaHumanCharacter/Lookdev_UHM/Teeth/Materials/M_teeth_unified.M_teeth_unified"
+      ]
+    },
+    {
+      "index": 4,
+      "slot": "MI_EyeL_Baked",
+      "material": "/Game/MetaHumans/LZW/MC_LZW_MaterialsExport/Face/Materials/MI_Face_Eye_Left.MI_Face_Eye_Left",
+      "class": "MaterialInstanceConstant",
+      "textures": {
+        "Sclera Basecolor": {
+          "path": "/MetaHumanCharacter/Lookdev_UHM/Eye/Textures/T_EyeSclera_D.T_EyeSclera_D",
+          "class": "Texture2D",
+          "srgb": true,
+          "compression": "<TextureCompressionSettings.TC_DEFAULT: 0>"
+        },
+        "Iris": {
+          "path": "/MetaHumanCharacter/Lookdev_UHM/Eye/Textures/T_Iris001_01_D.T_Iris001_01_D",
+          "class": "Texture2D",
+          "srgb": true,
+          "compression": "<TextureCompressionSettings.TC_DEFAULT: 0>"
+        },
+        "Sclera Normal": {
+          "path": "/MetaHumanCharacter/Lookdev_UHM/Eye/Textures/T_EyeSclera_N.T_EyeSclera_N",
+          "class": "Texture2D",
+          "srgb": false,
+          "compression": "<TextureCompressionSettings.TC_NORMALMAP: 1>"
+        },
+        "Iris Normal": {
+          "path": "/MetaHumanCharacter/Lookdev_UHM/Eye/Textures/Iris/T_iris_D_N.T_iris_D_N",
+          "class": "Texture2D",
+          "srgb": false,
+          "compression": "<TextureCompressionSettings.TC_NORMALMAP: 1>"
+        },
+        "Iris Pattern Masks": {
+          "path": "/MetaHumanCharacter/Lookdev_UHM/Eye/Textures/Iris/T_Iris_D_M.T_Iris_D_M",
+          "class": "Texture2D",
+          "srgb": false,
+          "compression": "<TextureCompressionSettings.TC_MASKS: 2>"
+        },
+        "Fake Reflection Cube Map": {
+          "path": "/MetaHumanCharacter/Lookdev_UHM/Eye/Textures/T_alice_sun_painted.T_alice_sun_painted",
+          "class": "TextureCube",
+          "srgb": false,
+          "compression": "<TextureCompressionSettings.TC_HDR: 6>"
+        },
+        "Sclera Basecolor Baked": {
+          "path": "/MetaHumanCharacter/Lookdev_UHM/Common/Textures/Placeholders/T_Flat_Grey_C.T_Flat_Grey_C",
+          "class": "Texture2D",
+          "srgb": true,
+          "compression": "<TextureCompressionSettings.TC_DEFAULT: 0>"
+        },
+        "Iris Basecolor Baked": {
+          "path": "/MetaHumanCharacter/Lookdev_UHM/Common/Textures/Placeholders/T_Flat_Grey_C.T_Flat_Grey_C",
+          "class": "Texture2D",
+          "srgb": true,
+          "compression": "<TextureCompressionSettings.TC_DEFAULT: 0>"
+        },
+        "Sclera Normal Baked": {
+          "path": "/MetaHumanCharacter/Lookdev_UHM/Common/Textures/Placeholders/T_Flat_N.T_Flat_N",
+          "class": "Texture2D",
+          "srgb": false,
+          "compression": "<TextureCompressionSettings.TC_NORMALMAP: 1>"
+        },
+        "Iris Normal Baked": {
+          "path": "/MetaHumanCharacter/Lookdev_UHM/Common/Textures/Placeholders/T_Flat_N.T_Flat_N",
+          "class": "Texture2D",
+          "srgb": false,
+          "compression": "<TextureCompressionSettings.TC_NORMALMAP: 1>"
+        }
+      },
+      "scalars": {
+        "IoR": 1.409999966621399,
+        "Corneal Limbus Softness": 0.06000000238418579,
+        "Refraction Depth Scale": 1.0,
+        "Iris Concavity Power": 0.3499999940395355,
+        "Iris Concavity Scale": 0.15000000596046448,
+        "Cornea Size": 0.16339999437332153,
+        "Sclera Transmission Spread": 0.11500000208616257,
+        "Corneal Limbus Size": 0.054999999701976776,
+        "Limbal Ring Softness": 0.08500000834465027,
+        "Limbal Ring Size": 0.7750000357627869,
+        "Corneal Limbus Density": 0.5,
+        "Pupil Feather Softness": 0.20000000298023224,
+        "Iris Mask Softness": 0.06279999762773514,
+        "Iris Mask Offset": -0.009999999776482582,
+        "Pupil Feather Strength": 0.7200000286102295,
+        "Pupil Dilation": 0.9550000429153442,
+        "Pupil Shift X": 0.0,
+        "Pupil Shift Y": 0.0,
+        "Iris Scale": 1.0,
+        "Sclera Normal Strength": 1.0,
+        "Corneal Limbus Softness Variation Strength": 0.009999999776482582,
+        "Corneal Limbus Softness Variation Scale": 0.6000000238418579,
+        "Iris Normal Strength": 1.0,
+        "Sclera Transmission Variation Scale": 0.3499999940395355,
+        "Sclera Transmission Variation Strength": 0.019999999552965164,
+        "Corneal Limbus Softness Variation Rotation": 0.03840000182390213,
+        "Sclera Transmission Variation Rotation": 0.0,
+        "Iris Rotation": 0.0,
+        "Sclera Rotation": 0.0,
+        "Sclera Corner Softness": 0.15000000596046448,
+        "Sclera Corner Variation Scale": 1.1200000047683716,
+        "Sclera Corner Variation Strength": 0.07000000029802322,
+        "Sclera Corner Variation Rotation": 0.0,
+        "Sclera Corner Size": 0.20000000298023224,
+        "Sclera Irritation Area Softness": 0.15000000596046448,
+        "Sclera Irritation Variation Scale": 1.0,
+        "Sclera Irritation Variation Strength": 0.004999999888241291,
+        "Sclera Irritation Variation Rotation": 0.0,
+        "Sclera Irritation Area Size": 0.20000000298023224,
+        "Sclera Irritation Veins Opacity": 0.5,
+        "Sclera Gradient Mask Softness": 0.20000000298023224,
+        "Sclera Gradient Mask Position": 0.0,
+        "Iris Color Hue Variation": 0.10000000149011612,
+        "Iris Color Value Variation": 0.10000000149011612,
+        "Iris Primary Color Hue": 0.875119149684906,
+        "Iris Primary Color Value": 0.26406240463256836,
+        "Iris Global Saturation": 1.159999966621399,
+        "Iris Secondary Color Hue": 0.9625746607780457,
+        "Iris Secondary Color Value": 0.1416664570569992,
+        "Iris Shadow Details Amount": 0.75,
+        "Iris Color Blend Coverage": 0.5358574390411377,
+        "Iris Color Blend Coverage Softness": 0.5,
+        "Iris Saturation Variation": 0.0,
+        "Iris Color Blend Switch": 1.0,
+        "Cloudy Eye Intensity": 2.0,
+        "Cloudy Eye Variation": 0.646399974822998,
+        "Cloudy Eye Size": 0.40880000591278076,
+        "Cloudy Eye Softness": 0.3271999955177307,
+        "Cornea Roughness": 0.07500000298023224,
+        "Cloudy Eye Cornea Normal Variation Strength": 0.0,
+        "Pupil Funnel Normal Strength": 0.5,
+        "Melanosis Ring Softness Variation Scale": 1.0,
+        "Melanosis Ring Softness Variation Rotation": 0.0,
+        "Melanosis Ring Softness": 0.023000000044703484,
+        "Melanosis Ring Softness Variation Strength": 0.019999999552965164,
+        "Melanosis Ring Opacity Variation Scale": 0.20000000298023224,
+        "Melanosis Ring Opacity Variation Rotation": 0.1088000014424324,
+        "Melanosis Ring Opacity Variation Strength": 0.800000011920929,
+        "Melanosis Ring Distance": 0.15800000727176666,
+        "Melanosis Ring Thickness": 0.001500000013038516,
+        "Caustics Compensation Fresnel Exponent": 2.25,
+        "Caustics Compensation Basecolor Multiply": 2.5,
+        "Caustics Compensation Depth": 0.75,
+        "Fake Reflection Intensity": 0.15000000596046448,
+        "Fake Reflection Masking Strength": 1.0,
+        "Bake Basecolor Iris": 0.0,
+        "Bake Normal Sclera": 0.0,
+        "Bake Normal Iris": 0.0,
+        "Fake AO Saturation": 0.30000001192092896,
+        "Fake AO Strength": 1.2000000476837158
+      },
+      "vectors": {
+        "Corneal Limbus Color (Mult)": [
+          0.8468734622001648,
+          0.896269679069519,
+          1.0,
+          1.0
+        ],
+        "Sclera Transmission Color (Mult)": [
+          0.803124725818634,
+          0.803124725818634,
+          0.803124725818634,
+          1.0
+        ],
+        "Iris Color Multiply": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "Sclera Color Multiply": [
+          0.832291305065155,
+          0.7403927445411682,
+          0.69444340467453,
+          1.0
+        ],
+        "Limbal Ring Color (Mult)": [
+          0.8114579319953918,
+          0.8114579319953918,
+          0.8114579319953918,
+          1.0
+        ],
+        "Sclera Corner Color (Mult)": [
+          0.6499999761581421,
+          0.5525000095367432,
+          0.5525000095367432,
+          1.0
+        ],
+        "Scela Irriration Bloodshot Color (Mult)": [
+          1.0,
+          0.699999988079071,
+          0.699999988079071,
+          1.0
+        ],
+        "Sclera Gradient Mask Color Multiply": [
+          1.1200000047683716,
+          1.1200000047683716,
+          1.1200000047683716,
+          1.0
+        ],
+        "Iris Shadow Details Color": [
+          0.23124900460243225,
+          0.13396799564361572,
+          0.0067529999651014805,
+          1.0
+        ],
+        "Cloudy Eye Color": [
+          0.16684399545192719,
+          0.16684399545192719,
+          0.1899999976158142,
+          1.0
+        ],
+        "Melanosis Ring Color": [
+          0.5927090048789978,
+          0.24633100628852844,
+          0.0,
+          1.0
+        ]
+      },
+      "parents": [
+        "/MetaHumanCharacter/Materials/MI_Eye_Left_MHC.MI_Eye_Left_MHC",
+        "/MetaHumanCharacter/Lookdev_UHM/Eye/Materials/MI_eye_eyeball_unified_MH_preset_left.MI_eye_eyeball_unified_MH_preset_left",
+        "/MetaHumanCharacter/Lookdev_UHM/Eye/Materials/M_eye_eyeball_unified.M_eye_eyeball_unified"
+      ]
+    },
+    {
+      "index": 5,
+      "slot": "MI_EyeR_Baked",
+      "material": "/Game/MetaHumans/LZW/MC_LZW_MaterialsExport/Face/Materials/MI_Face_Eye_Right.MI_Face_Eye_Right",
+      "class": "MaterialInstanceConstant",
+      "textures": {
+        "Sclera Basecolor": {
+          "path": "/MetaHumanCharacter/Lookdev_UHM/Eye/Textures/T_EyeSclera_D.T_EyeSclera_D",
+          "class": "Texture2D",
+          "srgb": true,
+          "compression": "<TextureCompressionSettings.TC_DEFAULT: 0>"
+        },
+        "Iris": {
+          "path": "/MetaHumanCharacter/Lookdev_UHM/Eye/Textures/T_Iris001_01_D.T_Iris001_01_D",
+          "class": "Texture2D",
+          "srgb": true,
+          "compression": "<TextureCompressionSettings.TC_DEFAULT: 0>"
+        },
+        "Sclera Normal": {
+          "path": "/MetaHumanCharacter/Lookdev_UHM/Eye/Textures/T_EyeSclera_N.T_EyeSclera_N",
+          "class": "Texture2D",
+          "srgb": false,
+          "compression": "<TextureCompressionSettings.TC_NORMALMAP: 1>"
+        },
+        "Iris Normal": {
+          "path": "/MetaHumanCharacter/Lookdev_UHM/Eye/Textures/Iris/T_iris_D_N.T_iris_D_N",
+          "class": "Texture2D",
+          "srgb": false,
+          "compression": "<TextureCompressionSettings.TC_NORMALMAP: 1>"
+        },
+        "Iris Pattern Masks": {
+          "path": "/MetaHumanCharacter/Lookdev_UHM/Eye/Textures/Iris/T_Iris_D_M.T_Iris_D_M",
+          "class": "Texture2D",
+          "srgb": false,
+          "compression": "<TextureCompressionSettings.TC_MASKS: 2>"
+        },
+        "Fake Reflection Cube Map": {
+          "path": "/MetaHumanCharacter/Lookdev_UHM/Eye/Textures/T_alice_sun_painted.T_alice_sun_painted",
+          "class": "TextureCube",
+          "srgb": false,
+          "compression": "<TextureCompressionSettings.TC_HDR: 6>"
+        },
+        "Sclera Basecolor Baked": {
+          "path": "/MetaHumanCharacter/Lookdev_UHM/Common/Textures/Placeholders/T_Flat_Grey_C.T_Flat_Grey_C",
+          "class": "Texture2D",
+          "srgb": true,
+          "compression": "<TextureCompressionSettings.TC_DEFAULT: 0>"
+        },
+        "Iris Basecolor Baked": {
+          "path": "/MetaHumanCharacter/Lookdev_UHM/Common/Textures/Placeholders/T_Flat_Grey_C.T_Flat_Grey_C",
+          "class": "Texture2D",
+          "srgb": true,
+          "compression": "<TextureCompressionSettings.TC_DEFAULT: 0>"
+        },
+        "Sclera Normal Baked": {
+          "path": "/MetaHumanCharacter/Lookdev_UHM/Common/Textures/Placeholders/T_Flat_N.T_Flat_N",
+          "class": "Texture2D",
+          "srgb": false,
+          "compression": "<TextureCompressionSettings.TC_NORMALMAP: 1>"
+        },
+        "Iris Normal Baked": {
+          "path": "/MetaHumanCharacter/Lookdev_UHM/Common/Textures/Placeholders/T_Flat_N.T_Flat_N",
+          "class": "Texture2D",
+          "srgb": false,
+          "compression": "<TextureCompressionSettings.TC_NORMALMAP: 1>"
+        }
+      },
+      "scalars": {
+        "IoR": 1.409999966621399,
+        "Corneal Limbus Softness": 0.06000000238418579,
+        "Refraction Depth Scale": 1.0,
+        "Iris Concavity Power": 0.3499999940395355,
+        "Iris Concavity Scale": 0.15000000596046448,
+        "Cornea Size": 0.16339999437332153,
+        "Sclera Transmission Spread": 0.11500000208616257,
+        "Corneal Limbus Size": 0.054999999701976776,
+        "Limbal Ring Softness": 0.08500000834465027,
+        "Limbal Ring Size": 0.7750000357627869,
+        "Corneal Limbus Density": 0.5,
+        "Pupil Feather Softness": 0.20000000298023224,
+        "Iris Mask Softness": 0.06279999762773514,
+        "Iris Mask Offset": -0.009999999776482582,
+        "Pupil Feather Strength": 0.7200000286102295,
+        "Pupil Dilation": 0.9550000429153442,
+        "Pupil Shift X": 0.0,
+        "Pupil Shift Y": 0.0,
+        "Iris Scale": 1.0,
+        "Sclera Normal Strength": 1.0,
+        "Corneal Limbus Softness Variation Strength": 0.009999999776482582,
+        "Corneal Limbus Softness Variation Scale": 0.6000000238418579,
+        "Iris Normal Strength": 1.0,
+        "Sclera Transmission Variation Scale": 0.3499999940395355,
+        "Sclera Transmission Variation Strength": 0.019999999552965164,
+        "Corneal Limbus Softness Variation Rotation": 0.03840000182390213,
+        "Sclera Transmission Variation Rotation": 0.0,
+        "Iris Rotation": 0.0,
+        "Sclera Rotation": 0.0,
+        "Sclera Corner Softness": 0.15000000596046448,
+        "Sclera Corner Variation Scale": 1.1200000047683716,
+        "Sclera Corner Variation Strength": 0.07000000029802322,
+        "Sclera Corner Variation Rotation": 0.0,
+        "Sclera Corner Size": 0.20000000298023224,
+        "Sclera Irritation Area Softness": 0.15000000596046448,
+        "Sclera Irritation Variation Scale": 1.0,
+        "Sclera Irritation Variation Strength": 0.004999999888241291,
+        "Sclera Irritation Variation Rotation": 0.0,
+        "Sclera Irritation Area Size": 0.20000000298023224,
+        "Sclera Irritation Veins Opacity": 0.5,
+        "Sclera Gradient Mask Softness": 0.20000000298023224,
+        "Sclera Gradient Mask Position": 0.0,
+        "Iris Color Hue Variation": 0.10000000149011612,
+        "Iris Color Value Variation": 0.10000000149011612,
+        "Iris Primary Color Hue": 0.875119149684906,
+        "Iris Primary Color Value": 0.26406240463256836,
+        "Iris Global Saturation": 1.159999966621399,
+        "Iris Secondary Color Hue": 0.9625746607780457,
+        "Iris Secondary Color Value": 0.1416664570569992,
+        "Iris Shadow Details Amount": 0.75,
+        "Iris Color Blend Coverage": 0.5358574390411377,
+        "Iris Color Blend Coverage Softness": 0.5,
+        "Iris Saturation Variation": 0.0,
+        "Iris Color Blend Switch": 1.0,
+        "Cloudy Eye Intensity": 0.5,
+        "Cloudy Eye Variation": 0.25,
+        "Cloudy Eye Size": 0.30000001192092896,
+        "Cloudy Eye Softness": 0.5,
+        "Cornea Roughness": 0.07500000298023224,
+        "Cloudy Eye Cornea Normal Variation Strength": 0.0,
+        "Pupil Funnel Normal Strength": 0.5,
+        "Melanosis Ring Softness Variation Scale": 1.0,
+        "Melanosis Ring Softness Variation Rotation": 0.0,
+        "Melanosis Ring Softness": 0.023000000044703484,
+        "Melanosis Ring Softness Variation Strength": 0.019999999552965164,
+        "Melanosis Ring Opacity Variation Scale": 0.20000000298023224,
+        "Melanosis Ring Opacity Variation Rotation": 0.0,
+        "Melanosis Ring Opacity Variation Strength": 0.800000011920929,
+        "Melanosis Ring Distance": 0.15800000727176666,
+        "Melanosis Ring Thickness": 0.001500000013038516,
+        "Caustics Compensation Fresnel Exponent": 2.25,
+        "Caustics Compensation Basecolor Multiply": 2.5,
+        "Caustics Compensation Depth": 0.75,
+        "Fake Reflection Intensity": 0.15000000596046448,
+        "Fake Reflection Masking Strength": 1.0,
+        "Bake Basecolor Iris": 0.0,
+        "Bake Normal Sclera": 0.0,
+        "Bake Normal Iris": 0.0,
+        "Fake AO Saturation": 0.30000001192092896,
+        "Fake AO Strength": 1.2000000476837158
+      },
+      "vectors": {
+        "Corneal Limbus Color (Mult)": [
+          0.8468734622001648,
+          0.896269679069519,
+          1.0,
+          1.0
+        ],
+        "Sclera Transmission Color (Mult)": [
+          0.803124725818634,
+          0.803124725818634,
+          0.803124725818634,
+          1.0
+        ],
+        "Iris Color Multiply": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "Sclera Color Multiply": [
+          0.832291305065155,
+          0.7403927445411682,
+          0.69444340467453,
+          1.0
+        ],
+        "Limbal Ring Color (Mult)": [
+          0.8114579319953918,
+          0.8114579319953918,
+          0.8114579319953918,
+          1.0
+        ],
+        "Sclera Corner Color (Mult)": [
+          0.6499999761581421,
+          0.5525000095367432,
+          0.5525000095367432,
+          1.0
+        ],
+        "Scela Irriration Bloodshot Color (Mult)": [
+          1.0,
+          0.699999988079071,
+          0.699999988079071,
+          1.0
+        ],
+        "Sclera Gradient Mask Color Multiply": [
+          1.1200000047683716,
+          1.1200000047683716,
+          1.1200000047683716,
+          1.0
+        ],
+        "Iris Shadow Details Color": [
+          0.23124900460243225,
+          0.13396799564361572,
+          0.0067529999651014805,
+          1.0
+        ],
+        "Cloudy Eye Color": [
+          0.16684399545192719,
+          0.16684399545192719,
+          0.1899999976158142,
+          1.0
+        ],
+        "Melanosis Ring Color": [
+          0.5927090048789978,
+          0.24633100628852844,
+          0.0,
+          1.0
+        ]
+      },
+      "parents": [
+        "/MetaHumanCharacter/Materials/MI_Eye_Right_MHC.MI_Eye_Right_MHC",
+        "/MetaHumanCharacter/Lookdev_UHM/Eye/Materials/MI_eye_eyeball_unified_MH_preset_left_right.MI_eye_eyeball_unified_MH_preset_left_right",
+        "/MetaHumanCharacter/Lookdev_UHM/Eye/Materials/MI_eye_eyeball_unified_MH_preset_left.MI_eye_eyeball_unified_MH_preset_left",
+        "/MetaHumanCharacter/Lookdev_UHM/Eye/Materials/M_eye_eyeball_unified.M_eye_eyeball_unified"
+      ]
+    },
+    {
+      "index": 6,
+      "slot": "MI_Face_EyeShell",
+      "material": "/Game/MetaHumans/LZW/MC_LZW_MaterialsExport/Face/Materials/MI_Face_EyeShell.MI_Face_EyeShell",
+      "class": "MaterialInstanceConstant",
+      "textures": {},
+      "scalars": {
+        "Blur Size": 0.12999999523162842,
+        "OuterBlur_Radius": 0.3190000057220459,
+        "OuterBlur_Hardness": 0.6669999957084656,
+        "InnerBlur_Hardness": 0.8037999868392944,
+        "InnerBlur_Radius": 0.298799991607666,
+        "TopBlur_Hardness": 0.7799999713897705,
+        "TopBlur_Radius": 0.33000001311302185,
+        "BottomBlur_Hardness": 0.73403000831604,
+        "BottomBlur_Radius": 0.2624010145664215,
+        "OuterBlurBorder_Radius": 0.08799999952316284,
+        "OuterBlurBorder_Hardness": 0.11400000005960464,
+        "InnerBlurBorder_Hardness": 0.53329998254776,
+        "InnerBlurBorder_Radius": 0.17299999296665192,
+        "TopBlurBorder_Hardness": 0.5230000019073486,
+        "TopBlurBorder_Radius": 0.10999999940395355,
+        "BottomBlurBorder_Hardness": 0.3264000117778778,
+        "BottomBlurBorder_Radius": 0.14079999923706055,
+        "OuterShadow_Radius": 0.0,
+        "OuterShadow_Hardness": 0.0,
+        "InnerShadow_Hardness": 0.7080000042915344,
+        "InnerShadow_Radius": 0.2743990123271942,
+        "TopShadow_Hardness": 0.4864000082015991,
+        "TopShadow_Radius": 0.7504000067710876,
+        "BottomShadow_Hardness": 0.0,
+        "BottomShadow_Radius": 0.0,
+        "OuterShadowBorder_Radius": 0.10199999809265137,
+        "OuterShadowBorder_Hardness": 0.0,
+        "InnerShadowBorder_Hardness": 0.38240599632263184,
+        "InnerShadowBorder_Radius": 0.20440000295639038,
+        "TopShadowBorder_Hardness": 0.0,
+        "TopShadowBorder_Radius": 0.18440000712871552,
+        "BottomShadowBorder_Hardness": 0.0,
+        "BottomShadowBorder_Radius": 0.05000000074505806,
+        "ShadowMultiply": 0.25
+      },
+      "vectors": {
+        "Blur color": [
+          1.0,
+          0.9046609997749329,
+          0.8962690234184265,
+          1.0
+        ],
+        "ShadowTint": [
+          0.9010419845581055,
+          0.9010419845581055,
+          0.9010419845581055,
+          1.0
+        ]
+      },
+      "parents": [
+        "/MetaHumanCharacter/Lookdev_UHM/Eye/Materials/MI_eye_occlusion_unified.MI_eye_occlusion_unified",
+        "/MetaHumanCharacter/Lookdev_UHM/Eye/Materials/M_eye_occlusion_unified.M_eye_occlusion_unified"
+      ]
+    },
+    {
+      "index": 7,
+      "slot": "MI_Face_Eyelashes",
+      "material": "/Game/MetaHumans/LZW/MC_LZW_MaterialsExport/Face/Materials/MI_Face_Eyelashes.MI_Face_Eyelashes",
+      "class": "MaterialInstanceConstant",
+      "textures": {
+        "Texture": {
+          "path": "/MetaHumanCharacter/Lookdev_UHM/Common/Textures/Placeholders/T_Flat_Black_M.T_Flat_Black_M",
+          "class": "Texture2D",
+          "srgb": false,
+          "compression": "<TextureCompressionSettings.TC_MASKS: 2>"
+        }
+      },
+      "scalars": {
+        "Metallic": 0.0,
+        "Specular": 0.0,
+        "Roughness": 0.25,
+        "HairRedness": 0.2800000011920929,
+        "HairMelanin": 0.30000001192092896,
+        "Exp": 1.0,
+        "Opacity": 0.0,
+        "OpacityRT": 0.0,
+        "ExpRT": 1.600000023841858
+      },
+      "vectors": {
+        "DyeColor": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ]
+      },
+      "parents": [
+        "/MetaHumanCharacter/Materials/MI_Eyelashes_LowerLODs.MI_Eyelashes_LowerLODs",
+        "/MetaHumanCharacter/Materials/M_Eyelashes_Cards.M_Eyelashes_Cards"
+      ]
+    },
+    {
+      "index": 8,
+      "slot": "MI_Face_LacrimalFluid",
+      "material": "/Game/MetaHumans/LZW/MC_LZW_MaterialsExport/Face/Materials/MI_Face_LacrimalFluid.MI_Face_LacrimalFluid",
+      "class": "MaterialInstanceConstant",
+      "textures": {},
+      "scalars": {
+        "Metallic": 1.0,
+        "FadeStart": 0.20000000298023224,
+        "FadeEnd": 0.5,
+        "Opacity": 0.014999999664723873,
+        "DepthOffset": 0.10000000149011612
+      },
+      "vectors": {},
+      "parents": [
+        "/MetaHumanCharacter/Lookdev_UHM/Eye/Materials/MI_eye_lacrimal_fluid_unified.MI_eye_lacrimal_fluid_unified",
+        "/MetaHumanCharacter/Lookdev_UHM/Eye/Materials/M_eye_lacrimal_fluid_unified.M_eye_lacrimal_fluid_unified"
+      ]
+    },
+    {
+      "index": 9,
+      "slot": "M_Hide_8",
+      "material": "/Engine/EngineMaterials/WorldGridMaterial.WorldGridMaterial",
+      "class": "Material",
+      "textures": {},
+      "scalars": {},
+      "vectors": {},
+      "parents": []
+    },
+    {
+      "index": 10,
+      "slot": "衣服套装_002",
+      "material": "/Game/2_Cloth/2_new_raw/衣服套装_002.衣服套装_002",
+      "class": "MaterialInstanceConstant",
+      "textures": {
+        "DiffuseColorMap": {
+          "path": "/Game/2_Cloth/2_new_raw/衣服套装_basecolor.衣服套装_basecolor",
+          "class": "Texture2D",
+          "srgb": true,
+          "compression": "<TextureCompressionSettings.TC_DEFAULT: 0>"
+        },
+        "AmbientColorMap": {
+          "path": "/Engine/EngineResources/DefaultTexture.DefaultTexture",
+          "class": "Texture2D",
+          "srgb": true,
+          "compression": "<TextureCompressionSettings.TC_DEFAULT: 0>"
+        },
+        "SpecularColorMap": {
+          "path": "/Engine/EngineResources/DefaultTexture.DefaultTexture",
+          "class": "Texture2D",
+          "srgb": true,
+          "compression": "<TextureCompressionSettings.TC_DEFAULT: 0>"
+        },
+        "ShininessMap": {
+          "path": "/Game/2_Cloth/2_new_raw/衣服套装_糙度.衣服套装_糙度",
+          "class": "Texture2D",
+          "srgb": true,
+          "compression": "<TextureCompressionSettings.TC_DEFAULT: 0>"
+        },
+        "EmissiveColorMap": {
+          "path": "/Engine/EngineResources/DefaultTexture.DefaultTexture",
+          "class": "Texture2D",
+          "srgb": true,
+          "compression": "<TextureCompressionSettings.TC_DEFAULT: 0>"
+        },
+        "NormalMap": {
+          "path": "/Engine/EngineMaterials/DefaultNormal.DefaultNormal",
+          "class": "Texture2D",
+          "srgb": false,
+          "compression": "<TextureCompressionSettings.TC_NORMALMAP: 1>"
+        },
+        "AmbientOcclusionMap": {
+          "path": "/Engine/EngineMaterials/BaseFlattenLinearColor.BaseFlattenLinearColor",
+          "class": "Texture2D",
+          "srgb": false,
+          "compression": "<TextureCompressionSettings.TC_DEFAULT: 0>"
+        },
+        "OpacityMaskMap": {
+          "path": "/Engine/EngineMaterials/BaseFlattenLinearColor.BaseFlattenLinearColor",
+          "class": "Texture2D",
+          "srgb": false,
+          "compression": "<TextureCompressionSettings.TC_DEFAULT: 0>"
+        },
+        "OpacityMap": {
+          "path": "/Engine/EngineMaterials/BaseFlattenLinearColor.BaseFlattenLinearColor",
+          "class": "Texture2D",
+          "srgb": false,
+          "compression": "<TextureCompressionSettings.TC_DEFAULT: 0>"
+        }
+      },
+      "scalars": {
+        "one": 1.0,
+        "DiffuseColorMapWeight": 1.0,
+        "SpecularColorMapWeight": 0.0,
+        "Shininess": 20.0,
+        "NormalMapWeight": 0.0,
+        "ShininessMapWeight": 1.0,
+        "AmbientColorMapWeight": 0.0,
+        "EmissiveColorMapWeight": 0.0,
+        "AmbientOcclusionMapWeight": 0.0,
+        "AmbientOcclusion": 1.0,
+        "OpacityMaskMapWeight": 0.0,
+        "Opacity": 1.0,
+        "OpacityMapWeight": 0.0,
+        "OpacitySourceChannel": 0.0,
+        "AmbientColorMapTilingU": 1.0,
+        "AmbientColorMapTilingV": 1.0,
+        "DiffuseColorMapTilingU": 1.0,
+        "DiffuseColorMapTilingV": 1.0,
+        "SpecularColorMapTilingU": 1.0,
+        "SpecularColorMapTilingV": 1.0,
+        "ShininessMapTilingU": 1.0,
+        "ShininessMapTilingV": 1.0,
+        "OpacityMapTilingU": 1.0,
+        "OpacityMapTilingV": 1.0,
+        "OpacityMaskMapTilingU": 1.0,
+        "OpacityMaskMapTilingV": 1.0,
+        "AmbientOcclusionMapTilingU": 1.0,
+        "AmbientOcclusionMapTilingV": 1.0,
+        "NormalMapTilingU": 1.0,
+        "NormalMapTilingV": 1.0,
+        "EmissiveColorMapTilingU": 1.0,
+        "EmissiveColorMapTilingV": 1.0
+      },
+      "vectors": {
+        "DiffuseColor": [
+          1.0,
+          1.0,
+          1.0,
+          0.0
+        ],
+        "SpecularColor": [
+          0.5,
+          0.5,
+          0.5,
+          1.0
+        ],
+        "AmbientColor": [
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "EmissiveColor": [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      },
+      "parents": [
+        "/InterchangeAssets/Materials/FBXLegacyPhongSurfaceMaterial.FBXLegacyPhongSurfaceMaterial"
+      ]
+    }
+  ]
+}
