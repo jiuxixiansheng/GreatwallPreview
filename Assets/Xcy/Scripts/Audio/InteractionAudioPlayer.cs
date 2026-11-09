@@ -203,8 +203,14 @@ namespace Xcy.Audio
 
         public void ApplyCue(InteractionAudioCue cue, int emitter, Vector3 position, bool stop)
         {
-            if (stop) { StopLoop(cue, emitter); return; }
+            if (stop)
+            {
+                if (cue == InteractionAudioCue.CrackPrompt) SetCrackPromptGlow(false);
+                StopLoop(cue, emitter);
+                return;
+            }
             if (library == null || !library.TryGet(cue, out var entry)) return;
+            if (cue == InteractionAudioCue.CrackPrompt) SetCrackPromptGlow(true);
             if (entry.loop || entry.repeatInterval > 0f)
             {
                 int key = Key(cue, emitter);
@@ -233,6 +239,13 @@ namespace Xcy.Audio
             if (cue == InteractionAudioCue.WallGlow) onWallGlow.Invoke();
             if (cue == InteractionAudioCue.LightCurtain) onLightCurtain.Invoke();
             if (logPlayback) Debug.Log("[交互音效] " + cue + " / " + emitter, this);
+        }
+
+        private void SetCrackPromptGlow(bool active)
+        {
+            if (crackRepair == null) return;
+            foreach (var crack in crackRepair.Cracks)
+                if (crack != null) crack.SetPromptGlow(active);
         }
 
         private static int Key(InteractionAudioCue cue, int emitter) => (int)cue * 100 + emitter;
@@ -285,6 +298,7 @@ namespace Xcy.Audio
         }
         public void StopAllAudio()
         {
+            SetCrackPromptGlow(false);
             StopLoops();
             foreach (var source in oneShots) if (source != null) source.Stop();
         }
