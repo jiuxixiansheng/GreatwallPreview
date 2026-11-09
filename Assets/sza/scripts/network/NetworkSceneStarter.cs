@@ -20,6 +20,9 @@ public class NetworkSceneStarter : MonoBehaviour
         NetworkManager manager = GetComponent<NetworkManager>();
         KcpTransport transport = GetComponent<KcpTransport>();
 
+        var gameplay = GetComponent<NetworkGameplayCoordinator>();
+        if (gameplay != null) gameplay.PrepareSceneNetworkObjects();
+
         manager.transport = transport;
         transport.port = config.connectionPort;
 

@@ -1,0 +1,505 @@
+{
+  "materials": [
+    {
+      "path": "/Game/MetaHumans/LZW/Grooms/MI_WI_Hair_S_SlickBack_Hair.MI_WI_Hair_S_SlickBack_Hair",
+      "scalars": {
+        "Intensity": 0.04784899950027466,
+        "Rwidth": 0.029999999329447746,
+        "TRTwidth": 0.03500000014901161,
+        "TRTSaturation": 1.2000000476837158,
+        "RIntensity": 0.21443399786949158,
+        "Roughness": 0.6116719841957092,
+        "RoughnessTRT": 0.38999998569488525,
+        "TRTIntensity": 0.10000000149011612,
+        "ScraggleMobile": 0.17580699920654297,
+        "ScraggleFreq": 20.0,
+        "RoughnessOverall": 0.506193995475769,
+        "IntensityFillLight": 0.0,
+        "fillLightSaturation": -0.10000000149011612,
+        "RoughnessFill": 0.7200000286102295,
+        "TangentNoiseTiling": 16.0,
+        "LightDirection": 0.7380949854850769,
+        "Scraggle": 0.15000000596046448,
+        "RoughnessVariation": 0.3499999940395355,
+        "MelaninVariationFine": 0.699999988079071,
+        "hairMelanin": 0.6786283850669861,
+        "HairRoughness": 0.3700000047683716,
+        "hairRedness": 0.0,
+        "RedVariation": 0.0,
+        "Spec0": 0.44999998807907104,
+        "Spec1": 0.75,
+        "PixelDepthOffset": 1.0,
+        "SpecEdge": 0.5,
+        "SpecFront": 0.5,
+        "MelaninVariationRough": 0.4000000059604645,
+        "rotation": -90.0,
+        "OpacityNear": 2.0,
+        "OpacityFar": 2.0,
+        "OpacityPowNear": 0.5,
+        "OpacityPowFar": 0.5,
+        "Ombre": 0.0,
+        "Highlights": 1.0,
+        "Region": 0.0,
+        "OmbreShift": 1.0,
+        "OmbreContrast": 0.0,
+        "OmbreIntensity": 0.0,
+        "OmbreMelaninVariationFine": 0.699999988079071,
+        "OmbreMelanin": 0.0,
+        "OmbreRedness": 0.0,
+        "OmbreRedVariation": 0.0,
+        "OmbreMelaninVariationRough": 0.4000000059604645,
+        "HighlightsVariationNumber": 0.0,
+        "HighlightsBlending": 0.5239989757537842,
+        "HighlightsMelaninVariationFine": 0.699999988079071,
+        "HighlightsMelanin": 0.0,
+        "HighlightsRedness": 0.0,
+        "HighlightsRedVariation": 0.0,
+        "HighlightsMelaninVariationRough": 0.4000000059604645,
+        "HighlightsIntensity": 0.894931972026825,
+        "RegionMelaninVariationFine": 0.699999988079071,
+        "RegionMelanin": 0.28189998865127563,
+        "RegionRedness": 0.25,
+        "RegionRedVariation": 0.0,
+        "RegionMelaninVariationRough": 0.4000000059604645,
+        "Desat": 0.10000000149011612,
+        "WhiteMelininHigh": 0.05000000074505806,
+        "WhiteMelininLow": 0.15000000596046448,
+        "WhiteMelaninVariation": 0.30000001192092896,
+        "LightAmount": 0.5,
+        "HighlightsRootDistance": 0.0,
+        "WhiteAmount": 0.8991979956626892
+      },
+      "vectors": {
+        "FillVector": [
+          0.0,
+          0.0,
+          -1.0,
+          1.0
+        ],
+        "hairDye": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "OmbrehairDye": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "HighlightshairDye": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "RegionhairDye": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "PaintColor": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ]
+      },
+      "textures": {
+        "HighlightsMask": "/Game/MetaHumans/Common/Optional/Grooms/HighlightsTextures/HighlightMask_thin.HighlightMask_thin"
+      },
+      "switches": [],
+      "parents": [
+        "/Game/MetaHumans/Common/Materials/MI_Hair.MI_Hair",
+        "/Game/MetaHumans/Common/Materials/M_hair_v4.M_hair_v4"
+      ]
+    },
+    {
+      "path": "/Game/MetaHumans/LZW/Grooms/MI_WI_Hair_S_SlickBack_Hair_Cards.MI_WI_Hair_S_SlickBack_Hair_Cards",
+      "scalars": {
+        "Intensity": 0.04784899950027466,
+        "Rwidth": 0.029999999329447746,
+        "TRTwidth": 0.03500000014901161,
+        "TRTSaturation": 1.2000000476837158,
+        "RIntensity": 0.21443399786949158,
+        "Roughness": 0.6116719841957092,
+        "RoughnessTRT": 0.38999998569488525,
+        "TRTIntensity": 0.10000000149011612,
+        "ScraggleMobile": 0.17580699920654297,
+        "ScraggleFreq": 20.0,
+        "RoughnessOverall": 0.506193995475769,
+        "IntensityFillLight": 0.0,
+        "fillLightSaturation": -0.10000000149011612,
+        "RoughnessFill": 0.7200000286102295,
+        "TangentNoiseTiling": 16.0,
+        "LightDirection": 0.7380949854850769,
+        "Scraggle": -0.05000000074505806,
+        "RoughnessVariation": 0.3499999940395355,
+        "MelaninVariationFine": 0.699999988079071,
+        "hairMelanin": 0.6786283850669861,
+        "HairRoughness": 0.3700000047683716,
+        "hairRedness": 0.0,
+        "RedVariation": 0.0,
+        "Spec0": 0.44999998807907104,
+        "Spec1": 0.75,
+        "PixelDepthOffset": 1.0,
+        "SpecEdge": 0.5,
+        "SpecFront": 0.5,
+        "MelaninVariationRough": 0.4000000059604645,
+        "rotation": -90.0,
+        "OpacityNear": 2.0,
+        "OpacityFar": 2.0,
+        "OpacityPowNear": 0.5,
+        "OpacityPowFar": 0.5,
+        "Ombre": 0.0,
+        "Highlights": 1.0,
+        "Region": 0.0,
+        "OmbreShift": 1.0,
+        "OmbreContrast": 0.0,
+        "OmbreIntensity": 0.0,
+        "OmbreMelaninVariationFine": 0.699999988079071,
+        "OmbreMelanin": 0.0,
+        "OmbreRedness": 0.0,
+        "OmbreRedVariation": 0.0,
+        "OmbreMelaninVariationRough": 0.4000000059604645,
+        "HighlightsVariationNumber": 0.0,
+        "HighlightsBlending": 0.5239989757537842,
+        "HighlightsMelaninVariationFine": 0.699999988079071,
+        "HighlightsMelanin": 0.0,
+        "HighlightsRedness": 0.0,
+        "HighlightsRedVariation": 0.0,
+        "HighlightsMelaninVariationRough": 0.4000000059604645,
+        "HighlightsIntensity": 0.894931972026825,
+        "RegionMelaninVariationFine": 0.699999988079071,
+        "RegionMelanin": 0.28189998865127563,
+        "RegionRedness": 0.25,
+        "RegionRedVariation": 0.0,
+        "RegionMelaninVariationRough": 0.4000000059604645,
+        "Desat": 0.10000000149011612,
+        "WhiteMelininHigh": 0.05000000074505806,
+        "WhiteMelininLow": 0.15000000596046448,
+        "WhiteMelaninVariation": 0.30000001192092896,
+        "LightAmount": 0.5,
+        "HighlightsRootDistance": 0.0,
+        "WhiteAmount": 0.8991979956626892
+      },
+      "vectors": {
+        "FillVector": [
+          0.0,
+          0.0,
+          -1.0,
+          1.0
+        ],
+        "hairDye": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "OmbrehairDye": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "HighlightshairDye": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "RegionhairDye": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "PaintColor": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ]
+      },
+      "textures": {
+        "HighlightsMask": "/Game/MetaHumans/Common/Optional/Grooms/HighlightsTextures/HighlightMask_thin.HighlightMask_thin"
+      },
+      "switches": [],
+      "parents": [
+        "/Game/MetaHumans/Common/Materials/MI_Hair_Cards.MI_Hair_Cards",
+        "/Game/MetaHumans/Common/Materials/MI_Hair.MI_Hair",
+        "/Game/MetaHumans/Common/Materials/M_hair_v4.M_hair_v4"
+      ]
+    },
+    {
+      "path": "/Game/MetaHumans/LZW/Grooms/MI_WI_Hair_S_SlickBack_Hair_Helmet.MI_WI_Hair_S_SlickBack_Hair_Helmet",
+      "scalars": {
+        "Intensity": 0.04784899950027466,
+        "Rwidth": 0.029999999329447746,
+        "TRTwidth": 0.03500000014901161,
+        "TRTSaturation": 1.2000000476837158,
+        "RIntensity": 0.21443399786949158,
+        "Roughness": 0.6116719841957092,
+        "RoughnessTRT": 0.38999998569488525,
+        "TRTIntensity": 0.10000000149011612,
+        "ScraggleMobile": 0.17580699920654297,
+        "ScraggleFreq": 20.0,
+        "RoughnessOverall": 0.506193995475769,
+        "IntensityFillLight": 0.0,
+        "fillLightSaturation": -0.10000000149011612,
+        "RoughnessFill": 0.7200000286102295,
+        "TangentNoiseTiling": 16.0,
+        "LightDirection": 0.7380949854850769,
+        "Scraggle": 0.15000000596046448,
+        "RoughnessVariation": 0.3499999940395355,
+        "MelaninVariationFine": 0.699999988079071,
+        "hairMelanin": 0.6786283850669861,
+        "HairRoughness": 0.3700000047683716,
+        "hairRedness": 0.0,
+        "RedVariation": 0.0,
+        "Spec0": 0.5,
+        "Spec1": 1.0,
+        "PixelDepthOffset": 1.0,
+        "SpecEdge": 0.5,
+        "SpecFront": 0.5,
+        "MelaninVariationRough": 0.4000000059604645,
+        "rotation": -90.0,
+        "OpacityNear": 2.0,
+        "OpacityFar": 2.0,
+        "OpacityPowNear": 0.5,
+        "OpacityPowFar": 0.5,
+        "Ombre": 0.0,
+        "Highlights": 1.0,
+        "Region": 0.0,
+        "OmbreShift": 1.0,
+        "OmbreContrast": 0.0,
+        "OmbreIntensity": 0.0,
+        "OmbreMelaninVariationFine": 0.699999988079071,
+        "OmbreMelanin": 0.0,
+        "OmbreRedness": 0.0,
+        "OmbreRedVariation": 0.0,
+        "OmbreMelaninVariationRough": 0.4000000059604645,
+        "HighlightsVariationNumber": 0.0,
+        "HighlightsBlending": 0.5239989757537842,
+        "HighlightsMelaninVariationFine": 0.699999988079071,
+        "HighlightsMelanin": 0.0,
+        "HighlightsRedness": 0.0,
+        "HighlightsRedVariation": 0.0,
+        "HighlightsMelaninVariationRough": 0.4000000059604645,
+        "HighlightsIntensity": 0.894931972026825,
+        "RegionMelaninVariationFine": 0.699999988079071,
+        "RegionMelanin": 0.28189998865127563,
+        "RegionRedness": 0.25,
+        "RegionRedVariation": 0.0,
+        "RegionMelaninVariationRough": 0.4000000059604645,
+        "Desat": 0.10000000149011612,
+        "WhiteMelininHigh": 0.05000000074505806,
+        "WhiteMelininLow": 0.15000000596046448,
+        "WhiteMelaninVariation": 0.30000001192092896,
+        "LightAmount": 0.5,
+        "HighlightsRootDistance": 0.0,
+        "WhiteAmount": 0.8991979956626892
+      },
+      "vectors": {
+        "FillVector": [
+          0.0,
+          0.0,
+          -1.0,
+          1.0
+        ],
+        "hairDye": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "OmbrehairDye": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "HighlightshairDye": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "RegionhairDye": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "PaintColor": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ]
+      },
+      "textures": {
+        "HighlightsMask": "/Game/MetaHumans/Common/Optional/Grooms/HighlightsTextures/HighlightMask_thin.HighlightMask_thin"
+      },
+      "switches": [],
+      "parents": [
+        "/Game/MetaHumans/Common/Materials/MI_Hair_Helmet.MI_Hair_Helmet",
+        "/Game/MetaHumans/Common/Materials/MI_Hair.MI_Hair",
+        "/Game/MetaHumans/Common/Materials/M_hair_v4.M_hair_v4"
+      ]
+    }
+  ],
+  "meshes": [
+    {
+      "path": "/Game/MetaHumans/LZW/Grooms/Hair_S_SlickBack_CardsMesh_Group0_LOD0.Hair_S_SlickBack_CardsMesh_Group0_LOD0",
+      "materials": [
+        {
+          "slot": "MaterialSlot",
+          "material": null
+        },
+        {
+          "slot": "lambert4",
+          "material": "/Engine/EngineMaterials/WorldGridMaterial.WorldGridMaterial"
+        },
+        {
+          "slot": "Cards_M",
+          "material": "/Engine/EngineMaterials/WorldGridMaterial.WorldGridMaterial"
+        }
+      ],
+      "exported": true
+    },
+    {
+      "path": "/Game/MetaHumans/LZW/Grooms/Hair_S_SlickBack_CardsMesh_Group0_LOD1.Hair_S_SlickBack_CardsMesh_Group0_LOD1",
+      "materials": [
+        {
+          "slot": "Cards_M",
+          "material": "/Engine/EngineMaterials/WorldGridMaterial.WorldGridMaterial"
+        }
+      ],
+      "exported": true
+    },
+    {
+      "path": "/Game/MetaHumans/LZW/Grooms/Hair_S_SlickBack_CardsMesh_Group0_LOD2.Hair_S_SlickBack_CardsMesh_Group0_LOD2",
+      "materials": [
+        {
+          "slot": "Cards_M",
+          "material": "/Engine/EngineMaterials/WorldGridMaterial.WorldGridMaterial"
+        }
+      ]
+    }
+  ],
+  "groom": {
+    "hair_groups_cards": "[{}, {}, {}, {}, {}]",
+    "hair_groups_meshes": "[{}, {}, {}]",
+    "hair_groups_materials": "[{}, {}, {}]",
+    "hair_groups_lod": "[{}]",
+    "hair_groups_info": "[{}]"
+  },
+  "textures": [
+    {
+      "path": "/Game/MetaHumans/Common/Optional/Grooms/GroomAssets/Hair/Hair_S_SlickBack/Hair_S_SlickBack_CardsAtlas_Attribute.Hair_S_SlickBack_CardsAtlas_Attribute",
+      "exported": true,
+      "file": "Hair_S_SlickBack_CardsAtlas_Attribute.png",
+      "srgb": false,
+      "compression": "<TextureCompressionSettings.TC_MASKS: 2>"
+    },
+    {
+      "path": "/Game/MetaHumans/Common/Optional/Grooms/GroomAssets/Hair/Hair_S_SlickBack/Hair_S_SlickBack_CardsAtlas_Tangent.Hair_S_SlickBack_CardsAtlas_Tangent",
+      "exported": true,
+      "file": "Hair_S_SlickBack_CardsAtlas_Tangent.png",
+      "srgb": false,
+      "compression": "<TextureCompressionSettings.TC_MASKS: 2>"
+    },
+    {
+      "path": "/Game/MetaHumans/Common/Optional/Grooms/GroomAssets/Hair/Hair_S_SlickBack/Hair_S_SlickBack_ColorXYDepthGroupID.Hair_S_SlickBack_ColorXYDepthGroupID",
+      "exported": true,
+      "file": "Hair_S_SlickBack_ColorXYDepthGroupID.png",
+      "srgb": false,
+      "compression": "<TextureCompressionSettings.TC_MASKS: 2>"
+    },
+    {
+      "path": "/Game/MetaHumans/Common/Optional/Grooms/GroomAssets/Hair/Hair_S_SlickBack/Hair_S_SlickBack_RootUVSeedCoverage.Hair_S_SlickBack_RootUVSeedCoverage",
+      "exported": true,
+      "file": "Hair_S_SlickBack_RootUVSeedCoverage.png",
+      "srgb": false,
+      "compression": "<TextureCompressionSettings.TC_MASKS: 2>"
+    },
+    {
+      "path": "/Game/MetaHumans/Common/Optional/Grooms/GroomAssets/Hair/Hair_S_SlickBack/Hair_S_SlickBack_TangentStrandU.Hair_S_SlickBack_TangentStrandU",
+      "exported": true,
+      "file": "Hair_S_SlickBack_TangentStrandU.png",
+      "srgb": false,
+      "compression": "<TextureCompressionSettings.TC_MASKS: 2>"
+    }
+  ],
+  "card_descriptors": [
+    {
+      "lod_index": "0",
+      "group_index": "0",
+      "material_slot_name": "HairGroupsCardsSourceDescription: Failed to find property 'material_slot_name' for attribute 'material_slot_name' on 'HairGroupsCardsSourceDescription'",
+      "invert_uv": "HairGroupsCardsSourceDescription: Failed to find property 'invert_uv' for attribute 'invert_uv' on 'HairGroupsCardsSourceDescription'",
+      "imported_mesh": "/Game/MetaHumans/LZW/Grooms/Hair_S_SlickBack_CardsMesh_Group0_LOD0.Hair_S_SlickBack_CardsMesh_Group0_LOD0",
+      "layout": "<HairTextureLayout.LAYOUT2: 2>",
+      "textures": [
+        "/Game/MetaHumans/Common/Optional/Grooms/GroomAssets/Hair/Hair_S_SlickBack/Hair_S_SlickBack_CardsAtlas_Tangent.Hair_S_SlickBack_CardsAtlas_Tangent",
+        "/Game/MetaHumans/Common/Optional/Grooms/GroomAssets/Hair/Hair_S_SlickBack/Hair_S_SlickBack_CardsAtlas_Attribute.Hair_S_SlickBack_CardsAtlas_Attribute",
+        null
+      ]
+    },
+    {
+      "lod_index": "1",
+      "group_index": "0",
+      "material_slot_name": "HairGroupsCardsSourceDescription: Failed to find property 'material_slot_name' for attribute 'material_slot_name' on 'HairGroupsCardsSourceDescription'",
+      "invert_uv": "HairGroupsCardsSourceDescription: Failed to find property 'invert_uv' for attribute 'invert_uv' on 'HairGroupsCardsSourceDescription'",
+      "imported_mesh": "/Game/MetaHumans/LZW/Grooms/Hair_S_SlickBack_CardsMesh_Group0_LOD1.Hair_S_SlickBack_CardsMesh_Group0_LOD1",
+      "layout": "<HairTextureLayout.LAYOUT2: 2>",
+      "textures": [
+        "/Game/MetaHumans/Common/Optional/Grooms/GroomAssets/Hair/Hair_S_SlickBack/Hair_S_SlickBack_CardsAtlas_Tangent.Hair_S_SlickBack_CardsAtlas_Tangent",
+        "/Game/MetaHumans/Common/Optional/Grooms/GroomAssets/Hair/Hair_S_SlickBack/Hair_S_SlickBack_CardsAtlas_Attribute.Hair_S_SlickBack_CardsAtlas_Attribute",
+        null
+      ]
+    },
+    {
+      "lod_index": "2",
+      "group_index": "0",
+      "material_slot_name": "HairGroupsCardsSourceDescription: Failed to find property 'material_slot_name' for attribute 'material_slot_name' on 'HairGroupsCardsSourceDescription'",
+      "invert_uv": "HairGroupsCardsSourceDescription: Failed to find property 'invert_uv' for attribute 'invert_uv' on 'HairGroupsCardsSourceDescription'",
+      "imported_mesh": "/Game/MetaHumans/LZW/Grooms/Hair_S_SlickBack_CardsMesh_Group0_LOD2.Hair_S_SlickBack_CardsMesh_Group0_LOD2",
+      "layout": "<HairTextureLayout.LAYOUT2: 2>",
+      "textures": [
+        "/Game/MetaHumans/Common/Optional/Grooms/GroomAssets/Hair/Hair_S_SlickBack/Hair_S_SlickBack_CardsAtlas_Tangent.Hair_S_SlickBack_CardsAtlas_Tangent",
+        "/Game/MetaHumans/Common/Optional/Grooms/GroomAssets/Hair/Hair_S_SlickBack/Hair_S_SlickBack_CardsAtlas_Attribute.Hair_S_SlickBack_CardsAtlas_Attribute",
+        null
+      ]
+    },
+    {
+      "lod_index": "3",
+      "group_index": "0",
+      "material_slot_name": "HairGroupsCardsSourceDescription: Failed to find property 'material_slot_name' for attribute 'material_slot_name' on 'HairGroupsCardsSourceDescription'",
+      "invert_uv": "HairGroupsCardsSourceDescription: Failed to find property 'invert_uv' for attribute 'invert_uv' on 'HairGroupsCardsSourceDescription'",
+      "imported_mesh": "/Game/MetaHumans/LZW/Grooms/Hair_S_SlickBack_CardsMesh_Group0_LOD3.Hair_S_SlickBack_CardsMesh_Group0_LOD3",
+      "layout": "<HairTextureLayout.LAYOUT2: 2>",
+      "textures": [
+        "/Game/MetaHumans/Common/Optional/Grooms/GroomAssets/Hair/Hair_S_SlickBack/Hair_S_SlickBack_CardsAtlas_Tangent.Hair_S_SlickBack_CardsAtlas_Tangent",
+        "/Game/MetaHumans/Common/Optional/Grooms/GroomAssets/Hair/Hair_S_SlickBack/Hair_S_SlickBack_CardsAtlas_Attribute.Hair_S_SlickBack_CardsAtlas_Attribute",
+        null
+      ]
+    },
+    {
+      "lod_index": "4",
+      "group_index": "0",
+      "material_slot_name": "HairGroupsCardsSourceDescription: Failed to find property 'material_slot_name' for attribute 'material_slot_name' on 'HairGroupsCardsSourceDescription'",
+      "invert_uv": "HairGroupsCardsSourceDescription: Failed to find property 'invert_uv' for attribute 'invert_uv' on 'HairGroupsCardsSourceDescription'",
+      "imported_mesh": "/Game/MetaHumans/LZW/Grooms/Hair_S_SlickBack_CardsMesh_Group0_LOD4.Hair_S_SlickBack_CardsMesh_Group0_LOD4",
+      "layout": "<HairTextureLayout.LAYOUT2: 2>",
+      "textures": [
+        "/Game/MetaHumans/Common/Optional/Grooms/GroomAssets/Hair/Hair_S_SlickBack/Hair_S_SlickBack_CardsAtlas_Tangent.Hair_S_SlickBack_CardsAtlas_Tangent",
+        "/Game/MetaHumans/Common/Optional/Grooms/GroomAssets/Hair/Hair_S_SlickBack/Hair_S_SlickBack_CardsAtlas_Attribute.Hair_S_SlickBack_CardsAtlas_Attribute",
+        null
+      ]
+    }
+  ],
+  "card_type_doc": "Hair Groups Cards Source Description\r\n\r\n**C++ Source:**\r\n\r\n- **Plugin**: HairStrands\r\n- **Module**: HairStrandsCore\r\n- **File**: GroomAssetCards.h\r\n\r\n**Editor Properties:** (see get_editor_property/set_editor_property)\r\n\r\n- ``cards_info`` (HairGroupCardsInfo):  [Read-Only]\r\n- ``group_index`` (int32):  [Read-Write] Group index on which this cards geometry will be used (#hair_todo: change this to be a dropdown selection menu in FHairLODSettings instead)\r\n- ``guide_type`` (HairCardsGuideType):  [Read-Write]\r\n- ``imported_mesh`` (StaticMesh):  [Read-Write]\r\n- ``lod_index`` (int32):  [Read-Write] LOD on which this cards geometry will be used. -1 means not used  (#hair_todo: change this to be a dropdown selection menu in FHairLODSettings instead)\r\n- ``textures`` (HairGroupCardsTextures):  [Read-Write]"
+}

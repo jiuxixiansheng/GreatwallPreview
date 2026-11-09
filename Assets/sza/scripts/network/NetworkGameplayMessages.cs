@@ -14,6 +14,7 @@ public struct GameplayRequestMessage : NetworkMessage
 public struct GameplayVisualState
 {
     public bool distanceSet, restoreSet;
+    public bool disappearQueueApplied;
     public float distance, restore;
     public int shadows;
 }
@@ -31,6 +32,9 @@ public struct GameplaySnapshotMessage : NetworkMessage
     public int chapter;
     public double serverTime, timelineTime;
     public bool playing, transitioning;
+    public bool dragonTransformationStarted, dragonTransformationCompleted;
+    public double dragonTransformationTimelineTime;
+    public float dragonTransformationDuration;
     public bool[] solved, objectActive;
     public GameplayVisualState[] visuals;
     public Vector3 characterPosition;

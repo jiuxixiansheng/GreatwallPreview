@@ -84,6 +84,14 @@ namespace Xcy.CrackRepair
         {
             if (!Application.isPlaying || repairUnlocked || repairCompleted) return;
             repairUnlocked = true;
+            // Signal 是修复阶段的可靠入口，不依赖编辑时绑定的玩家或玩家是否进入旧碰撞盒。
+            var director = part2TimelineRelay != null
+                ? part2TimelineRelay.GetComponent<UnityEngine.Playables.PlayableDirector>() : null;
+            if (director != null)
+                foreach (var trigger in FindObjectsByType<CrackRepairTrigger>(
+                    FindObjectsInactive.Include, FindObjectsSortMode.None))
+                    if (trigger.gameObject.scene == gameObject.scene && trigger.TargetTimeline == director)
+                        trigger.PrepareForRepair();
             foreach (CrackRepairDecal crack in cracks)
                 if (crack != null) crack.Unlock();
         }

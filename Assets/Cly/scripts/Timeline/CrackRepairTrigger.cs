@@ -1,5 +1,7 @@
 using UnityEngine;
 using UnityEngine.Playables;
+using Unity.XR.CoreUtils;
+using Mirror;
 
 namespace Greatwall.VRAnimation.Timeline
 {
@@ -8,8 +10,10 @@ namespace Greatwall.VRAnimation.Timeline
     public sealed class CrackRepairTrigger : MonoBehaviour
     {
         [Header("允许触发监听的物体")]
-        [Tooltip("在编辑模式下拖入场景物体。任意一个物体自身或子物体的碰撞体进入盒子后，开始监听；数组为空时不触发。")]
+        [Tooltip("可选的额外触发物体。自身或子物体的碰撞体进入区域后开始监听。")]
         [SerializeField] private GameObject[] triggerObjects = new GameObject[0];
+        [Tooltip("自动接受本机网络玩家；单机模式下接受 XR Origin，无需拖入运行时玩家。")]
+        [SerializeField] private bool automaticallyDetectPlayers = true;
 
         [Header("修复完成事件（必须与发送端一致）")]
         [SerializeField] private string completionEventName = "裂缝修复完成";
@@ -17,21 +21,16 @@ namespace Greatwall.VRAnimation.Timeline
         [Header("修复完成后继续播放的 Timeline")]
         [SerializeField] private PlayableDirector timelineToResume;
 
+        public PlayableDirector TargetTimeline => timelineToResume;
+
         private bool waitingForRepair;
         private bool completed;
         private bool listening;
         private EventDispatcher dispatcher;
         private string registeredEventName;
 
-        private void Reset()
-        {
-            ConfigureTrigger();
-        }
-
-        private void Awake()
-        {
-            ConfigureTrigger();
-        }
+        private void Reset() => ConfigureTrigger();
+        private void Awake() => ConfigureTrigger();
 
         private void ConfigureTrigger()
         {
@@ -43,44 +42,49 @@ namespace Greatwall.VRAnimation.Timeline
 
         private void OnEnable()
         {
-            // 临时禁用后恢复等待，但已经完成的交互不会重新开始。
-            if (waitingForRepair && !completed) RegisterListener();
+            if (Application.isPlaying && waitingForRepair && !completed) RegisterListener();
         }
 
-        private void OnTriggerEnter(Collider other)
-        {
-            TryBeginWaiting(other);
-        }
-
-        private void OnTriggerStay(Collider other)
-        {
-            // 兼容组件启用时目标物体已经在盒内，不依赖再次跨过边界。
-            TryBeginWaiting(other);
-        }
+        private void OnTriggerEnter(Collider other) => TryBeginWaiting(other);
+        private void OnTriggerStay(Collider other) => TryBeginWaiting(other);
 
         private void TryBeginWaiting(Collider other)
         {
-            if (!isActiveAndEnabled || completed || waitingForRepair) return;
-
-            if (!MatchesTriggerObject(other)) return;
-            if (!RegisterListener()) return;
-
-            waitingForRepair = true;
-            Debug.Log("[CrackRepairTrigger] 已开始监听裂缝修复完成。", this);
+            if (!isActiveAndEnabled || completed || waitingForRepair || other == null) return;
+            if (MatchesTriggerObject(other)) BeginListening();
         }
 
         private bool MatchesTriggerObject(Collider other)
         {
-            if (triggerObjects == null) return false;
+            if (other == null) return false;
+            if (triggerObjects != null)
+                foreach (GameObject target in triggerObjects)
+                    if (target != null && (other.transform == target.transform ||
+                                          other.transform.IsChildOf(target.transform))) return true;
 
-            foreach (GameObject target in triggerObjects)
-            {
-                if (target == null) continue;
-                if (other.transform == target.transform || other.transform.IsChildOf(target.transform))
-                    return true;
-            }
+            if (!automaticallyDetectPlayers) return false;
+            var player = other.GetComponentInParent<PlayerNetworkSetup>();
+            if (player != null) return player.isLocalPlayer;
+            if (NetworkClient.active || NetworkServer.active) return false;
+            return other.GetComponentInParent<XROrigin>() != null;
+        }
 
-            return false;
+        /// <summary>由区域检测或外部事件开始监听，不重置已完成的一次交互。</summary>
+        public void BeginListening()
+        {
+            if (!Application.isPlaying || !isActiveAndEnabled || completed || waitingForRepair) return;
+            if (!RegisterListener()) return;
+            waitingForRepair = true;
+        }
+
+        /// <summary>修复阶段的 Signal 到达时调用；重新进入本章也能再次使用。</summary>
+        public void PrepareForRepair()
+        {
+            if (!Application.isPlaying) return;
+            RemoveListener();
+            completed = false;
+            waitingForRepair = true;
+            if (isActiveAndEnabled) RegisterListener();
         }
 
         private bool RegisterListener()
@@ -91,7 +95,6 @@ namespace Greatwall.VRAnimation.Timeline
                 Debug.LogError("[CrackRepairTrigger] 请填写修复完成事件名称。", this);
                 return false;
             }
-
             dispatcher = EventDispatcher.Instance;
             registeredEventName = completionEventName;
             dispatcher.AddListener(registeredEventName, OnRepairCompleted);
@@ -99,28 +102,43 @@ namespace Greatwall.VRAnimation.Timeline
             return true;
         }
 
-        // 不在 OnTriggerExit 取消：玩家离开区域后仍然等待修复完成。
         private void OnRepairCompleted()
         {
-            if (completed || !waitingForRepair) return;
-
+            if (completed || !waitingForRepair || timelineToResume == null) return;
+            if (NetworkGameplayCoordinator.IsManaged)
+            {
+                var network = NetworkGameplayCoordinator.Instance;
+                if (network.story == null || network.story.CurrentDirector != timelineToResume ||
+                    network.story.IsTransitionPending) return;
+                // Host 恢复 Timeline、Animator 和音频，并通过现有快照同步给客户端。
+                // 客户端完成交互时使用现有 Resume 请求通知 Host。
+                network.ResumeTimeline();
+            }
+            else
+            {
+                var stories = FindObjectsByType<StoryTimelineManager>(
+                    FindObjectsInactive.Include, FindObjectsSortMode.None);
+                StoryTimelineManager owner = null;
+                foreach (var story in stories)
+                    if (story.CurrentDirector == timelineToResume) { owner = story; break; }
+                if (owner != null)
+                {
+                    if (owner.IsTransitionPending) return;
+                    owner.SetNetworkPlayback(true);
+                }
+                else timelineToResume.Resume();
+            }
             completed = true;
             waitingForRepair = false;
             RemoveListener();
-
-            if (timelineToResume != null) timelineToResume.Resume();
         }
 
-        private void OnDisable()
-        {
-            RemoveListener();
-        }
+        private void OnDisable() => RemoveListener();
 
         private void RemoveListener()
         {
             if (!listening) return;
-            if (dispatcher != null)
-                dispatcher.RemoveListener(registeredEventName, OnRepairCompleted);
+            if (dispatcher != null) dispatcher.RemoveListener(registeredEventName, OnRepairCompleted);
             listening = false;
             dispatcher = null;
         }

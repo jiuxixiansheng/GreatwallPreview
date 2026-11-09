@@ -1,0 +1,117 @@
+{
+  "materials": [
+    {
+      "name": "M_LZW_Body",
+      "slot": "MI_Body_Baked_VT",
+      "role": "skin",
+      "color": "Body_BaseColor_Matched.png",
+      "normal": "Body_Normal.png",
+      "roughness": "",
+      "roughnessValue": 0.5,
+      "tintR": 1,
+      "tintG": 1,
+      "tintB": 1,
+      "uvOffsetX": -1
+    },
+    {
+      "name": "M_LZW_Face",
+      "slot": "MI_Face_Skin_Baked_LOD0_VT",
+      "role": "skin",
+      "color": "Face_BaseColor.png",
+      "normal": "Face_Normal.png",
+      "roughness": "",
+      "roughnessValue": 0.5
+    },
+    {
+      "name": "M_LZW_Teeth",
+      "slot": "MI_Teeth_Baked",
+      "role": "teeth",
+      "color": "Teeth_BaseColor.png",
+      "normal": "Teeth_Normal.png",
+      "roughness": "",
+      "roughnessValue": 0.3
+    },
+    {
+      "name": "M_LZW_MouthSecondary",
+      "slot": "M_Hide",
+      "role": "teeth",
+      "color": "Teeth_BaseColor.png",
+      "normal": "Teeth_Normal.png",
+      "roughness": "",
+      "roughnessValue": 0.3
+    },
+    {
+      "name": "M_LZW_Eye_Left",
+      "slot": "MI_EyeL_Baked",
+      "role": "eye",
+      "color": "Eye_Sclera.png",
+      "normal": "Eye_Sclera_Normal.png",
+      "roughness": "",
+      "roughnessValue": 0.075
+    },
+    {
+      "name": "M_LZW_Eye_Right",
+      "slot": "MI_EyeR_Baked",
+      "role": "eye",
+      "color": "Eye_Sclera.png",
+      "normal": "Eye_Sclera_Normal.png",
+      "roughness": "",
+      "roughnessValue": 0.075
+    },
+    {
+      "name": "M_LZW_EyeShell_Hidden",
+      "slot": "MI_Face_EyeShell",
+      "role": "hidden",
+      "color": "",
+      "normal": "",
+      "roughness": "",
+      "roughnessValue": 0.5
+    },
+    {
+      "name": "M_LZW_Eyelashes_Hidden",
+      "slot": "MI_Face_Eyelashes",
+      "role": "hidden",
+      "color": "",
+      "normal": "",
+      "roughness": "",
+      "roughnessValue": 0.5
+    },
+    {
+      "name": "M_LZW_TearFilm",
+      "slot": "MI_Face_LacrimalFluid",
+      "role": "wet",
+      "color": "",
+      "normal": "",
+      "roughness": "",
+      "roughnessValue": 0.5
+    },
+    {
+      "name": "M_LZW_Unassigned_Hidden",
+      "slot": "M_Hide_8",
+      "role": "hidden",
+      "color": "",
+      "normal": "",
+      "roughness": "",
+      "roughnessValue": 0.5
+    },
+    {
+      "name": "M_LZW_Clothes",
+      "slot": "衣服套装_002",
+      "role": "cloth",
+      "color": "Clothes_BaseColor.png",
+      "normal": "",
+      "roughness": "Clothes_Roughness.png",
+      "roughnessValue": 1
+    }
+  ],
+  "normalMaps": [
+    "Body_Normal.png",
+    "Face_Normal.png",
+    "Teeth_Normal.png",
+    "Eye_Sclera_Normal.png",
+    "Eye_Iris_Normal.png"
+  ],
+  "linearMaps": [
+    "Clothes_Roughness.png"
+  ]
+}
