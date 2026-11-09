@@ -31,6 +31,7 @@ namespace Xcy.Audio
         public bool PrologueRunning => prologueRoutine != null;
 
         private readonly List<AudioSource> oneShots = new List<AudioSource>();
+        private readonly HashSet<AudioSource> prologueOneShots = new HashSet<AudioSource>();
         private readonly Dictionary<int, AudioSource> loops = new Dictionary<int, AudioSource>();
         private readonly Dictionary<int, Coroutine> repeats = new Dictionary<int, Coroutine>();
         private NetworkInteractionAudioRelay relay;
@@ -95,14 +96,16 @@ namespace Xcy.Audio
             if (story == null) return;
             if (chapter != story.CurrentChapterIndex)
             {
+                // Let the opening sounds finish across the normal part0 -> part1 transfer.
+                bool continuePrologue = chapter == 0 && story.CurrentChapterIndex == 1;
                 chapter = story.CurrentChapterIndex;
-                CancelPrologue();
-                StopAllAudio();
+                if (!continuePrologue) CancelPrologue();
+                StopChapterAudio(continuePrologue);
                 flightObserved = false;
             }
             if (story.IsTransitionPending && !transitioning)
             {
-                CancelPrologue();
+                if (chapter != 0) CancelPrologue();
                 StopLoops();
             }
             transitioning = story.IsTransitionPending;
@@ -139,6 +142,8 @@ namespace Xcy.Audio
         {
             if (!InChapter(0) || PrologueRunning) return;
             prologueRoutine = StartCoroutine(PrologueSequence());
+            // Audio accompanies the transfer; its duration must never gate the chapter change.
+            if (InChapter(0)) story.SwitchToNextChapter();
         }
 
         private IEnumerator PrologueSequence()
@@ -146,11 +151,12 @@ namespace Xcy.Audio
             Vector3 position = prologueTarget != null ? prologueTarget.position : transform.position;
             Emit(InteractionAudioCue.WallGlow, 0, position);
             yield return new WaitForSeconds(Duration(InteractionAudioCue.WallGlow));
-            if (!InChapter(0)) { prologueRoutine = null; yield break; }
+            bool canContinue = story != null && (story.CurrentChapterIndex == 0 ||
+                story.CurrentChapterIndex == 1 && !story.IsTransitionPending);
+            if (!canContinue) { prologueRoutine = null; yield break; }
             Emit(InteractionAudioCue.LightCurtain, 0, position);
             yield return new WaitForSeconds(Duration(InteractionAudioCue.LightCurtain));
             prologueRoutine = null;
-            if (InChapter(0)) story.SwitchToNextChapter();
         }
 
         private float Duration(InteractionAudioCue cue) => library != null && library.TryGet(cue, out var entry) ? entry.clip.length : 0f;
@@ -228,6 +234,10 @@ namespace Xcy.Audio
                 source.loop = false;
                 source.clip = entry.clip;
                 source.Play();
+                if (cue == InteractionAudioCue.WallGlow || cue == InteractionAudioCue.LightCurtain)
+                    prologueOneShots.Add(source);
+                else
+                    prologueOneShots.Remove(source);
                 OneShotsPlayed++;
             }
             if (cue == InteractionAudioCue.WallGlow) onWallGlow.Invoke();
@@ -285,8 +295,16 @@ namespace Xcy.Audio
         }
         public void StopAllAudio()
         {
+            CancelPrologue();
+            StopChapterAudio(false);
+        }
+        private void StopChapterAudio(bool preservePrologue)
+        {
             StopLoops();
-            foreach (var source in oneShots) if (source != null) source.Stop();
+            foreach (var source in oneShots)
+                if (source != null && !(preservePrologue && prologueOneShots.Contains(source)))
+                    source.Stop();
+            if (!preservePrologue) prologueOneShots.Clear();
         }
     }
 }
