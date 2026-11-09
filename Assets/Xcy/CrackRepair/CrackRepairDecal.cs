@@ -10,12 +10,17 @@ namespace Xcy.CrackRepair
     [RequireComponent(typeof(XRSimpleInteractable))]
     public sealed class CrackRepairDecal : MonoBehaviour
     {
+        private static readonly int PromptGlowIntensityId = Shader.PropertyToID("_PromptGlowIntensity");
+
         [SerializeField] private DecalProjector projector;
         [SerializeField] private MeshRenderer originalPlaneRenderer;
         [SerializeField] private XRSimpleInteractable interactable;
         [SerializeField] private Part2CrackRepairCoordinator coordinator;
-        [SerializeField] private Texture2D repairShapeMask;
+        [SerializeField] private Texture2D repairOrderMap;
         [SerializeField, Min(0.1f)] private float repairDuration = 2.5f;
+        [Header("Interaction Prompt")]
+        [SerializeField, Range(0.1f, 3f)] private float promptGlowCyclesPerSecond = 0.9f;
+        [SerializeField, Range(0f, 8f)] private float promptGlowPeak = 5.6f;
 
         private Vector3 fullSize;
         private CrackRepairParticles particles;
@@ -23,8 +28,16 @@ namespace Xcy.CrackRepair
         private bool unlocked;
         private bool repairing;
         private bool repaired;
+        private bool promptGlowActive;
 
         public bool IsRepaired => repaired;
+        public bool IsRepairing => repairing;
+        public bool CanStartRepair => isActiveAndEnabled && unlocked && !repairing && !repaired && projector != null;
+        public double RepairStartedAt { get; private set; }
+        public event System.Action<CrackRepairDecal> RepairStarted;
+        public event System.Action<CrackRepairDecal> RepairStopped;
+        private bool reportCompletion;
+        private float initialElapsed;
 
         private void Awake()
         {
@@ -32,13 +45,12 @@ namespace Xcy.CrackRepair
             if (originalPlaneRenderer == null) originalPlaneRenderer = GetComponent<MeshRenderer>();
             if (projector == null) projector = GetComponentInChildren<DecalProjector>(true);
             CaptureFullProjectorState();
-            if (repairShapeMask == null) repairShapeMask = Resources.Load<Texture2D>("CrackRepairShape");
             maskAnimator = GetComponent<CrackRepairMaskAnimator>();
             if (maskAnimator == null) maskAnimator = gameObject.AddComponent<CrackRepairMaskAnimator>();
-            maskAnimator.Initialize(projector, repairShapeMask);
+            maskAnimator.Initialize(projector, repairOrderMap);
             particles = GetComponent<CrackRepairParticles>();
             if (particles == null) particles = gameObject.AddComponent<CrackRepairParticles>();
-            particles.Initialize(projector, fullSize);
+            particles.Initialize(projector, fullSize, repairOrderMap);
         }
 
         private void OnEnable()
@@ -50,7 +62,12 @@ namespace Xcy.CrackRepair
 
         private void OnDisable()
         {
+            SetPromptGlow(false);
             if (interactable != null) interactable.selectEntered.RemoveListener(OnSelected);
+            StopAllCoroutines();
+            if (repairing) RepairStopped?.Invoke(this);
+            repairing = false;
+            if (particles != null) particles.Clear();
         }
 
         private void CaptureFullProjectorState()
@@ -63,7 +80,9 @@ namespace Xcy.CrackRepair
 
         public void ResetRepair()
         {
+            SetPromptGlow(false);
             StopAllCoroutines();
+            if (repairing) RepairStopped?.Invoke(this);
             if (particles != null) particles.Clear();
             unlocked = false;
             repairing = false;
@@ -84,22 +103,87 @@ namespace Xcy.CrackRepair
             if (interactable != null) interactable.enabled = true;
         }
 
+        public void SetPromptGlow(bool active)
+        {
+            promptGlowActive = active;
+            if (!active) SetPromptGlowIntensity(0f);
+        }
+
+        private void Update()
+        {
+            if (!promptGlowActive || !unlocked || repairing || repaired || projector == null) return;
+            float phase = Time.unscaledTime * (2f * Mathf.PI * promptGlowCyclesPerSecond);
+            float pulse = 0.5f + 0.5f * Mathf.Sin(phase);
+            SetPromptGlowIntensity(promptGlowPeak * pulse * pulse);
+        }
+
+        private void SetPromptGlowIntensity(float intensity)
+        {
+            Material material = projector != null ? projector.material : null;
+            if (material != null && material.HasProperty(PromptGlowIntensityId))
+                material.SetFloat(PromptGlowIntensityId, intensity);
+        }
+
         private void OnSelected(SelectEnterEventArgs _) => StartRepair();
 
         [ContextMenu("Start Repair")]
         public void StartRepair()
         {
-            if (!Application.isPlaying || !unlocked || repairing || repaired || projector == null) return;
+            if (!Application.isPlaying || !CanStartRepair) return;
+            if (Xcy.Audio.NetworkInteractionAudioRelay.RouteCrackRepair(this)) return;
+            StartRepairFromAuthority();
+        }
+
+        public void StartRepairFromAuthority()
+        {
+            if (!Application.isPlaying || !CanStartRepair || NetworkGameplayCoordinator.IsFollower) return;
+            BeginRepair(0f, true);
+        }
+
+        private void BeginRepair(float elapsed, bool notifyCoordinator)
+        {
+            SetPromptGlow(false);
             repairing = true;
             unlocked = false;
+            initialElapsed = Mathf.Clamp(elapsed, 0f, repairDuration);
+            RepairStartedAt = Mirror.NetworkTime.time - initialElapsed;
+            reportCompletion = notifyCoordinator;
             if (interactable != null) interactable.enabled = false;
             if (particles != null) particles.Begin();
+            RepairStarted?.Invoke(this);
             StartCoroutine(AnimateRepair());
+        }
+
+        public void ApplyNetworkRepairState(byte state, double startedAt, bool repairUnlocked)
+        {
+            if (!NetworkGameplayCoordinator.IsFollower || !isActiveAndEnabled) return;
+            if (state == 2)
+            {
+                SetPromptGlow(false);
+                StopAllCoroutines();
+                if (repairing) RepairStopped?.Invoke(this);
+                repairing = false;
+                repaired = true;
+                unlocked = false;
+                if (particles != null) particles.Clear();
+                maskAnimator?.SetProgress(1f);
+                if (projector != null) projector.enabled = false;
+                if (interactable != null) interactable.enabled = false;
+            }
+            else if (state == 1 && !repairing && !repaired)
+            {
+                if (projector != null) BeginRepair((float)System.Math.Max(0d, Mirror.NetworkTime.time - startedAt), false);
+            }
+            else if (state == 0)
+            {
+                if (repairing || repaired) ResetRepair();
+                if (repairUnlocked) Unlock();
+            }
         }
 
         private IEnumerator AnimateRepair()
         {
-            float elapsed = 0f;
+            float elapsed = initialElapsed;
             while (elapsed < repairDuration)
             {
                 elapsed += Time.deltaTime;
@@ -114,7 +198,8 @@ namespace Xcy.CrackRepair
             projector.enabled = false;
             repairing = false;
             repaired = true;
-            coordinator?.NotifyRepairCompleted(this);
+            RepairStopped?.Invoke(this);
+            if (reportCompletion) coordinator?.NotifyRepairCompleted(this);
         }
 
     }
