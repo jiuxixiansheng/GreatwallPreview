@@ -44,6 +44,7 @@ namespace Greatwall.CannonGame
         public bool IsHeld => _state == AmmoState.Held;
         public bool IsLoaded => _state == AmmoState.Loaded;
         public bool IsAvailable => _state == AmmoState.Home;
+        public event System.Action<CannonAmmo> PickedUp;
 
         public void Initialize(XRGrabInteractable grab, Collider collider, Rigidbody body, GameObject visual, Vector3 homePosition, Quaternion homeRotation)
         {
@@ -62,8 +63,10 @@ namespace Greatwall.CannonGame
         private void OnSelectEntered(SelectEnterEventArgs args)
         {
             if (!_initialized) return;
+            if (_state == AmmoState.Held) return;
             if (_state == AmmoState.Inserting || _state == AmmoState.Loaded || _state == AmmoState.Consumed) return;
             _state = AmmoState.Held;
+            PickedUp?.Invoke(this);
         }
 
         private void OnSelectExited(SelectExitEventArgs args)
