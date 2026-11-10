@@ -17868,6 +17868,8 @@ PlayableDirector:
     value: {fileID: 1762072877}
   - key: {fileID: -1884837866280663868, guid: 37e6125ae72183849802a5035e4707e8, type: 2}
     value: {fileID: 827460676}
+  - key: {fileID: 607240083193691215, guid: 37e6125ae72183849802a5035e4707e8, type: 2}
+    value: {fileID: 1737221429}
   m_ExposedReferences:
     m_References:
     - 794f9daaf0fb9744db0aaa47b2a3bfdd: {fileID: 829701954}
@@ -32289,6 +32291,7 @@ GameObject:
   - component: {fileID: 1737221425}
   - component: {fileID: 1737221427}
   - component: {fileID: 1737221428}
+  - component: {fileID: 1737221429}
   m_Layer: 0
   m_Name: NetworkManager
   m_TagString: Untagged
@@ -34164,15 +34167,46 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   interaction: {fileID: 672390245853133678}
-  videoClip: {fileID: 32900000, guid: 7b6b505ab7bf4114d8a52de4e6735071, type: 3}
+  videoClip: {fileID: 32900000, guid: fd47cfe9ec903734ab70c0b6903b347c, type: 3}
   maskShader: {fileID: 4800000, guid: 67ca7ca0bab28184db5bd4efbc42f959, type: 3}
   playOnce: 1
+  waitingTimeline: {fileID: 766607135}
   fadeSeconds: 0.45
   networkLeadSeconds: 0.9
   screenDistance: 0.65
   lensRadius: 0.5
   videoVolume: 1
   serverTouchValidationDistance: 2
+--- !u!114 &1737221429
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1737221420}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e52de21a22b6dd44c9cc19f810c65059, type: 3}
+  m_Name:
+  m_EditorClassIdentifier:
+  m_Events:
+    m_Signals:
+    - {fileID: 11400000, guid: d73c8a1baf11bd14db25e79db68062aa, type: 2}
+    m_Events:
+    - m_PersistentCalls:
+        m_Calls:
+        - m_Target: {fileID: 1737221428}
+          m_TargetAssemblyTypeName: Sza.Telescope.TelescopeVideoManager, Assembly-CSharp
+          m_MethodName: WaitForVideo
+          m_Mode: 0
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName:
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument:
+            m_BoolArgument: 0
+          m_CallState: 2
 --- !u!1 &1752260716
 GameObject:
   m_ObjectHideFlags: 0
