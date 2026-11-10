@@ -1,0 +1,13 @@
+{
+    "unityVersion": "6000.0.55f1",
+    "pipeline": "UniversalRenderPipelineAsset",
+    "prefab": "Assets/Cly/Character/LZW/Materials_URP/Prefabs/LZW_URP.prefab",
+    "materialCount": 11,
+    "rendererCount": 1,
+    "assignedSlots": 11,
+    "errors": [],
+    "warnings": [],
+    "rendererSlots": [
+        "LZW_Assembled: M_LZW_Body,M_LZW_Face,M_LZW_Teeth,M_LZW_MouthSecondary,M_LZW_Eye_Left,M_LZW_Eye_Right,M_LZW_EyeShell_Hidden,M_LZW_Eyelashes_Hidden,M_LZW_TearFilm,M_LZW_Unassigned_Hidden,M_LZW_Clothes"
+    ]
+}

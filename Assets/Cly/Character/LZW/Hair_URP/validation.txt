@@ -1,0 +1,6 @@
+Unity=6000.0.55f1
+Hair shader=Cly/LZW/Hair Cards URP
+Triangles=21316
+HairBounds=Center: (0.00, 1.49, -0.01), Extents: (0.12, 0.15, 0.13)
+Head=(0.00, 1.38, -0.01)
+ShaderErrors=0

@@ -1,0 +1,22 @@
+{
+  "source_lab_median": [
+    110.0,
+    7.0,
+    -1.0
+  ],
+  "face_lab_median": [
+    166.0,
+    22.0,
+    33.0
+  ],
+  "texture": "Body_BaseColor_Matched.png",
+  "material_tint": [
+    1,
+    1,
+    1
+  ],
+  "uv_offset": [
+    -1,
+    0
+  ]
+}

@@ -1,0 +1,18 @@
+[
+  {
+    "name": "LZW_Hair_Pigment.png",
+    "resolution": 2048,
+    "seed_levels": 176,
+    "largest_equal_seed_area": 0.25658715219730605,
+    "method": "coverage-weighted CDF of original seed; no random noise or tint lift",
+    "limitation": "atlas quantization/overlapping strands mean approximate visible area, not an exact strand count"
+  },
+  {
+    "name": "LZW_HairBacking_Pigment.png",
+    "resolution": 1024,
+    "seed_levels": 255,
+    "largest_equal_seed_area": 0.005625406235988681,
+    "method": "coverage-weighted CDF of original seed; no random noise or tint lift",
+    "limitation": "atlas quantization/overlapping strands mean approximate visible area, not an exact strand count"
+  }
+]

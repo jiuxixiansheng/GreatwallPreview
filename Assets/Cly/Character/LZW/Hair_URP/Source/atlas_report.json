@@ -1,0 +1,12 @@
+{
+  "layout": "UE Card Compact (Layout2)",
+  "resolution": 2048,
+  "white_amount_source": 0.8991979956626892,
+  "seed_threshold": 0.97,
+  "white_coverage_measured": 0.7587556231336685,
+  "melanin_source": 0.6786283850669861,
+  "roughness_source": 0.3700000047683716,
+  "preserves_existing_uv": true,
+  "github_reference": "https://github.com/Ducklexander/metahuman-to-vrchat/blob/main/tools/textures/hair_atlas.py",
+  "implementation": "Original atlas decoder; repository generator not executed or copied. Source groom coverage/seed/flow used instead of generating strands or re-UVing."
+}

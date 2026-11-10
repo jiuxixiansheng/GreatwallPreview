@@ -1,0 +1,5 @@
+SourceTriangles=701
+DetailedTriangles=11216
+Vertices=6184
+Authored normals, tangents and UV preserved/interpolated
+Depth relief=1.2mm peak-to-peak from source Groom
