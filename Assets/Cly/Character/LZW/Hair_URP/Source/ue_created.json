@@ -1,0 +1,8 @@
+{
+  "material": "/Game/MetaHumans/Blender_assemble/HairExport/M_LZW_HairCards_Standalone.M_LZW_HairCards_Standalone",
+  "meshes": [
+    "/Game/MetaHumans/Blender_assemble/HairExport/SM_LZW_HairCards_LOD0.SM_LZW_HairCards_LOD0",
+    "/Game/MetaHumans/Blender_assemble/HairExport/SM_LZW_HairCards_LOD1.SM_LZW_HairCards_LOD1"
+  ],
+  "source_groom_unchanged": true
+}

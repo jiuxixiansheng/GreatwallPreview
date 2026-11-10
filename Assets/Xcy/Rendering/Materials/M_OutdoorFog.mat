@@ -1,0 +1,39 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!21 &2100000
+Material:
+  serializedVersion: 8
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: M_OutdoorFog
+  m_Shader: {fileID: 4800000, guid: 13aa093527708ad4eb59c9ce2db7a556, type: 3}
+  m_Parent: {fileID: 0}
+  m_ModifiedSerializedProperties: 0
+  m_ValidKeywords: []
+  m_InvalidKeywords: []
+  m_LightmapFlags: 4
+  m_EnableInstancingVariants: 0
+  m_DoubleSidedGI: 0
+  m_CustomRenderQueue: -1
+  stringTagMap: {}
+  disabledShaderPasses: []
+  m_LockedProperties: 
+  m_SavedProperties:
+    serializedVersion: 3
+    m_TexEnvs: []
+    m_Ints: []
+    m_Floats:
+    - _BaseHeight: -17
+    - _Density: 0.0062
+    - _HeightFalloff: 0.1196
+    - _HorizonFalloff: 2
+    - _MaxDistance: 500
+    - _MaxOpacity: 0.85
+    - _SkyStrength: 0.368
+    - _StartDistance: 15
+    m_Colors:
+    - _FogColor: {r: 0.58, g: 0.65, b: 0.68, a: 1}
+  m_BuildTextureStacks: []
+  m_AllowLocking: 1

@@ -1,0 +1,121 @@
+[
+  {
+    "source": "/Game/MetaHumans/LZW/Textures/T_Body_Body_Basecolor.T_Body_Body_Basecolor",
+    "file": "T_Body_Body_Basecolor_82b64cb5.png",
+    "success": true,
+    "srgb": false,
+    "compression": "<TextureCompressionSettings.TC_DEFAULT: 0>"
+  },
+  {
+    "source": "/Game/MetaHumans/LZW/Textures/T_Body_Body_Normal.T_Body_Body_Normal",
+    "file": "T_Body_Body_Normal_47603f74.png",
+    "success": true,
+    "srgb": false,
+    "compression": "<TextureCompressionSettings.TC_NORMALMAP: 1>"
+  },
+  {
+    "source": "/Engine/EngineMaterials/T_Default_Material_Grid_M.T_Default_Material_Grid_M",
+    "file": "T_Default_Material_Grid_M_8c3216de.png",
+    "success": true,
+    "srgb": false,
+    "compression": "<TextureCompressionSettings.TC_DEFAULT: 0>"
+  },
+  {
+    "source": "/Engine/EngineMaterials/T_Default_Material_Grid_N.T_Default_Material_Grid_N",
+    "file": "T_Default_Material_Grid_N_2fa00c69.png",
+    "success": true,
+    "srgb": false,
+    "compression": "<TextureCompressionSettings.TC_NORMALMAP: 1>"
+  },
+  {
+    "source": "/Game/1_LZW/ChatGPT_Image_2026年6月29日_13_41_52.ChatGPT_Image_2026年6月29日_13_41_52",
+    "file": "ChatGPT_Image_2026_6_29__13_41_52_30685740.png",
+    "success": true,
+    "srgb": true,
+    "compression": "<TextureCompressionSettings.TC_EDITOR_ICON: 7>"
+  },
+  {
+    "source": "/Game/MetaHumans/LZW/MC_LZW_MaterialsExport/Face/Textures/T_Face_Normal.T_Face_Normal",
+    "file": "T_Face_Normal_5d50ee43.png",
+    "success": true,
+    "srgb": false,
+    "compression": "<TextureCompressionSettings.TC_NORMALMAP: 1>"
+  },
+  {
+    "source": "/Game/MetaHumans/LZW/MC_LZW_MaterialsExport/Face/Textures/T_Face_Cavity.T_Face_Cavity",
+    "file": "T_Face_Cavity_0e35c8c7.png",
+    "success": true,
+    "srgb": false,
+    "compression": "<TextureCompressionSettings.TC_MASKS: 2>"
+  },
+  {
+    "source": "/MetaHumanCharacter/Lookdev_UHM/Common/Textures/Placeholders/T_Flat_Grey_M.T_Flat_Grey_M",
+    "file": "T_Flat_Grey_M_faa32ee4.png",
+    "success": true,
+    "srgb": false,
+    "compression": "<TextureCompressionSettings.TC_MASKS: 2>"
+  },
+  {
+    "source": "/MetaHumanCharacter/Lookdev_UHM/Teeth/Textures/T_Teeth_BaseColor.T_Teeth_BaseColor",
+    "file": "T_Teeth_BaseColor_d8f6b045.png",
+    "success": true,
+    "srgb": true,
+    "compression": "<TextureCompressionSettings.TC_DEFAULT: 0>"
+  },
+  {
+    "source": "/MetaHumanCharacter/Lookdev_UHM/Teeth/Textures/T_Teeth_Normal.T_Teeth_Normal",
+    "file": "T_Teeth_Normal_2cbb6e8b.png",
+    "success": true,
+    "srgb": false,
+    "compression": "<TextureCompressionSettings.TC_NORMALMAP: 1>"
+  },
+  {
+    "source": "/MetaHumanCharacter/Lookdev_UHM/Eye/Textures/T_EyeSclera_D.T_EyeSclera_D",
+    "file": "T_EyeSclera_D_b8088773.png",
+    "success": true,
+    "srgb": true,
+    "compression": "<TextureCompressionSettings.TC_DEFAULT: 0>"
+  },
+  {
+    "source": "/MetaHumanCharacter/Lookdev_UHM/Eye/Textures/T_Iris001_01_D.T_Iris001_01_D",
+    "file": "T_Iris001_01_D_3a985cb5.png",
+    "success": true,
+    "srgb": true,
+    "compression": "<TextureCompressionSettings.TC_DEFAULT: 0>"
+  },
+  {
+    "source": "/MetaHumanCharacter/Lookdev_UHM/Eye/Textures/T_EyeSclera_N.T_EyeSclera_N",
+    "file": "T_EyeSclera_N_46625d7f.png",
+    "success": true,
+    "srgb": false,
+    "compression": "<TextureCompressionSettings.TC_NORMALMAP: 1>"
+  },
+  {
+    "source": "/MetaHumanCharacter/Lookdev_UHM/Eye/Textures/Iris/T_iris_D_N.T_iris_D_N",
+    "file": "T_iris_D_N_b945e476.png",
+    "success": true,
+    "srgb": false,
+    "compression": "<TextureCompressionSettings.TC_NORMALMAP: 1>"
+  },
+  {
+    "source": "/MetaHumanCharacter/Lookdev_UHM/Eye/Textures/Iris/T_Iris_D_M.T_Iris_D_M",
+    "file": "T_Iris_D_M_6fccf4da.png",
+    "success": true,
+    "srgb": false,
+    "compression": "<TextureCompressionSettings.TC_MASKS: 2>"
+  },
+  {
+    "source": "/Game/2_Cloth/2_new_raw/衣服套装_basecolor.衣服套装_basecolor",
+    "file": "_____basecolor_65f47aee.png",
+    "success": true,
+    "srgb": true,
+    "compression": "<TextureCompressionSettings.TC_DEFAULT: 0>"
+  },
+  {
+    "source": "/Game/2_Cloth/2_new_raw/衣服套装_糙度.衣服套装_糙度",
+    "file": "________c11803b4.png",
+    "success": true,
+    "srgb": true,
+    "compression": "<TextureCompressionSettings.TC_DEFAULT: 0>"
+  }
+]

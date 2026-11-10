@@ -1,83 +1,70 @@
-using UnityEngine;
-using UnityEngine.Events;
 using System.Collections.Generic;
+using Mirror;
+using UnityEngine;
 
 public class BrickDropZone : MonoBehaviour
 {
-    [Header("解谜设置")]
-    [Tooltip("需要放入的砖块总数")]
-    public int targetBrickCount = 3;
-
-    [Tooltip("目标物体的 Tag 标签")]
+    [Header("瑙ｈ皽璁剧疆")]
+    [Min(1)] public int targetBrickCount = 3;
     public string targetTag = "Brick";
+    public List<GameObject> targetObjects = new List<GameObject>();
+    private readonly Dictionary<Rigidbody, HashSet<Collider>> bricksInside =
+        new Dictionary<Rigidbody, HashSet<Collider>>();
+    private bool isSolved;
+    public bool IsSolved => isSolved;
+    public int CurrentBrickCount => bricksInside.Count;
+    public event System.Action<BrickDropZone, Rigidbody> BrickAccepted;
+    public event System.Action<BrickDropZone> Solved;
 
-    [Header("触发事件")]
-    [Tooltip("当三块砖都放进去时触发什么？")]
-    public UnityEvent onPuzzleSolved;
+    private bool CanJudge => !NetworkGameplayCoordinator.IsManaged || NetworkServer.active;
 
-    // 使用 List 记录当前在框内的砖块，防止物理穿模导致的重复计数 Bug
-    private List<Collider> bricksInside = new List<Collider>();
-
-    // 防止解开谜题后重复触发
-    private bool isSolved = false;
-
-    void OnTriggerEnter(Collider other)
+    private void OnTriggerEnter(Collider other)
     {
-        if (isSolved) return;
-
-        // 如果碰到的是砖块
-        if (other.CompareTag(targetTag))
+        if (isSolved || !CanJudge) return;
+        Rigidbody brick = other.attachedRigidbody;
+        if (brick == null || (!other.CompareTag(targetTag) && !brick.CompareTag(targetTag))) return;
+        if (NetworkGameplayCoordinator.IsManaged &&
+            !NetworkGameplayCoordinator.Instance.IsRegisteredBrick(brick)) return;
+        if (!bricksInside.TryGetValue(brick, out var colliders))
         {
-            // 确保这块砖之前没被记录过
-            if (!bricksInside.Contains(other))
-            {
-                bricksInside.Add(other);
-                Debug.Log($"[解谜] 放入了一块砖！当前进度: {bricksInside.Count} / {targetBrickCount}");
-
-                // 检查是否凑齐了 3 块
-                if (bricksInside.Count >= targetBrickCount)
-                {
-                    ExecuteSolveLogic(); // 调用核心通关逻辑
-                }
-            }
+            colliders = new HashSet<Collider>();
+            bricksInside.Add(brick, colliders);
+            BrickAccepted?.Invoke(this, brick);
+        }
+        colliders.Add(other);
+        Debug.Log($"[淇] 褰撳墠鐮栧潡锛歿bricksInside.Count}/{targetBrickCount}", this);
+        if (bricksInside.Count >= targetBrickCount)
+        {
+            if (NetworkGameplayCoordinator.IsManaged) NetworkGameplayCoordinator.Instance.ServerSolve(this);
+            else ApplySolvedState(true);
         }
     }
 
-    void OnTriggerExit(Collider other)
+    private void OnTriggerExit(Collider other)
     {
-        if (isSolved) return;
-
-        // 如果玩家又把砖块拿出来了，把它从列表里剔除
-        if (other.CompareTag(targetTag))
-        {
-            if (bricksInside.Contains(other))
-            {
-                bricksInside.Remove(other);
-                Debug.Log($"[解谜] 拿走了一块砖。当前进度: {bricksInside.Count} / {targetBrickCount}");
-            }
-        }
+        if (isSolved || !CanJudge) return;
+        var brick = other.attachedRigidbody;
+        if (brick == null || !bricksInside.TryGetValue(brick, out var colliders)) return;
+        colliders.Remove(other);
+        if (colliders.Count == 0) bricksInside.Remove(brick);
     }
 
-    // ==========================================
-    // 【新增调试接口】：供外部脚本或按键强制调用
-    // ==========================================
+    private void OnDisable() => bricksInside.Clear();
+
     public void ForceSolvePuzzle()
     {
-        if (isSolved)
-        {
-            Debug.LogWarning("[解谜调试] 谜题已经解开过了，无需重复触发。");
-            return;
-        }
-
-        Debug.Log("[解谜调试] 收到外部强制放行指令！跳过搬砖过程。");
-        ExecuteSolveLogic();
+        if (isSolved) return;
+        if (NetworkGameplayCoordinator.IsManaged) NetworkGameplayCoordinator.Instance.RequestDebugSolve(this);
+        else ApplySolvedState(true);
     }
 
-    // 将通关的公共逻辑提取出来，保持代码整洁
-    private void ExecuteSolveLogic()
+    public void ApplySolvedState(bool dispatchEvent)
     {
+        bool firstApplication = !isSolved;
         isSolved = true;
-        Debug.Log("[解谜] 目标达成！触发后续机关/剧情！");
-        onPuzzleSolved.Invoke(); // 触发面板上的事件
+        if (firstApplication && dispatchEvent) Solved?.Invoke(this);
+        if (firstApplication && dispatchEvent) EventDispatcher.Instance.Dispatch("淇鍩庡缁撴潫");
+        foreach (var obj in targetObjects) if (obj != null) obj.SetActive(false);
+        gameObject.SetActive(false);
     }
 }

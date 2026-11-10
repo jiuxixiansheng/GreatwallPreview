@@ -1,0 +1,96 @@
+using System.Collections;
+using UnityEngine;
+
+public class CommandTerminal : MonoBehaviour
+{
+    [Header("转场 01")]
+    [SerializeField] private GameObject zhuanChang01HideObject;
+    [SerializeField] private GameObject zhuanChang01ShowObject;
+    [SerializeField] private float zhuanChang01SwitchDelay = 1.0f;
+
+    [Header("转场 02")]
+    [SerializeField] private GameObject zhuanChang02HideObject;
+    [SerializeField] private GameObject zhuanChang02ShowObject;
+    [SerializeField] private float zhuanChang02SwitchDelay = 1.0f;
+
+    [Header("转场 03")]
+    [SerializeField] private GameObject zhuanChang03HideObject;
+    [SerializeField] private GameObject zhuanChang03ShowObject;
+    [SerializeField] private float zhuanChang03SwitchDelay = 1.0f;
+
+    public void ZhuanChang01()
+    {
+        if (NetworkGameplayCoordinator.IsApplyingSnapshot) return;
+        EventDispatcher.Instance.Dispatch("zhuanchang");
+
+        StartCoroutine(SwitchObjectAfterDelay(
+            zhuanChang01HideObject,
+            zhuanChang01ShowObject,
+            zhuanChang01SwitchDelay
+        ));
+    }
+
+    public void ZhuanChang02()
+    {
+        if (NetworkGameplayCoordinator.IsApplyingSnapshot) return;
+        EventDispatcher.Instance.Dispatch("zhuanchang");
+
+        StartCoroutine(SwitchObjectAfterDelay(
+            zhuanChang02HideObject,
+            zhuanChang02ShowObject,
+            zhuanChang02SwitchDelay
+        ));
+    }
+
+    public void ZhuanChang03()
+    {
+        if (NetworkGameplayCoordinator.IsApplyingSnapshot) return;
+        EventDispatcher.Instance.Dispatch("zhuanchang");
+
+        StartCoroutine(SwitchObjectAfterDelay(
+            zhuanChang03HideObject,
+            zhuanChang03ShowObject,
+            zhuanChang03SwitchDelay
+        ));
+    }
+
+    public void ZhuanChang04(float time)
+    {
+        if (NetworkGameplayCoordinator.IsApplyingSnapshot || NetworkGameplayCoordinator.IsFollower) return;
+        if (NetworkGameplayCoordinator.IsManaged)
+            NetworkGameplayCoordinator.Instance.RecordDragonTransformation(time);
+        EventDispatcher.Instance.Dispatch("小龙特效转场",time);
+        EventDispatcher.Instance.Dispatch<float>("大龙特效转场", time);
+    }
+
+    private IEnumerator SwitchObjectAfterDelay(GameObject hideObject, GameObject showObject, float delay)
+    {
+        if (delay > 0f)
+            yield return new WaitForSeconds(delay);
+
+        if (hideObject != null)
+            hideObject.SetActive(false);
+
+        if (showObject != null)
+            showObject.SetActive(true);
+    }
+
+    public void XiaolouAppear()
+    {
+        if (NetworkGameplayCoordinator.IsApplyingSnapshot) return;
+        EventDispatcher.Instance.Dispatch("修复小楼");
+    }
+
+    public void ChangeShadowState()
+    {
+        if (NetworkGameplayCoordinator.IsApplyingSnapshot) return;
+        EventDispatcher.Instance.Dispatch("切换阴影投射状态");
+    }
+
+    public void NextChapter()
+    {
+        if (NetworkGameplayCoordinator.IsApplyingSnapshot) return;
+        EventDispatcher.Instance.Dispatch("切换章节");
+    }
+
+}

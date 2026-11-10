@@ -1,0 +1,3 @@
+# Client connects to the Host PC IPv4 address.
+IP=192.168.31.12
+Port=5678

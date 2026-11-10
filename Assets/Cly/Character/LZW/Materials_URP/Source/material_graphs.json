@@ -1,0 +1,308 @@
+[
+  {
+    "index": 0,
+    "roots": {
+      "MP_BASE_COLOR": "/Game/MetaHumans/LZW/Material/M_body.M_body:MaterialExpressionTextureSample_0",
+      "MP_NORMAL": "/Game/MetaHumans/LZW/Material/M_body.M_body:MaterialExpressionTextureSample_1",
+      "MP_ROUGHNESS": null,
+      "MP_METALLIC": null,
+      "MP_SPECULAR": null,
+      "MP_OPACITY": null,
+      "MP_OPACITY_MASK": null
+    },
+    "nodes": [
+      {
+        "node": "/Game/MetaHumans/LZW/Material/M_body.M_body:MaterialExpressionTextureSample_0",
+        "class": "MaterialExpressionTextureSample",
+        "properties": {
+          "texture": "/Game/MetaHumans/LZW/Textures/T_Body_Body_Basecolor.T_Body_Body_Basecolor"
+        }
+      },
+      {
+        "node": "/Game/MetaHumans/LZW/Material/M_body.M_body:MaterialExpressionTextureSample_1",
+        "class": "MaterialExpressionTextureSample",
+        "properties": {
+          "texture": "/Game/MetaHumans/LZW/Textures/T_Body_Body_Normal.T_Body_Body_Normal"
+        }
+      }
+    ]
+  },
+  {
+    "index": 9,
+    "roots": {
+      "MP_BASE_COLOR": "/Engine/EngineMaterials/WorldGridMaterial.WorldGridMaterial:MaterialExpressionMultiply_30",
+      "MP_NORMAL": "/Engine/EngineMaterials/WorldGridMaterial.WorldGridMaterial:MaterialExpressionMultiply_31",
+      "MP_ROUGHNESS": "/Engine/EngineMaterials/WorldGridMaterial.WorldGridMaterial:MaterialExpressionClamp_6",
+      "MP_METALLIC": null,
+      "MP_SPECULAR": null,
+      "MP_OPACITY": null,
+      "MP_OPACITY_MASK": null
+    },
+    "nodes": [
+      {
+        "node": "/Engine/EngineMaterials/WorldGridMaterial.WorldGridMaterial:MaterialExpressionMultiply_30",
+        "class": "MaterialExpressionMultiply",
+        "properties": {
+          "const_a": "0.0",
+          "const_b": "1.0"
+        }
+      },
+      {
+        "node": "/Engine/EngineMaterials/WorldGridMaterial.WorldGridMaterial:MaterialExpressionLinearInterpolate_66",
+        "class": "MaterialExpressionLinearInterpolate",
+        "properties": {
+          "const_a": "0.0",
+          "const_b": "1.0"
+        }
+      },
+      {
+        "node": "/Engine/EngineMaterials/WorldGridMaterial.WorldGridMaterial:MaterialExpressionLinearInterpolate_67",
+        "class": "MaterialExpressionLinearInterpolate",
+        "properties": {
+          "const_a": "0.4000000059604645",
+          "const_b": "1.0"
+        }
+      },
+      {
+        "node": "/Engine/EngineMaterials/WorldGridMaterial.WorldGridMaterial:MaterialExpressionTextureSample_29",
+        "class": "MaterialExpressionTextureSample",
+        "properties": {
+          "texture": "/Engine/EngineMaterials/T_Default_Material_Grid_M.T_Default_Material_Grid_M"
+        }
+      },
+      {
+        "node": "/Engine/EngineMaterials/WorldGridMaterial.WorldGridMaterial:MaterialExpressionTextureCoordinate_15",
+        "class": "MaterialExpressionTextureCoordinate",
+        "properties": {
+          "coordinate_index": "0",
+          "u_tiling": "20.0",
+          "v_tiling": "20.0"
+        }
+      },
+      {
+        "node": "/Engine/EngineMaterials/WorldGridMaterial.WorldGridMaterial:MaterialExpressionOneMinus_6",
+        "class": "MaterialExpressionOneMinus",
+        "properties": {}
+      },
+      {
+        "node": "/Engine/EngineMaterials/WorldGridMaterial.WorldGridMaterial:MaterialExpressionLinearInterpolate_65",
+        "class": "MaterialExpressionLinearInterpolate",
+        "properties": {
+          "const_a": "0.0",
+          "const_b": "1.0"
+        }
+      },
+      {
+        "node": "/Engine/EngineMaterials/WorldGridMaterial.WorldGridMaterial:MaterialExpressionTextureSample_26",
+        "class": "MaterialExpressionTextureSample",
+        "properties": {
+          "texture": "/Engine/EngineMaterials/T_Default_Material_Grid_M.T_Default_Material_Grid_M"
+        }
+      },
+      {
+        "node": "/Engine/EngineMaterials/WorldGridMaterial.WorldGridMaterial:MaterialExpressionDivide_18",
+        "class": "MaterialExpressionDivide",
+        "properties": {
+          "const_a": "1.0",
+          "const_b": "0.10000000149011612"
+        }
+      },
+      {
+        "node": "/Engine/EngineMaterials/WorldGridMaterial.WorldGridMaterial:MaterialExpressionDivide_19",
+        "class": "MaterialExpressionDivide",
+        "properties": {
+          "const_a": "1.0",
+          "const_b": "2.0"
+        }
+      },
+      {
+        "node": "/Engine/EngineMaterials/WorldGridMaterial.WorldGridMaterial:MaterialExpressionTextureCoordinate_14",
+        "class": "MaterialExpressionTextureCoordinate",
+        "properties": {
+          "coordinate_index": "0",
+          "u_tiling": "1.0",
+          "v_tiling": "1.0"
+        }
+      },
+      {
+        "node": "/Engine/EngineMaterials/WorldGridMaterial.WorldGridMaterial:MaterialExpressionMaterialFunctionCall_8",
+        "class": "MaterialExpressionMaterialFunctionCall",
+        "properties": {}
+      },
+      {
+        "node": "/Engine/EngineMaterials/WorldGridMaterial.WorldGridMaterial:MaterialExpressionConstant_36",
+        "class": "MaterialExpressionConstant",
+        "properties": {
+          "r": "1500.0"
+        }
+      },
+      {
+        "node": "/Engine/EngineMaterials/WorldGridMaterial.WorldGridMaterial:MaterialExpressionMultiply_32",
+        "class": "MaterialExpressionMultiply",
+        "properties": {
+          "const_a": "0.0",
+          "const_b": "0.5"
+        }
+      },
+      {
+        "node": "/Engine/EngineMaterials/WorldGridMaterial.WorldGridMaterial:MaterialExpressionLinearInterpolate_62",
+        "class": "MaterialExpressionLinearInterpolate",
+        "properties": {
+          "const_a": "0.0",
+          "const_b": "1.0"
+        }
+      },
+      {
+        "node": "/Engine/EngineMaterials/WorldGridMaterial.WorldGridMaterial:MaterialExpressionConstant_39",
+        "class": "MaterialExpressionConstant",
+        "properties": {
+          "r": "0.29499998688697815"
+        }
+      },
+      {
+        "node": "/Engine/EngineMaterials/WorldGridMaterial.WorldGridMaterial:MaterialExpressionConstant_40",
+        "class": "MaterialExpressionConstant",
+        "properties": {
+          "r": "0.6600000262260437"
+        }
+      },
+      {
+        "node": "/Engine/EngineMaterials/WorldGridMaterial.WorldGridMaterial:MaterialExpressionLinearInterpolate_61",
+        "class": "MaterialExpressionLinearInterpolate",
+        "properties": {
+          "const_a": "0.0",
+          "const_b": "0.5"
+        }
+      },
+      {
+        "node": "/Engine/EngineMaterials/WorldGridMaterial.WorldGridMaterial:MaterialExpressionComponentMask_6",
+        "class": "MaterialExpressionComponentMask",
+        "properties": {
+          "r": "True",
+          "g": "False",
+          "b": "False",
+          "a": "False"
+        }
+      },
+      {
+        "node": "/Engine/EngineMaterials/WorldGridMaterial.WorldGridMaterial:MaterialExpressionAdd_14",
+        "class": "MaterialExpressionAdd",
+        "properties": {
+          "const_a": "0.0",
+          "const_b": "0.0"
+        }
+      },
+      {
+        "node": "/Engine/EngineMaterials/WorldGridMaterial.WorldGridMaterial:MaterialExpressionTextureSample_27",
+        "class": "MaterialExpressionTextureSample",
+        "properties": {
+          "texture": "/Engine/EngineMaterials/T_Default_Material_Grid_M.T_Default_Material_Grid_M"
+        }
+      },
+      {
+        "node": "/Engine/EngineMaterials/WorldGridMaterial.WorldGridMaterial:MaterialExpressionLinearInterpolate_63",
+        "class": "MaterialExpressionLinearInterpolate",
+        "properties": {
+          "const_a": "0.0",
+          "const_b": "0.0"
+        }
+      },
+      {
+        "node": "/Engine/EngineMaterials/WorldGridMaterial.WorldGridMaterial:MaterialExpressionConstant_37",
+        "class": "MaterialExpressionConstant",
+        "properties": {
+          "r": "0.5"
+        }
+      },
+      {
+        "node": "/Engine/EngineMaterials/WorldGridMaterial.WorldGridMaterial:MaterialExpressionConstant_41",
+        "class": "MaterialExpressionConstant",
+        "properties": {
+          "r": "0.5"
+        }
+      },
+      {
+        "node": "/Engine/EngineMaterials/WorldGridMaterial.WorldGridMaterial:MaterialExpressionMultiply_31",
+        "class": "MaterialExpressionMultiply",
+        "properties": {
+          "const_a": "0.0",
+          "const_b": "1.0"
+        }
+      },
+      {
+        "node": "/Engine/EngineMaterials/WorldGridMaterial.WorldGridMaterial:MaterialExpressionTextureSample_28",
+        "class": "MaterialExpressionTextureSample",
+        "properties": {
+          "texture": "/Engine/EngineMaterials/T_Default_Material_Grid_N.T_Default_Material_Grid_N"
+        }
+      },
+      {
+        "node": "/Engine/EngineMaterials/WorldGridMaterial.WorldGridMaterial:MaterialExpressionDivide_20",
+        "class": "MaterialExpressionDivide",
+        "properties": {
+          "const_a": "1.0",
+          "const_b": "0.05000000074505806"
+        }
+      },
+      {
+        "node": "/Engine/EngineMaterials/WorldGridMaterial.WorldGridMaterial:MaterialExpressionConstant3Vector_6",
+        "class": "MaterialExpressionConstant3Vector",
+        "properties": {
+          "constant": "<Struct 'LinearColor' (0x0000021FB91A85C8) {r: 0.300000, g: 0.300000, b: 1.000000, a: 0.000000}>"
+        }
+      },
+      {
+        "node": "/Engine/EngineMaterials/WorldGridMaterial.WorldGridMaterial:MaterialExpressionClamp_6",
+        "class": "MaterialExpressionClamp",
+        "properties": {}
+      },
+      {
+        "node": "/Engine/EngineMaterials/WorldGridMaterial.WorldGridMaterial:MaterialExpressionAdd_15",
+        "class": "MaterialExpressionAdd",
+        "properties": {
+          "const_a": "0.0",
+          "const_b": "1.0"
+        }
+      },
+      {
+        "node": "/Engine/EngineMaterials/WorldGridMaterial.WorldGridMaterial:MaterialExpressionLinearInterpolate_69",
+        "class": "MaterialExpressionLinearInterpolate",
+        "properties": {
+          "const_a": "0.0",
+          "const_b": "0.5"
+        }
+      },
+      {
+        "node": "/Engine/EngineMaterials/WorldGridMaterial.WorldGridMaterial:MaterialExpressionMultiply_33",
+        "class": "MaterialExpressionMultiply",
+        "properties": {
+          "const_a": "1.0",
+          "const_b": "1.0"
+        }
+      },
+      {
+        "node": "/Engine/EngineMaterials/WorldGridMaterial.WorldGridMaterial:MaterialExpressionLinearInterpolate_64",
+        "class": "MaterialExpressionLinearInterpolate",
+        "properties": {
+          "const_a": "0.0",
+          "const_b": "1.0"
+        }
+      },
+      {
+        "node": "/Engine/EngineMaterials/WorldGridMaterial.WorldGridMaterial:MaterialExpressionLinearInterpolate_68",
+        "class": "MaterialExpressionLinearInterpolate",
+        "properties": {
+          "const_a": "0.699999988079071",
+          "const_b": "1.0"
+        }
+      },
+      {
+        "node": "/Engine/EngineMaterials/WorldGridMaterial.WorldGridMaterial:MaterialExpressionConstant_38",
+        "class": "MaterialExpressionConstant",
+        "properties": {
+          "r": "1.0"
+        }
+      }
+    ]
+  }
+]
