@@ -26,6 +26,8 @@ namespace Greatwall.CannonGame
         private float _pull;
         private bool _held;
         private bool _fired;
+        private bool _pullSoundStarted;
+        public event System.Action PullStarted;
 
         public float Pull => _pull;
         public bool IsHeld => _held;
@@ -49,6 +51,7 @@ namespace Greatwall.CannonGame
         {
             _held = true;
             _fired = false;
+            _pullSoundStarted = false;
             _pull = 0f;
             _hand = args.interactorObject.transform;
             _handStart = _hand.position;
@@ -68,6 +71,12 @@ namespace Greatwall.CannonGame
                 float raw = Vector3.Dot(_hand.position - _handStart, _axis);
                 _pull = Mathf.Clamp(raw, 0f, MaxPull);
                 ApplyPull(_pull);
+
+                if (!_pullSoundStarted && _pull >= 0.005f)
+                {
+                    _pullSoundStarted = true;
+                    PullStarted?.Invoke();
+                }
 
                 if (!_fired && _pull >= FireThreshold)
                 {
