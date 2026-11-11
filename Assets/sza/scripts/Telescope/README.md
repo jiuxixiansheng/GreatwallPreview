@@ -13,6 +13,8 @@
 
 默认 `Play Once` 开启：本轮运行只触发一次，触发后隐藏提示。关闭它可重播，但手必须先离开触碰范围再进入，持续接触不会循环。`Fade Seconds` 调整淡入淡出时长，`Lens Radius` 调整镜口大小。替换视频时在 Manager 上修改 `Video Clip`。
 
+望远镜出现并启用后，`TelescopeVideoInteraction` 会带动模型、触碰范围和子物体提示整体上下浮动。默认 `Float Telescope` 开启，`Telescope Float Amplitude` 为上下各0.06米，`Telescope Float Period` 为3.2秒一轮；按世界竖直方向计算，不受父物体缩放影响。联机使用共享网络时钟，剧情暂停时照常浮动；隐藏、禁用或关闭浮动后恢复原摆放位置，再次出现不会叠加偏移。原有 `Float Amplitude` 继续控制提示 UI 自身的小幅浮动。
+
 运行时可在 `TelescopeVideoInteraction` 组件菜单使用“测试触碰望远镜”测试播放。实际触碰只读取 `NetworkClient.localPlayer` 的手部同步目标，远端手、玩家身体及射线远距离悬停不会触发。
 
 `timeline_02_2` 的 `Telescope - Wait at Frame 8330` 信号轨在 8330 帧（60 fps 下为 138.833 秒）调用 `NetworkManager/TelescopeVideoManager.WaitForVideo`，由 Host 暂停并同步剧情。任一玩家的有效触碰触发全员视频时，Host 立即从暂停位置继续 Timeline，视频和后续剧情并行播放。视频结束只恢复视野，不再发送继续命令。如果已提前触碰播放过视频，经过等待点时直接放行，避免错过继续信号后卡住。Client 不会因本机求值或收到视频状态而单独控制剧情。

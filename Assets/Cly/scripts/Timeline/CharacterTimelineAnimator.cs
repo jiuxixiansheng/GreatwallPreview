@@ -39,6 +39,9 @@ namespace Greatwall.VRAnimation.Timeline
         private int requestedBodyStateHash;
         private double bodyCrossFadeEndsAt;
 
+        public Animator BoundAnimator => animator;
+        public int FaceLayerIndex => faceLayerIndex;
+
         private void Reset()
         {
             animator = GetComponent<Animator>();
