@@ -29,6 +29,8 @@
 
 嘴型使用 `AS_LZW_Face_all_assemble.FBX`，原速约 87.42 秒，未按配音长度拉伸。现有时间线中的声音排列保留；请自行移动这段嘴型、拆分片段或安排配音。罗哲文专用的 Timeline Face Track 支持编辑器拖动预览和 Clip In 裁切，暂停后按片段进度继续，片段结束回到 FaceLayer.Idle。普通播放保持 1 倍速。
 
+嘴型只在片段覆盖的时间内播放。拖短右边界会截断尾部；裁掉左侧后从 Clip In 指定的位置开始。例如 Clip In 为 10 秒、片段长 5 秒，就播放原动画第 10–15 秒，结束时立即回到中性表情；编辑器预览和运行时行为相同。缩短片段不改变动画速度，暂停在片段中间时保留当前表情。
+
 添加新的嘴型时，在 `AC_LuoZhewen.controller/FaceLayer` 中添加状态、指定动画，再将完整状态路径填入 Timeline Face Clip。身体和上半身同理。Reference Animation Clip 用于提供片段长度；真正播放的动画由 State Path 对应的 Animator 状态决定，两处应保持一致。
 
 ## 上下半身与步速

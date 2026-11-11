@@ -84,7 +84,12 @@ namespace Sza.Characters
                 var animator = actor.animator;
                 int neutral = Animator.StringToHash(animator.GetLayerName(activeLayer) + ".Idle");
                 if (animator.HasState(activeLayer, neutral))
-                    animator.CrossFadeInFixedTime(neutral, active.crossFadeSeconds, activeLayer, 0f);
+                {
+                    // The Timeline clip owns the exact mouth-animation interval.
+                    // A queued CrossFade is not evaluated in an empty editor-preview gap.
+                    animator.Play(neutral, activeLayer, 0f);
+                    animator.Update(0f);
+                }
             }
             active = null;
         }
