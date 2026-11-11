@@ -14,7 +14,7 @@ namespace Greatwall.VRAnimation.Timeline
         public string statePath;
         [Min(0f)] public float crossFadeSeconds = 0.1f;
 
-        public ClipCaps clipCaps => ClipCaps.Blending;
+        public ClipCaps clipCaps => ClipCaps.Blending | ClipCaps.ClipIn;
         public override double duration =>
             referenceAnimationClip != null ? Math.Max(0.01d, referenceAnimationClip.length) : 0.5d;
 
@@ -25,6 +25,8 @@ namespace Greatwall.VRAnimation.Timeline
             FaceActionBehaviour behaviour = playable.GetBehaviour();
             behaviour.statePath = statePath;
             behaviour.crossFadeSeconds = crossFadeSeconds;
+            behaviour.referenceAnimationLength = referenceAnimationClip != null ? referenceAnimationClip.length : 0f;
+            behaviour.loop = referenceAnimationClip != null && referenceAnimationClip.isLooping;
             return playable;
         }
     }
