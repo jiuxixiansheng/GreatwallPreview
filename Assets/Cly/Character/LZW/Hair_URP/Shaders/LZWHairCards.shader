@@ -19,6 +19,8 @@ Shader "Cly/LZW/Hair Cards URP"
         _SurfaceOffset("Surface Offset (metres)",Range(-.01,.01))=0
         _DetailNormalMap("Hair Surface Detail (linear RGB)",2D)="bump"{}
         _DetailNormalStrength("Hair Surface Detail Strength",Range(0,2))=0
+        [HideInInspector] _SzaPortalClipEnabled("Portal Clip", Float) = 0
+        [HideInInspector] _SzaPortalPlaneWS("Portal Plane", Vector) = (0,0,1,0)
     }
     SubShader
     {
@@ -38,7 +40,10 @@ Shader "Cly/LZW/Hair Cards URP"
             half4 _WhiteTint;
             half _UseSeedColor,_WhiteAmount,_BlackLevel;
             half _DetailNormalStrength;
+            float4 _SzaPortalPlaneWS;
+            float _SzaPortalClipEnabled;
         CBUFFER_END
+        #include "Assets/sza/Rendering/Portal/CharacterPortalClip.hlsl"
         TEXTURE2D(_BaseMap); SAMPLER(sampler_BaseMap);
         TEXTURE2D(_FlowMap); SAMPLER(sampler_FlowMap);
         TEXTURE2D(_PigmentMap); SAMPLER(sampler_PigmentMap);
@@ -88,6 +93,7 @@ Shader "Cly/LZW/Hair Cards URP"
         half4 Frag(Varyings i, FRONT_FACE_TYPE face:FRONT_FACE_SEMANTIC):SV_Target
         {
             UNITY_SETUP_INSTANCE_ID(i); UNITY_SETUP_STEREO_EYE_INDEX_POST_VERTEX(i);
+            SzaClipAtPortal(i.positionWS);
             half4 sample=HairSample(i.uv);
             half3 n=normalize(i.normalWS)*IS_FRONT_VFACE(face,1,-1);
             half3 t=normalize(i.tangentWS.xyz);
@@ -192,7 +198,7 @@ Shader "Cly/LZW/Hair Cards URP"
                 #endif
                 return o;
             }
-            half4 DepthFrag(Varyings i):SV_Target { HairSample(i.uv); return 0; }
+            half4 DepthFrag(Varyings i):SV_Target { SzaClipAtPortal(i.positionWS); HairSample(i.uv); return 0; }
             ENDHLSL
         }
         Pass
@@ -204,7 +210,7 @@ Shader "Cly/LZW/Hair Cards URP"
             #pragma vertex Vert
             #pragma fragment DepthFrag
             #pragma multi_compile_instancing
-            half4 DepthFrag(Varyings i):SV_Target { HairSample(i.uv); return i.positionCS.z; }
+            half4 DepthFrag(Varyings i):SV_Target { SzaClipAtPortal(i.positionWS); HairSample(i.uv); return i.positionCS.z; }
             ENDHLSL
         }
         Pass
@@ -220,6 +226,7 @@ Shader "Cly/LZW/Hair Cards URP"
             half4 NormalsFrag(Varyings i,FRONT_FACE_TYPE face:FRONT_FACE_SEMANTIC):SV_Target
             {
                 UNITY_SETUP_INSTANCE_ID(i); UNITY_SETUP_STEREO_EYE_INDEX_POST_VERTEX(i); HairSample(i.uv);
+                SzaClipAtPortal(i.positionWS);
                 half3 n=normalize(i.normalWS)*IS_FRONT_VFACE(face,1,-1);
                 #if defined(_GBUFFER_NORMALS_OCT)
                     return half4(PackFloat2To888(saturate(PackNormalOctQuadEncode(n)*.5+.5)),0);
