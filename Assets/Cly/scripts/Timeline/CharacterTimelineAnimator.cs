@@ -81,7 +81,7 @@ namespace Greatwall.VRAnimation.Timeline
                 footstepSource.maxDistance = 20f;
                 footstepSource.rolloffMode = AudioRolloffMode.Linear;
             }
-            footstepSource.PlayOneShot(sound, 0.7f);
+            footstepSource.PlayOneShot(sound, 0.35f);
         }
 
         // 上半身状态的 Speed 使用固定值 1，不绑定 MoveAnimationSpeed 等移动倍率参数。
