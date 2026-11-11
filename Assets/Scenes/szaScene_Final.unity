@@ -364,7 +364,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   sceneRoot: {fileID: 1086670814}
   volume: {fileID: 20851450}
-  guideHeightOffset: 0.05
+  guideHeightOffset: 0
 --- !u!65 &20851450
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -384,8 +384,8 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 5.2037745, y: 2.084845, z: 4.891301}
-  m_Center: {x: 1.9907622, y: -0.49269795, z: 1.4897747}
+  m_Size: {x: 4.8259945, y: 2.084845, z: 4.815745}
+  m_Center: {x: 1.9840956, y: -0.49269795, z: 1.5008862}
 --- !u!4 &20851451
 Transform:
   m_ObjectHideFlags: 0
@@ -395,7 +395,7 @@ Transform:
   m_GameObject: {fileID: 20851448}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -2, y: 7.5, z: -1.5}
+  m_LocalPosition: {x: -2, y: 6.984, z: -1.5}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -6113,7 +6113,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   sceneRoot: {fileID: 2030794325}
   volume: {fileID: 296919646}
-  guideHeightOffset: 0.05
+  guideHeightOffset: 0
 --- !u!65 &296919646
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -6133,8 +6133,8 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 25.26649, y: 3.815281, z: 5.502237}
-  m_Center: {x: 2.4111311, y: -13.445389, z: -7.80021}
+  m_Size: {x: 25.26649, y: 3.016468, z: 9.272504}
+  m_Center: {x: 2.4109073, y: -13.045542, z: -9.267636}
 --- !u!4 &296919647
 Transform:
   m_ObjectHideFlags: 0
@@ -6263,7 +6263,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   sceneRoot: {fileID: 614664459}
   volume: {fileID: 310840784}
-  guideHeightOffset: 0.05
+  guideHeightOffset: 0
 --- !u!65 &310840784
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -6283,8 +6283,8 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 11.468451, y: 1.9212875, z: 10.286604}
-  m_Center: {x: 13.070035, y: -13.496702, z: -1.1471071}
+  m_Size: {x: 12.628163, y: 4.609236, z: 12.612662}
+  m_Center: {x: 13.140488, y: -13.084843, z: -2.252271}
 --- !u!4 &310840785
 Transform:
   m_ObjectHideFlags: 0
@@ -64658,7 +64658,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   sceneRoot: {fileID: 1353997085}
   volume: {fileID: 2108339021}
-  guideHeightOffset: 0.05
+  guideHeightOffset: 0
 --- !u!65 &2108339021
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -64678,8 +64678,8 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 10.557236, y: 4.1678925, z: 9.710519}
-  m_Center: {x: 5.4572506, y: -12.42099, z: 7.173536}
+  m_Size: {x: 11.693986, y: 4.221199, z: 10.838027}
+  m_Center: {x: 5.49884, y: -12.447643, z: 6.9794564}
 --- !u!4 &2108339022
 Transform:
   m_ObjectHideFlags: 0

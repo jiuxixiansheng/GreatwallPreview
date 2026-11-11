@@ -52,6 +52,9 @@ namespace Greatwall.CannonGame
         public Vector3 MuzzlePosition => _muzzlePosition;
         public Vector3 FireDirection => _fireDirection;
         public Vector3 SlotPosition => _slotPosition;
+        public event System.Action<CannonAmmo> AmmoInserted;
+        public event System.Action Fired;
+        public event System.Action<Vector3> FireworkExploded;
 
         private void Awake()
         {
@@ -86,6 +89,9 @@ namespace Greatwall.CannonGame
             CreateVfx();
             CreateGuidance();
             _ready = true;
+            var audio = GetComponent<Xcy.Audio.CannonInteractionAudio>();
+            if (audio == null) audio = gameObject.AddComponent<Xcy.Audio.CannonInteractionAudio>();
+            audio.Initialize(this, _chainPull);
 
             Debug.Log($"[CannonGame] ready muzzle={_muzzlePosition} dir={_fireDirection} slot={_slotPosition} ammo={_ammo.Count}");
         }
@@ -288,6 +294,7 @@ namespace Greatwall.CannonGame
             _loaded = ammo;
             ammo.InsertIntoSlot(_slotPosition, _slotRotation);
             _vfx.SetGhostVisible(false);
+            AmmoInserted?.Invoke(ammo);
             Debug.Log("[CannonGame] ammo inserted; ready to fire");
         }
 
@@ -313,6 +320,7 @@ namespace Greatwall.CannonGame
             var apex = _muzzlePosition + velocity * apexTime + Vector3.down * (4.905f * apexTime * apexTime);
 
             _vfx.PlayMuzzleFlash();
+            Fired?.Invoke();
             _vfx.LaunchProjectile(_muzzlePosition + _fireDirection * 0.12f, velocity, apexTime);
             StartCoroutine(Recoil());
 
@@ -320,6 +328,7 @@ namespace Greatwall.CannonGame
             _vfx.SetGhostVisible(true);
             yield return new WaitForSeconds(Mathf.Max(0f, apexTime - 0.35f));
             _vfx.PlayFirework(apex);
+            FireworkExploded?.Invoke(apex);
             Debug.Log($"[CannonGame] shot={_shotCount} apex={apex}");
         }
 
