@@ -122,6 +122,7 @@ namespace Sza.Editor
                 bow.hitEffect = Effect(root.transform, "Love hit", "Love hit · 命中");
                 bow.hitEffect.transform.localScale = Vector3.one * 0.8f;
                 bow.pickupPrompt = Prompt(root.transform);
+                ConfigureInteraction(root);
                 var saved = PrefabUtility.SaveAsPrefabAsset(root, PrefabPath);
                 var identity = saved.GetComponent<NetworkIdentity>();
                 // Mirror's editor getter initializes a new prefab ID; persist it for player builds.
@@ -130,6 +131,67 @@ namespace Sza.Editor
                 AssetDatabase.SaveAssetIfDirty(identity);
             }
             finally { UnityEngine.Object.DestroyImmediate(root); }
+        }
+
+        [MenuItem("Tools/Sza/更新弓箭双手射箭交互")]
+        public static void UpgradeInteraction()
+        {
+            if (Application.isPlaying) throw new InvalidOperationException("请先退出运行模式。");
+            var root = PrefabUtility.LoadPrefabContents(PrefabPath);
+            try
+            {
+                ConfigureInteraction(root);
+                PrefabUtility.SaveAsPrefabAsset(root, PrefabPath);
+            }
+            finally { PrefabUtility.UnloadPrefabContents(root); }
+            var identity = AssetDatabase.LoadAssetAtPath<GameObject>(PrefabPath).GetComponent<NetworkIdentity>();
+            if (identity.assetId == 0) throw new InvalidOperationException("弓箭网络预制体 assetId 无效。");
+            EditorUtility.SetDirty(identity); AssetDatabase.SaveAssetIfDirty(identity);
+            Debug.Log("[魔法弓箭] 已更新固定中央握点、双手拉弓、生成箭及网络射击。");
+        }
+
+        private static void ConfigureInteraction(GameObject root)
+        {
+            var bow = root.GetComponent<NetworkMagicBow>();
+            var grip = root.GetComponent<XRGrabInteractable>();
+            var attach = root.transform.Find("GripAttach · 中央握点");
+            if (attach == null) attach = new GameObject("GripAttach · 中央握点").transform;
+            attach.SetParent(root.transform, false);
+            attach.localPosition = new Vector3(0.1f, 0f, 0f);
+            attach.localRotation = Quaternion.Euler(0f, 90f, 0f);
+            grip.attachTransform = attach;
+            grip.useDynamicAttach = false;
+            grip.attachEaseInTime = 0.08f;
+            grip.smoothPosition = grip.smoothRotation = false;
+            var facing = root.GetComponent<BowFacingGrabTransformer>();
+            if (facing == null) facing = root.AddComponent<BowFacingGrabTransformer>();
+            grip.addDefaultGrabTransformers = false;
+            grip.startingSingleGrabTransformers.Clear();
+            grip.startingSingleGrabTransformers.Add(facing);
+            grip.startingMultipleGrabTransformers.Clear();
+            foreach (var other in root.GetComponents<UnityEngine.XR.Interaction.Toolkit.Transformers.XRGeneralGrabTransformer>())
+                UnityEngine.Object.DestroyImmediate(other);
+            grip.colliders.Clear(); grip.colliders.Add(root.GetComponent<BoxCollider>());
+            var weapon = root.GetComponent<NetworkMagicBowWeapon>();
+            if (weapon == null) weapon = root.AddComponent<NetworkMagicBowWeapon>();
+            if (Mathf.Approximately(weapon.maximumLateralPull, 0.25f)) weapon.maximumLateralPull = 0.75f;
+            weapon.bow = bow;
+            weapon.stringBone = bow.model.GetComponentsInChildren<Transform>().Single(x => x.name == "String");
+            bow.drawAndFire.SampleAnimation(bow.model, 0f);
+            weapon.relaxedNock = bow.model.transform.InverseTransformPoint(weapon.stringBone.position);
+            var handle = root.GetComponentInChildren<BowStringHandle>(true);
+            if (handle == null)
+            {
+                var go = new GameObject("BowString · 另一只手抓取");
+                go.transform.SetParent(root.transform, false);
+                var collider = go.AddComponent<SphereCollider>(); collider.radius = 0.085f; collider.isTrigger = true;
+                handle = go.AddComponent<BowStringHandle>();
+            }
+            handle.transform.localPosition = weapon.relaxedNock;
+            handle.weapon = weapon;
+            handle.colliders.Clear(); handle.colliders.Add(handle.GetComponent<SphereCollider>());
+            weapon.stringHandle = handle;
+            handle.gameObject.SetActive(false);
         }
 
         private static Material BowMaterial(Material source, Shader shader)

@@ -43,6 +43,7 @@ namespace Sza.Bow
         private Quaternion arrowRotation;
         private bool initialized;
         private bool cached;
+        private NetworkMagicBowWeapon weapon;
 
         public bool Dropped => dropped;
         public bool EverPicked => everPicked;
@@ -63,6 +64,7 @@ namespace Sza.Bow
             networkGrab = GetComponent<NetworkGrabbable>();
             grab = GetComponent<XRGrabInteractable>();
             body = GetComponent<Rigidbody>();
+            weapon = GetComponent<NetworkMagicBowWeapon>();
             properties = new MaterialPropertyBlock();
             if (arrow != null) { arrowRest = arrow.localPosition; arrowRotation = arrow.localRotation; }
             networkGrab.ServerGrabbed += MarkPicked;
@@ -73,6 +75,22 @@ namespace Sza.Bow
         }
 
         public override void OnStartClient() { initialized = true; Render(); }
+
+        public void PlaceForPickup(Vector3 position, Quaternion rotation)
+        {
+            if (NetworkClient.active && !NetworkServer.active) return;
+            Cache();
+            origin = dropPosition = position;
+            orientation = rotation;
+            direction = rotation * Vector3.right;
+            dropped = true;
+            everPicked = false;
+            demoTime = DropTime + 5f;
+            transform.SetPositionAndRotation(position, rotation);
+            networkGrab.SetScriptedMotion(false);
+            initialized = true;
+            Render();
+        }
 
         public void Configure(Vector3 position, Quaternion rotation, Vector3 aim, Vector3 drop, float distance)
         {
@@ -122,6 +140,13 @@ namespace Sza.Bow
 
         private void Render()
         {
+            if (dropped && weapon != null && weapon.isActiveAndEnabled) weapon.RenderPose();
+            else RenderDemonstration();
+            RenderFeedback();
+        }
+
+        private void RenderDemonstration()
+        {
             float drawStart = appearSeconds;
             float revealStart = drawStart + drawSeconds;
             float releaseStart = revealStart + arrowRevealSeconds;
@@ -145,12 +170,16 @@ namespace Sza.Bow
                         orientation * arrowRotation);
                 }
             }
+            SetMaterial(arrowRenderer, reveal, 0f);
+        }
+
+        private void RenderFeedback()
+        {
             bool held = networkGrab.IsHeld || (!NetworkClient.active && !NetworkServer.active && grab.isSelected);
             double clock = NetworkClient.active || NetworkServer.active ? NetworkTime.time : Time.unscaledTimeAsDouble;
             float pulse = 0.55f + 0.45f * Mathf.Sin((float)(clock % breathePeriod / breathePeriod) * Mathf.PI * 2f);
             foreach (var renderer in bowRenderers)
                 SetMaterial(renderer, Mathf.Clamp01(demoTime / Mathf.Max(0.05f, appearSeconds)), dropped && !held ? pulse : 0f);
-            SetMaterial(arrowRenderer, reveal, 0f);
             if (appearanceEffect != null) appearanceEffect.transform.position = origin;
             if (hitEffect != null) hitEffect.transform.position = origin + orientation * (arrowRest + arrowDrawOffset) + direction * flightDistance;
             SetEffect(appearanceEffect, demoTime);
