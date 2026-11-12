@@ -313,7 +313,7 @@ MonoBehaviour:
   m_Name: BodyActionClip(Clone)(Clone)(Clone)(Clone)(Clone)(Clone)
   m_EditorClassIdentifier: 
   command: 0
-  referenceAnimationClip: {fileID: 8993902097722301239, guid: 7e07e70d6c0fc884bb51716d62224447, type: 3}
+  referenceAnimationClip: {fileID: 8993902097722301239, guid: 04b6740072b3b7f478dc992db66a0627, type: 3}
   statePath: BaseLayer.Idle
   stateCrossFadeSeconds: 0.7
   layerFadeSeconds: 0.25
@@ -436,7 +436,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 39c8c46acec8430b83215ac734e7bf49, type: 3}
   m_Name: UpperBodyActionClip
   m_EditorClassIdentifier: 
-  referenceAnimationClip: {fileID: 8993902097722301239, guid: 0f64e9b983a0a17439ae1dc68505e85d, type: 3}
+  referenceAnimationClip: {fileID: 8993902097722301239, guid: c78e5a9912bbd7d45a0d3bcfd4fba267, type: 3}
   statePath: UpperLayer.Chapter2_2.WalkCycle1
   stateCrossFadeSeconds: 0.5
   layerFadeSeconds: 0.25
@@ -742,7 +742,7 @@ MonoBehaviour:
   m_Name: BodyActionClip(Clone)(Clone)(Clone)(Clone)(Clone)(Clone)(Clone)(Clone)
   m_EditorClassIdentifier: 
   command: 0
-  referenceAnimationClip: {fileID: 8993902097722301239, guid: 7e07e70d6c0fc884bb51716d62224447, type: 3}
+  referenceAnimationClip: {fileID: 8993902097722301239, guid: 04b6740072b3b7f478dc992db66a0627, type: 3}
   statePath: BaseLayer.Idle
   stateCrossFadeSeconds: 0.7
   layerFadeSeconds: 0.25
@@ -6612,7 +6612,7 @@ MonoBehaviour:
   m_Name: BodyActionClip(Clone)(Clone)
   m_EditorClassIdentifier: 
   command: 0
-  referenceAnimationClip: {fileID: 8993902097722301239, guid: 7e07e70d6c0fc884bb51716d62224447, type: 3}
+  referenceAnimationClip: {fileID: 8993902097722301239, guid: 04b6740072b3b7f478dc992db66a0627, type: 3}
   statePath: BaseLayer.Idle
   stateCrossFadeSeconds: 0.7
   layerFadeSeconds: 0.25
@@ -6644,7 +6644,7 @@ MonoBehaviour:
   m_Name: BodyActionClip(Clone)(Clone)
   m_EditorClassIdentifier: 
   command: 0
-  referenceAnimationClip: {fileID: 8993902097722301239, guid: 0f64e9b983a0a17439ae1dc68505e85d, type: 3}
+  referenceAnimationClip: {fileID: 8993902097722301239, guid: c78e5a9912bbd7d45a0d3bcfd4fba267, type: 3}
   statePath: BaseLayer.Chapter2_2.WalkCycle1
   stateCrossFadeSeconds: 0.5
   layerFadeSeconds: 0.25
@@ -7811,7 +7811,7 @@ MonoBehaviour:
   m_Name: BodyActionClip(Clone)(Clone)
   m_EditorClassIdentifier: 
   command: 0
-  referenceAnimationClip: {fileID: 8993902097722301239, guid: 7e07e70d6c0fc884bb51716d62224447, type: 3}
+  referenceAnimationClip: {fileID: 8993902097722301239, guid: 04b6740072b3b7f478dc992db66a0627, type: 3}
   statePath: BaseLayer.Idle
   stateCrossFadeSeconds: 0.7
   layerFadeSeconds: 0.25
@@ -8522,7 +8522,7 @@ MonoBehaviour:
   m_Name: BodyActionClip
   m_EditorClassIdentifier: 
   command: 0
-  referenceAnimationClip: {fileID: 8993902097722301239, guid: 7e07e70d6c0fc884bb51716d62224447, type: 3}
+  referenceAnimationClip: {fileID: 8993902097722301239, guid: 04b6740072b3b7f478dc992db66a0627, type: 3}
   statePath: BaseLayer.Idle
   stateCrossFadeSeconds: 0.2
   layerFadeSeconds: 0.25
@@ -9201,7 +9201,7 @@ MonoBehaviour:
   m_Name: BodyActionClip(Clone)(Clone)(Clone)(Clone)
   m_EditorClassIdentifier: 
   command: 0
-  referenceAnimationClip: {fileID: 8993902097722301239, guid: 7e07e70d6c0fc884bb51716d62224447, type: 3}
+  referenceAnimationClip: {fileID: 8993902097722301239, guid: 04b6740072b3b7f478dc992db66a0627, type: 3}
   statePath: BaseLayer.Idle
   stateCrossFadeSeconds: 0.7
   layerFadeSeconds: 0.25

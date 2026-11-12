@@ -54,7 +54,91 @@ ModelImporter:
       mirror: 0
       bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
       curves: []
-      events: []
+      events:
+      - time: 0.03058104
+        functionName: PlayDragonFootstep
+        data:
+        objectReferenceParameter: {fileID: 8300000, guid: 41158f7bfb16434b98664a0d5748ab3b, type: 3}
+        floatParameter: 0
+        intParameter: 0
+        messageOptions: 1
+      - time: 0.10703364
+        functionName: PlayDragonFootstep
+        data:
+        objectReferenceParameter: {fileID: 8300000, guid: dbf670f271e84f79962e27e92f476bb9, type: 3}
+        floatParameter: 0
+        intParameter: 0
+        messageOptions: 1
+      - time: 0.17431192
+        functionName: PlayDragonFootstep
+        data:
+        objectReferenceParameter: {fileID: 8300000, guid: fe6406913947491d88bf44dc03492361, type: 3}
+        floatParameter: 0
+        intParameter: 0
+        messageOptions: 1
+      - time: 0.25076452
+        functionName: PlayDragonFootstep
+        data:
+        objectReferenceParameter: {fileID: 8300000, guid: 5f311749852440cbaba93f9e41fe3a9d, type: 3}
+        floatParameter: 0
+        intParameter: 0
+        messageOptions: 1
+      - time: 0.35168195
+        functionName: PlayDragonFootstep
+        data:
+        objectReferenceParameter: {fileID: 8300000, guid: 41158f7bfb16434b98664a0d5748ab3b, type: 3}
+        floatParameter: 0
+        intParameter: 0
+        messageOptions: 1
+      - time: 0.4464832
+        functionName: PlayDragonFootstep
+        data:
+        objectReferenceParameter: {fileID: 8300000, guid: dbf670f271e84f79962e27e92f476bb9, type: 3}
+        floatParameter: 0
+        intParameter: 0
+        messageOptions: 1
+      - time: 0.50764525
+        functionName: PlayDragonFootstep
+        data:
+        objectReferenceParameter: {fileID: 8300000, guid: fe6406913947491d88bf44dc03492361, type: 3}
+        floatParameter: 0
+        intParameter: 0
+        messageOptions: 1
+      - time: 0.6024465
+        functionName: PlayDragonFootstep
+        data:
+        objectReferenceParameter: {fileID: 8300000, guid: 5f311749852440cbaba93f9e41fe3a9d, type: 3}
+        floatParameter: 0
+        intParameter: 0
+        messageOptions: 1
+      - time: 0.6666667
+        functionName: PlayDragonFootstep
+        data:
+        objectReferenceParameter: {fileID: 8300000, guid: 41158f7bfb16434b98664a0d5748ab3b, type: 3}
+        floatParameter: 0
+        intParameter: 0
+        messageOptions: 1
+      - time: 0.7614679
+        functionName: PlayDragonFootstep
+        data:
+        objectReferenceParameter: {fileID: 8300000, guid: dbf670f271e84f79962e27e92f476bb9, type: 3}
+        floatParameter: 0
+        intParameter: 0
+        messageOptions: 1
+      - time: 0.89908254
+        functionName: PlayDragonFootstep
+        data:
+        objectReferenceParameter: {fileID: 8300000, guid: fe6406913947491d88bf44dc03492361, type: 3}
+        floatParameter: 0
+        intParameter: 0
+        messageOptions: 1
+      - time: 0.9969419
+        functionName: PlayDragonFootstep
+        data:
+        objectReferenceParameter: {fileID: 8300000, guid: 5f311749852440cbaba93f9e41fe3a9d, type: 3}
+        floatParameter: 0
+        intParameter: 0
+        messageOptions: 1
       transformMask: []
       maskType: 3
       maskSource: {instanceID: 0}

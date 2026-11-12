@@ -24,6 +24,8 @@ namespace Greatwall.VRAnimation.Timeline
         [SerializeField] private BodyLayerControlMode bodyLayerControlMode = BodyLayerControlMode.SeparateActionLayer;
         [SerializeField] private int bodyActionLayerIndex = 1;
         [SerializeField] private int faceLayerIndex = 2;
+        [Tooltip("右手专用 Animator Layer 的序号。请与 Animator Layers 中的实际顺序保持一致。")]
+        [SerializeField] private int rightHandLayerIndex = 4;
         [Tooltip("新增的上半身 Override 层序号，从 0 开始计数。请按实际 Animator Layers 顺序填写，不要与身体或面部层重复。")]
         [SerializeField] private int upperBodyLayerIndex = -1;
         [Tooltip("单身体层模式下，Release To Base Layer 命令要返回的完整状态路径。")]
@@ -41,6 +43,7 @@ namespace Greatwall.VRAnimation.Timeline
 
         public Animator BoundAnimator => animator;
         public int FaceLayerIndex => faceLayerIndex;
+        public int RightHandLayerIndex => rightHandLayerIndex;
 
         private void Reset()
         {
@@ -60,6 +63,8 @@ namespace Greatwall.VRAnimation.Timeline
 
             if (IsValidUpperBodyLayer())
                 animator.SetLayerWeight(upperBodyLayerIndex, 0f);
+            if (IsValidLayer(rightHandLayerIndex))
+                animator.SetLayerWeight(rightHandLayerIndex, 0f);
         }
 
         // WalkCycle1_v4 的落地事件。上半身层也会播放同一段 Clip，只响应身体层。
