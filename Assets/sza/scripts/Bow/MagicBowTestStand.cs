@@ -26,7 +26,7 @@ namespace Sza.Bow
             yield return null;
             if (NetworkClient.active && !NetworkServer.active || instance != null || bowPrefab == null) yield break;
             instance = Instantiate(bowPrefab, transform.position, transform.rotation);
-            instance.name = "Bow_Test · 第一章开场测试弓";
+            instance.name = name + " · 联机弓";
             instance.PlaceForPickup(transform.position, transform.rotation);
             if (NetworkServer.active) NetworkServer.Spawn(instance.gameObject);
         }

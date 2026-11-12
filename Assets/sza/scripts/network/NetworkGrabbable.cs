@@ -343,6 +343,20 @@ public class NetworkGrabbable : NetworkBehaviour, IXRSelectFilter
         body.position = position;
         body.rotation = rotation;
     }
+    public bool TryReturnToPose(Vector3 position, Quaternion rotation)
+    {
+        if ((NetworkClient.active && !NetworkServer.active) || body == null ||
+            IsHeld || grab.isSelected || !ValidPose(position, rotation)) return false;
+        StopBody();
+        SetPose(position, rotation);
+        foreach (NetworkTransformBase sync in networkTransforms)
+        {
+            if (isServer && netId != 0) sync.ServerTeleport(position, rotation);
+            else sync.ResetState();
+        }
+        MarkPoseDirty();
+        return true;
+    }
     private void MarkPoseDirty()
     {
         foreach (NetworkTransformBase sync in networkTransforms) sync.SetDirty();

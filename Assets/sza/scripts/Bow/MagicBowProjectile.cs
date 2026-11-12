@@ -9,7 +9,7 @@ namespace Sza.Bow
     {
         private NetworkMagicBowWeapon weapon;
         private uint shot;
-        private Vector3 start, direction, tipOffset;
+        private Vector3 start, direction, tipOffset, tailOffset;
         private double started, revealed;
         private float traveled;
         private bool authority, completed;
@@ -26,7 +26,9 @@ namespace Sza.Bow
             visual = GetComponent<Renderer>(); material = new MaterialPropertyBlock();
             var mesh = GetComponent<MeshFilter>().sharedMesh;
             tipOffset = transform.TransformVector(new Vector3(mesh.bounds.max.x, mesh.bounds.center.y, mesh.bounds.center.z));
+            tailOffset = transform.TransformVector(new Vector3(mesh.bounds.min.x, mesh.bounds.center.y, mesh.bounds.center.z));
             npcs = authority ? FindObjectsByType<NavMeshAgent>(FindObjectsSortMode.None) : null;
+            if (authority) MagicBowHitGeometry.Invalidate();
             Render();
         }
         private void Update()
@@ -54,28 +56,35 @@ namespace Sza.Bow
             float step = Mathf.Min(weapon.projectileSpeed * Time.fixedDeltaTime, weapon.maximumShotDistance - traveled);
             Vector3 tip = start + direction * traveled + tipOffset;
             Vector3 point, normal;
+            if (traveled == 0f && Sweep(start + tailOffset, Vector3.Distance(tailOffset, tipOffset), out point, out normal))
+            { Hit(point, normal); return; }
             if (Sweep(tip, Mathf.Max(0f, step), out point, out normal)) { Hit(point, normal); return; }
             traveled += step; transform.position = start + direction * traveled;
             if (traveled >= weapon.maximumShotDistance - 0.0001f) Hit(transform.position + tipOffset, -direction);
         }
         private bool Ignore(Collider collider) => collider == null || collider.transform.IsChildOf(weapon.transform) ||
-            shooter != null && collider.GetComponentInParent<NetworkIdentity>() == shooter;
+            shooter != null && collider.GetComponentInParent<NetworkIdentity>() == shooter ||
+            !MagicBowHitGeometry.AcceptCollider(collider);
 
         private bool Sweep(Vector3 tip, float step, out Vector3 point, out Vector3 normal)
         {
             float nearest = step + 1f;
             point = tip + direction * step; normal = -direction;
             if (traveled == 0f)
-                foreach (var collider in Physics.OverlapSphere(tip, weapon.hitRadius, weapon.hitLayers, QueryTriggerInteraction.Ignore))
+                foreach (var collider in Physics.OverlapSphere(tip, weapon.hitRadius, weapon.hitLayers, QueryTriggerInteraction.Collide))
                     if (!Ignore(collider)) { nearest = 0f; point = tip; break; }
-            foreach (var hit in Physics.SphereCastAll(tip, weapon.hitRadius, direction, step, weapon.hitLayers, QueryTriggerInteraction.Ignore))
+            foreach (var hit in Physics.SphereCastAll(tip, weapon.hitRadius, direction, step, weapon.hitLayers, QueryTriggerInteraction.Collide))
                 if (!Ignore(hit.collider) && hit.distance < nearest)
                 { nearest = hit.distance; point = hit.point; normal = hit.normal; }
+            RaycastHit geometryHit;
+            if (MagicBowHitGeometry.Cast(weapon, shooter, tip, direction, step, out geometryHit) && geometryHit.distance < nearest)
+            { nearest = geometryHit.distance; point = geometryHit.point; normal = geometryHit.normal; }
             // NPC navigation capsules are tested analytically; no new colliders disturb scene interactions.
             foreach (var agent in npcs)
             {
                 if (agent == null || !agent.gameObject.activeInHierarchy ||
-                    (weapon.hitLayers.value & 1 << agent.gameObject.layer) == 0) continue;
+                    (weapon.hitLayers.value & 1 << agent.gameObject.layer) == 0 ||
+                    MagicBowHitRule.Resolve(agent.transform) == MagicBowHitRule.Response.Ignore) continue;
                 bool visible = false;
                 foreach (var renderer in agent.GetComponentsInChildren<Renderer>())
                     if (renderer.enabled && (renderer is MeshRenderer || renderer is SkinnedMeshRenderer)) { visible = true; break; }
@@ -100,7 +109,9 @@ namespace Sza.Bow
                     {
                         if (!(renderer is MeshRenderer) && !(renderer is SkinnedMeshRenderer) || !renderer.enabled ||
                             renderer.name == "Pinch_Pointer_LOD0" ||
-                            (weapon.hitLayers.value & 1 << renderer.gameObject.layer) == 0) continue;
+                            (weapon.hitLayers.value & 1 << renderer.gameObject.layer) == 0 ||
+                            MagicBowHitRule.Resolve(renderer.transform) == MagicBowHitRule.Response.Ignore ||
+                            renderer.GetComponentInParent<Canvas>() != null) continue;
                         Bounds bounds = renderer.bounds; bounds.Expand(weapon.hitRadius * 2f);
                         float distance = 0f;
                         bool intersects = bounds.Contains(tip) || bounds.IntersectRay(new Ray(tip, direction), out distance);
