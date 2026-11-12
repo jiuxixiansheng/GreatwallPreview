@@ -232,7 +232,7 @@ AvatarMask:
   - m_Path: root/root_x/spine_01_x/spine_02_x/spine_03_x/shoulder_l/arm_stretch_l/forearm_stretch_l/hand_l/c_thumb1_l/c_thumb2_l/c_thumb3_l
     m_Weight: 0
   - m_Path: root/root_x/spine_01_x/spine_02_x/spine_03_x/shoulder_r
-    m_Weight: 0
+    m_Weight: 1
   - m_Path: root/root_x/spine_01_x/spine_02_x/spine_03_x/shoulder_r/arm_stretch_r
     m_Weight: 1
   - m_Path: root/root_x/spine_01_x/spine_02_x/spine_03_x/shoulder_r/arm_stretch_r/arm_twist_r
