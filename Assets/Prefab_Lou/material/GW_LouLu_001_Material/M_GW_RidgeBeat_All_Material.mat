@@ -128,7 +128,7 @@ Material:
     - _WorkflowMode: 1
     - _XRMotionVectorsPass: 1
     - _ZWrite: 1
-    - _distance: 0
+    - _distance: 0.986
     - _edge: 0.084
     m_Colors:
     - _BaseColor: {r: 1, g: 1, b: 1, a: 1}
