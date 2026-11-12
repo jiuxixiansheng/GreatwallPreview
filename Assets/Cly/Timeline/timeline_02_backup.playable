@@ -705,7 +705,7 @@ MonoBehaviour:
   m_Name: BodyActionClip
   m_EditorClassIdentifier: 
   command: 0
-  referenceAnimationClip: {fileID: 8993902097722301239, guid: 7e07e70d6c0fc884bb51716d62224447, type: 3}
+  referenceAnimationClip: {fileID: 8993902097722301239, guid: 04b6740072b3b7f478dc992db66a0627, type: 3}
   statePath: BaseLayer.Idle
   stateCrossFadeSeconds: 0.2
   layerFadeSeconds: 0.25

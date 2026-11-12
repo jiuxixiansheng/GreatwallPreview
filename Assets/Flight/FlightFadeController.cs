@@ -43,6 +43,7 @@ namespace Greatwall.Flight
         private float _speed = 1f;
         private Transform _eye;
         private static readonly int BaseColorID = Shader.PropertyToID("_BaseColor");
+        private static readonly int OpacityID = Shader.PropertyToID("_Opacity");
 
         private void Awake()
         {
@@ -74,7 +75,7 @@ namespace Greatwall.Flight
         }
 
         /// <summary>当前是否全黑。</summary>
-        public bool IsBlack => _alpha > 0.995f;
+        public bool IsBlack => _alpha > 0.995f && _eye != null && _renderer != null && _renderer.enabled;
 
         /// <summary>
         /// ★ 立即全黑（跳过渐变）。启动淡入的起点、循环复位时用。
@@ -102,7 +103,7 @@ namespace Greatwall.Flight
 
             if (Mathf.Abs(_alpha - _target) > 0.001f)
             {
-                _alpha = Mathf.MoveTowards(_alpha, _target, _speed * Time.deltaTime);
+                _alpha = Mathf.MoveTowards(_alpha, _target, _speed * Time.unscaledDeltaTime);
                 ApplyAlpha();
             }
 
@@ -135,11 +136,8 @@ namespace Greatwall.Flight
             var col = quad.GetComponent<Collider>();
             if (col != null) Destroy(col);
 
-            _mat = new Material(Shader.Find("Universal Render Pipeline/Unlit"));
-            if (_mat == null)
-            {
-                _mat = new Material(Shader.Find("Unlit/Color"));
-            }
+            Shader shader = Shader.Find("Sza/Ending/Blackout") ?? Shader.Find("Universal Render Pipeline/Unlit");
+            _mat = new Material(shader);
             _mat.name = "FlightBlackoutMat";
             var mr = quad.GetComponent<MeshRenderer>();
             mr.sharedMaterial = _mat;
@@ -157,6 +155,17 @@ namespace Greatwall.Flight
 
         private void EnsureParentedToEye()
         {
+            var local = Mirror.NetworkClient.localPlayer;
+            Camera localCamera = local != null ? local.GetComponentInChildren<Camera>(true) : null;
+            if (localCamera != null)
+            {
+                _eye = localCamera.transform;
+            }
+            else if (_eye == null)
+            {
+                Camera camera = Camera.main;
+                if (camera != null) _eye = camera.transform;
+            }
             if (_eye == null || _renderer == null) return;
 
             // 眼睛可能运行时才就绪（XR 加载晚），定期补挂
@@ -178,7 +187,11 @@ namespace Greatwall.Flight
             if (_mat == null) return;
 
             Color c = FadeColor;
-            if (_mat.HasProperty(BaseColorID))
+            if (_mat.HasProperty(OpacityID))
+            {
+                _mat.SetFloat(OpacityID, _alpha);
+            }
+            else if (_mat.HasProperty(BaseColorID))
             {
                 // URP/Unlit：透明需要切 Surface Type，直接用带 alpha 的颜色
                 // 并保证材质是 Transparent（运行时设置）
@@ -208,6 +221,12 @@ namespace Greatwall.Flight
             FadeOut(0.8f);
             yield return new WaitForSeconds(2f);
             FadeIn(0.8f);
+        }
+
+        private void OnDestroy()
+        {
+            if (_renderer != null) Destroy(_renderer.gameObject);
+            if (_mat != null) Destroy(_mat);
         }
     }
 }

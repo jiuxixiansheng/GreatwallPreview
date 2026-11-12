@@ -24,6 +24,8 @@ namespace Greatwall.VRAnimation.Timeline
         [SerializeField] private BodyLayerControlMode bodyLayerControlMode = BodyLayerControlMode.SeparateActionLayer;
         [SerializeField] private int bodyActionLayerIndex = 1;
         [SerializeField] private int faceLayerIndex = 2;
+        [Tooltip("右手专用 Animator Layer 的序号。请与 Animator Layers 中的实际顺序保持一致。")]
+        [SerializeField] private int rightHandLayerIndex = 4;
         [Tooltip("新增的上半身 Override 层序号，从 0 开始计数。请按实际 Animator Layers 顺序填写，不要与身体或面部层重复。")]
         [SerializeField] private int upperBodyLayerIndex = -1;
         [Tooltip("单身体层模式下，Release To Base Layer 命令要返回的完整状态路径。")]
@@ -35,8 +37,13 @@ namespace Greatwall.VRAnimation.Timeline
 
         private Coroutine bodyLayerFadeRoutine;
         private Coroutine upperBodyLayerFadeRoutine;
+        private AudioSource footstepSource;
         private int requestedBodyStateHash;
         private double bodyCrossFadeEndsAt;
+
+        public Animator BoundAnimator => animator;
+        public int FaceLayerIndex => faceLayerIndex;
+        public int RightHandLayerIndex => rightHandLayerIndex;
 
         private void Reset()
         {
@@ -56,6 +63,33 @@ namespace Greatwall.VRAnimation.Timeline
 
             if (IsValidUpperBodyLayer())
                 animator.SetLayerWeight(upperBodyLayerIndex, 0f);
+            if (IsValidLayer(rightHandLayerIndex))
+                animator.SetLayerWeight(rightHandLayerIndex, 0f);
+        }
+
+        // WalkCycle1_v4 的落地事件。上半身层也会播放同一段 Clip，只响应身体层。
+        public void PlayDragonFootstep(AnimationEvent footstep)
+        {
+            if (!Application.isPlaying || !isActiveAndEnabled || !footstep.isFiredByAnimator ||
+                !IsValidLayer(bodyActionLayerIndex) || footstep.animatorClipInfo.weight < 0.25f ||
+                !(footstep.objectReferenceParameter is AudioClip sound)) return;
+
+            int stateHash = footstep.animatorStateInfo.fullPathHash;
+            if (stateHash != animator.GetCurrentAnimatorStateInfo(bodyActionLayerIndex).fullPathHash &&
+                stateHash != animator.GetNextAnimatorStateInfo(bodyActionLayerIndex).fullPathHash) return;
+
+            if (footstepSource == null)
+            {
+                // 使用独立声源，避免脚步受 Timeline 对对白声源的音量和暂停控制影响。
+                footstepSource = gameObject.AddComponent<AudioSource>();
+                footstepSource.playOnAwake = false;
+                footstepSource.spatialBlend = 1f;
+                footstepSource.dopplerLevel = 0f;
+                footstepSource.minDistance = 2f;
+                footstepSource.maxDistance = 20f;
+                footstepSource.rolloffMode = AudioRolloffMode.Linear;
+            }
+            footstepSource.PlayOneShot(sound, 0.35f);
         }
 
         // 上半身状态的 Speed 使用固定值 1，不绑定 MoveAnimationSpeed 等移动倍率参数。

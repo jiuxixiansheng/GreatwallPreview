@@ -6,7 +6,8 @@ namespace Xcy.Audio
     public enum InteractionAudioCue : byte
     {
         WallGlow, LightCurtain, BrickPrompt, BrickPlaced, BrickCompleted,
-        CrackPrompt, CrackRepair, CrackCompleted, BoardingPrompt, Transfer, TakeOff
+        CrackPrompt, CrackRepair, CrackCompleted, BoardingPrompt, Transfer, TakeOff,
+        CannonPickup, CannonLoad, CannonPull, CannonFire, CannonFirework
     }
 
     [CreateAssetMenu(menuName = "Xcy/Interaction Audio Library")]

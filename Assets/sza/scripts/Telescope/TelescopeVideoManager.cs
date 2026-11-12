@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using Mirror;
 using UnityEngine;
+using UnityEngine.Playables;
 using UnityEngine.Video;
 
 namespace Sza.Telescope
@@ -26,6 +27,10 @@ namespace Sza.Telescope
         [Tooltip("关闭后，每次触碰必须先离开感应范围，再触碰才能重播。")]
         public bool playOnce = true;
 
+        [Header("剧情等待")]
+        [Tooltip("在这条 Timeline 的等待信号处暂停；任一玩家触发视频后立即继续，不等待视频结束。")]
+        public PlayableDirector waitingTimeline;
+
         [Header("头显转场")]
         [Min(0.05f)] public float fadeSeconds = 0.45f;
         [Min(0.1f)] public float networkLeadSeconds = 0.9f;
@@ -43,6 +48,7 @@ namespace Sza.Telescope
         private readonly Dictionary<int, double> requestTimes = new Dictionary<int, double>();
         private TelescopeStateMessage pending;
         private bool hasPending;
+        private bool waitingForVideo;
 
         public bool IsViewing => view != null && view.IsViewing;
         public bool CanInteract => interaction != null && interaction.IsAvailable && videoClip != null &&
@@ -86,6 +92,7 @@ namespace Sza.Telescope
                 {
                     view.StopViewing();
                     hasPending = hasPlayed = false;
+                    waitingForVideo = false;
                     acceptedRevision = serverRevision = 0;
                     serverStart = serverEnd = 0d;
                     initializedConnections.Clear();
@@ -120,6 +127,7 @@ namespace Sza.Telescope
             {
                 hasPlayed = true;
                 BeginViewing(Time.unscaledTimeAsDouble + Math.Max(networkLeadSeconds, fadeSeconds), false);
+                ResumeWaitingTimeline();
             }
         }
 
@@ -140,6 +148,46 @@ namespace Sza.Telescope
             serverStart = NetworkTime.time + Math.Max(networkLeadSeconds, fadeSeconds);
             serverEnd = serverStart + videoClip.length + fadeSeconds * 2d + 0.5d;
             NetworkServer.SendToAll(CurrentState(), Channels.Reliable, true);
+            ResumeWaitingTimeline();
+        }
+
+        // Signals run on every peer. Only the Host (or an offline session) controls the story.
+        public void WaitForVideo()
+        {
+            if (!Application.isPlaying || (NetworkClient.active && !NetworkServer.active) ||
+                !CanControlWaitingTimeline() || hasPlayed) return;
+            waitingForVideo = true;
+            SetWaitingTimelinePlayback(false);
+        }
+
+        private void ResumeWaitingTimeline()
+        {
+            if (!waitingForVideo) return;
+            waitingForVideo = false;
+            if (CanControlWaitingTimeline()) SetWaitingTimelinePlayback(true);
+        }
+
+        private bool CanControlWaitingTimeline()
+        {
+            if (waitingTimeline == null || !waitingTimeline.gameObject.activeInHierarchy) return false;
+            var coordinator = NetworkGameplayCoordinator.Instance;
+            return coordinator == null || !coordinator.isActiveAndEnabled ||
+                (coordinator.story != null && coordinator.story.CurrentDirector == waitingTimeline &&
+                 !coordinator.story.IsTransitionPending);
+        }
+
+        private void SetWaitingTimelinePlayback(bool play)
+        {
+            var coordinator = NetworkGameplayCoordinator.Instance;
+            if (NetworkServer.active && coordinator != null && coordinator.isActiveAndEnabled)
+                coordinator.HandleTimelineSignal(waitingTimeline, play);
+            else if (!NetworkClient.active)
+            {
+                if (coordinator != null && coordinator.isActiveAndEnabled && coordinator.story != null)
+                    coordinator.story.SetNetworkPlayback(play);
+                else if (play) waitingTimeline.Resume();
+                else waitingTimeline.Pause();
+            }
         }
 
         private TelescopeStateMessage CurrentState() => new TelescopeStateMessage
