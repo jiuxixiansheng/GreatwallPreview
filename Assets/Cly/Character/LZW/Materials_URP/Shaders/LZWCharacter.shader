@@ -18,6 +18,8 @@ Shader "Cly/LZW/Character URP"
         _IrisColor("Iris Tint", Color) = (0.55,0.45,0.32,1)
         _IrisRadius("Iris UV Radius", Range(0.06,0.4)) = 0.16
         _IrisCenter("Iris UV Center", Vector) = (0.5,0.5,0,0)
+        [HideInInspector] _SzaPortalClipEnabled("Portal Clip", Float) = 0
+        [HideInInspector] _SzaPortalPlaneWS("Portal Plane", Vector) = (0,0,1,0)
     }
     SubShader
     {
@@ -32,8 +34,11 @@ Shader "Cly/LZW/Character URP"
             float4 _BaseMap_ST;
             half4 _BaseColor, _SpecColor, _TransmissionColor, _IrisColor;
             float4 _IrisCenter;
+            float4 _SzaPortalPlaneWS;
+            float _SzaPortalClipEnabled;
             half _BumpScale, _Roughness, _SkinWrap, _Transmission, _IrisRadius, _EyeMode;
         CBUFFER_END
+        #include "Assets/sza/Rendering/Portal/CharacterPortalClip.hlsl"
         TEXTURE2D(_BaseMap); SAMPLER(sampler_BaseMap);
         TEXTURE2D(_BumpMap); SAMPLER(sampler_BumpMap);
         TEXTURE2D(_RoughnessMap); SAMPLER(sampler_RoughnessMap);
@@ -104,6 +109,7 @@ Shader "Cly/LZW/Character URP"
         {
             UNITY_SETUP_INSTANCE_ID(i);
             UNITY_SETUP_STEREO_EYE_INDEX_POST_VERTEX(i);
+            SzaClipAtPortal(i.positionWS);
             SurfaceData s = (SurfaceData)0;
             s.albedo = SAMPLE_TEXTURE2D(_BaseMap,sampler_BaseMap,i.uv).rgb*_BaseColor.rgb;
             #if defined(_LZW_EYE)
@@ -198,7 +204,7 @@ Shader "Cly/LZW/Character URP"
                 #endif
                 return o;
             }
-            half4 DepthFrag(Varyings i) : SV_Target { return 0; }
+            half4 DepthFrag(Varyings i) : SV_Target { SzaClipAtPortal(i.positionWS); return 0; }
             ENDHLSL
         }
         Pass
@@ -211,7 +217,7 @@ Shader "Cly/LZW/Character URP"
             #pragma vertex Vert
             #pragma fragment DepthFrag
             #pragma multi_compile_instancing
-            half4 DepthFrag(Varyings i) : SV_Target { return i.positionCS.z; }
+            half4 DepthFrag(Varyings i) : SV_Target { SzaClipAtPortal(i.positionWS); return i.positionCS.z; }
             ENDHLSL
         }
         Pass
@@ -230,6 +236,7 @@ Shader "Cly/LZW/Character URP"
             {
                 UNITY_SETUP_INSTANCE_ID(i);
                 UNITY_SETUP_STEREO_EYE_INDEX_POST_VERTEX(i);
+                SzaClipAtPortal(i.positionWS);
                 half3 n = NormalWS(i);
                 #if defined(_GBUFFER_NORMALS_OCT)
                     float2 oct = PackNormalOctQuadEncode(n);
