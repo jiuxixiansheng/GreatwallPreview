@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using Mirror;
 using UnityEngine;
@@ -13,6 +14,7 @@ public class NetworkGrabbable : NetworkBehaviour, IXRSelectFilter
     [Header("Network grab")]
     [SerializeField, Range(10f, 60f)] private float poseSendRate = 30f;
     [SerializeField] private bool logGrabEvents = true;
+    [SyncVar(hook = nameof(OnScriptedMotionChanged)), SerializeField] private bool scriptedMotion = false;
     [Header("Release safety limits")]
     [SerializeField, Min(0f)] private float maximumReleaseSpeed = 8f;
     [SerializeField, Min(0f)] private float maximumReleaseAngularSpeed = 20f;
@@ -28,6 +30,10 @@ public class NetworkGrabbable : NetworkBehaviour, IXRSelectFilter
     private uint localRequest, poseSequence;
     private float responseDeadline, nextPoseTime;
     private Coroutine releaseRoutine;
+    public uint HolderNetId => holderNetId;
+    public bool IsHeld => holderNetId != 0;
+    public bool ScriptedMotion => scriptedMotion;
+    public event Action ServerGrabbed;
     public bool canProcess => isActiveAndEnabled;
     private uint LocalPlayerId => NetworkClient.localPlayer != null ? NetworkClient.localPlayer.netId : 0;
 
@@ -49,6 +55,7 @@ public class NetworkGrabbable : NetworkBehaviour, IXRSelectFilter
         grab.selectFilters.Add(this);
         grab.selectEntered.AddListener(OnGrab);
         grab.selectExited.AddListener(OnRelease);
+        if (scriptedMotion) ApplyPhysicsRole();
     }
 
     public override void OnStartServer()
@@ -60,8 +67,26 @@ public class NetworkGrabbable : NetworkBehaviour, IXRSelectFilter
     public override void OnStartClient() => ApplyPhysicsRole();
     public override void OnStopClient() => EndLocalSession(true);
 
+    public void SetScriptedMotion(bool value)
+    {
+        if (NetworkClient.active && !NetworkServer.active) return;
+        if (scriptedMotion == value) return;
+        scriptedMotion = value;
+        if (body == null) return;
+        if (!value && !NetworkClient.active && !NetworkServer.active)
+        {
+            // Offline objects have neither network role; restore the cached defaults explicitly.
+            body.isKinematic = originalKinematic;
+            body.useGravity = originalGravity;
+        }
+        else ApplyPhysicsRole();
+    }
+
+    private void OnScriptedMotionChanged(bool previous, bool current) => ApplyPhysicsRole();
+
     public bool Process(IXRSelectInteractor interactor, IXRSelectInteractable interactable)
     {
+        if (scriptedMotion) return false;
         // XRI Single mode permits another local interactor to take the selection.
         // Near-Far + Direct on one controller would otherwise create a false drop.
         if (grab.isSelected && grab.selectMode == InteractableSelectMode.Single)
@@ -143,6 +168,13 @@ public class NetworkGrabbable : NetworkBehaviour, IXRSelectFilter
     private void ApplyPhysicsRole()
     {
         if (body == null) return;
+        if (scriptedMotion)
+        {
+            StopBody();
+            body.isKinematic = true;
+            body.useGravity = false;
+            return;
+        }
         bool simulate = (isClient && localSession) || (isServer && holderNetId == 0);
         if (simulate)
         {
@@ -168,6 +200,8 @@ public class NetworkGrabbable : NetworkBehaviour, IXRSelectFilter
 
     private void OnRelease(SelectExitEventArgs args)
     {
+        // XRI restores its pre-grab settings before this callback, including offline.
+        if (scriptedMotion) ApplyPhysicsRole();
         if (cancelingGrab || !isClient || !localSession || grab.isSelected || releasePending || releaseRoutine != null) return;
         Trace("XRI exit: canceled=" + args.isCanceled + ", interactor=" + args.interactorObject.transform.name);
         releaseRoutine = StartCoroutine(ReleaseAfterDetach(localRequest));
@@ -211,6 +245,7 @@ public class NetworkGrabbable : NetworkBehaviour, IXRSelectFilter
 
     private bool TryClaim(NetworkConnectionToClient sender, uint request)
     {
+        if (scriptedMotion) return false;
         if (sender == null || sender.identity == null || sender.identity.netId == 0 || request == 0) return false;
         if (serverHolder != null) return serverHolder == sender && serverRequest == request;
         serverHolder = sender;
@@ -218,6 +253,7 @@ public class NetworkGrabbable : NetworkBehaviour, IXRSelectFilter
         lastPoseSequence = 0;
         holderNetId = sender.identity.netId;
         ApplyPhysicsRole();
+        ServerGrabbed?.Invoke();
         return true;
     }
     private bool IsHolder(NetworkConnectionToClient sender, uint request) =>
