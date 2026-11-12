@@ -346,7 +346,7 @@ namespace Greatwall.VRAnimation.Timeline
                 root.SetActive(chapter.showDragon);
         }
 
-        private void PauseCurrentChapterAnimationAndAudio()
+        private void PauseCurrentChapterAnimationAndAudio(bool freezeCharacterAnimator = true)
         {
             StoryChapterEntry currentChapter = GetChapter(currentChapterIndex);
             if (currentChapter?.director != null)
@@ -358,7 +358,7 @@ namespace Greatwall.VRAnimation.Timeline
             if (characterAgent != null && characterAgent.enabled && characterAgent.isOnNavMesh)
                 characterAgent.isStopped = true;
 
-            if (characterAnimatorToPause != null && !characterAnimatorPausedByThisScript)
+            if (freezeCharacterAnimator && characterAnimatorToPause != null && !characterAnimatorPausedByThisScript)
             {
                 cachedCharacterAnimatorSpeed = characterAnimatorToPause.speed;
                 characterAnimatorToPause.speed = 0f;
@@ -553,7 +553,8 @@ namespace Greatwall.VRAnimation.Timeline
                 ResumePausedAnimationAndAudio();
                 director.Resume();
             }
-            else PauseCurrentChapterAnimationAndAudio();
+            // 交互暂停只停剧情时间；角色继续播放暂停点所在的 Animator 状态。
+            else PauseCurrentChapterAnimationAndAudio(freezeCharacterAnimator: false);
         }
 
         public void ApplyNetworkState(int index, double time, bool play, bool transitioning,
@@ -591,7 +592,7 @@ namespace Greatwall.VRAnimation.Timeline
             if (!shouldPlay)
             {
                 if (director.state == PlayState.Playing) director.Pause();
-                PauseCurrentChapterAnimationAndAudio();
+                PauseCurrentChapterAnimationAndAudio(freezeCharacterAnimator: transitioning);
             }
             else if (!transitioning)
                 ResumePausedAnimationAndAudio();
