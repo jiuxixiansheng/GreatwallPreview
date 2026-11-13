@@ -30,6 +30,12 @@ namespace Xcy.CrackRepair
         public event System.Action RepairUnlocked;
         public event System.Action RepairFinished;
 
+        public void SetRepairPromptGlowing(bool glowing)
+        {
+            if (part2TimelineRelay != null && part2TimelineRelay.TryGetComponent<Part2TremorEffects>(out var effects))
+                effects.SetRepairPromptGlowing(glowing);
+        }
+
 #if UNITY_EDITOR && ENABLE_INPUT_SYSTEM
         private void Update()
         {
