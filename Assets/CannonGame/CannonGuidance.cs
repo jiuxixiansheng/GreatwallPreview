@@ -8,14 +8,17 @@ namespace Greatwall.CannonGame
     public class CannonGuidance : MonoBehaviour
     {
         private const string HintText = "拾取炮弹";
+        private const string PullHintText = "向下拉动发射";
         private const float HintHeight = 0.95f;
         private const float HintScale = 0.0022f;
 
         private CannonGame _game;
-        private Transform _hint;
         private CanvasGroup _hintGroup;
         private Vector3 _hintBase;
         private float _hintAlpha;
+        private CanvasGroup _pullHintGroup;
+        private Vector3 _pullHintBase;
+        private float _pullHintAlpha;
         private Camera _camera;
 
         private MeshRenderer _glowRenderer;
@@ -37,33 +40,41 @@ namespace Greatwall.CannonGame
             }
             _hintBase = (count > 0 ? sum / count : transform.position) + Vector3.up * HintHeight;
 
-            if (font != null) CreateHint(font);
+            if (font != null)
+            {
+                _hintGroup = CreateHint("PickupHint", HintText, font, _hintBase);
+                if (chain != null && chain.TryGetComponent<Renderer>(out var chainRenderer))
+                {
+                    _pullHintBase = chainRenderer.bounds.center + game.transform.right * 0.45f
+                        - game.transform.forward * 0.22f + Vector3.up * 0.14f;
+                    _pullHintGroup = CreateHint("PullHint", PullHintText, font, _pullHintBase);
+                }
+            }
             CreateChainGlow(chain);
         }
 
-        private void CreateHint(Font font)
+        private CanvasGroup CreateHint(string objectName, string message, Font font, Vector3 position)
         {
-            var go = new GameObject("PickupHint", typeof(RectTransform));
-            _hint = go.transform;
-            _hint.SetParent(transform, false);
-            _hint.position = _hintBase;
-            _hint.localScale = Vector3.one * HintScale;
+            var go = new GameObject(objectName, typeof(RectTransform));
+            var rect = (RectTransform)go.transform;
+            rect.SetParent(transform, false);
+            rect.position = position;
+            rect.localScale = Vector3.one * HintScale;
 
             var canvas = go.AddComponent<Canvas>();
             canvas.renderMode = RenderMode.WorldSpace;
             canvas.sortingOrder = 20;
 
-            var rect = (RectTransform)_hint;
             rect.sizeDelta = new Vector2(560f, 150f);
 
-            _hintGroup = go.AddComponent<CanvasGroup>();
-            _hintGroup.alpha = 0f;
-            _hintGroup.interactable = false;
-            _hintGroup.blocksRaycasts = false;
+            var group = go.AddComponent<CanvasGroup>();
+            group.alpha = 0f;
+            group.interactable = false;
+            group.blocksRaycasts = false;
 
             var label = new GameObject("Label", typeof(RectTransform));
             var labelRect = (RectTransform)label.transform;
-            labelRect.SetParent(_hint, false);
+            labelRect.SetParent(rect, false);
             labelRect.anchorMin = Vector2.zero;
             labelRect.anchorMax = Vector2.one;
             labelRect.offsetMin = Vector2.zero;
@@ -71,7 +82,7 @@ namespace Greatwall.CannonGame
 
             var text = label.AddComponent<Text>();
             text.font = font;
-            text.text = HintText;
+            text.text = message;
             text.fontSize = 68;
             text.alignment = TextAnchor.MiddleCenter;
             text.color = new Color(1f, 0.88f, 0.6f, 1f);
@@ -82,6 +93,7 @@ namespace Greatwall.CannonGame
             var outline = label.AddComponent<Outline>();
             outline.effectColor = new Color(0.08f, 0.04f, 0.01f, 0.9f);
             outline.effectDistance = new Vector2(2.2f, -2.2f);
+            return group;
         }
 
         private void CreateChainGlow(Transform chain)
@@ -135,29 +147,31 @@ namespace Greatwall.CannonGame
                 }
             }
 
-            UpdateHint(dt, !loaded && !held);
+            UpdateHint(_hintGroup, _hintBase, ref _hintAlpha, dt, !loaded && !held);
+            UpdateHint(_pullHintGroup, _pullHintBase, ref _pullHintAlpha, dt, loaded);
             UpdateGlow(dt, loaded);
         }
 
-        private void UpdateHint(float dt, bool visible)
+        private void UpdateHint(CanvasGroup group, Vector3 position, ref float alpha, float dt, bool visible)
         {
-            _hintAlpha = Mathf.MoveTowards(_hintAlpha, visible ? 1f : 0f, dt * 2.5f);
-            if (_hintGroup == null) return;
+            if (group == null) return;
+            alpha = Mathf.MoveTowards(alpha, visible ? 1f : 0f, dt * 2.5f);
 
-            _hintGroup.alpha = _hintAlpha * (0.85f + 0.15f * Mathf.Sin(_time * 2.4f));
-            bool active = _hintAlpha > 0.01f;
-            if (_hintGroup.gameObject.activeSelf != active) _hintGroup.gameObject.SetActive(active);
+            group.alpha = alpha * (0.85f + 0.15f * Mathf.Sin(_time * 2.4f));
+            bool active = alpha > 0.01f;
+            if (group.gameObject.activeSelf != active) group.gameObject.SetActive(active);
             if (!active) return;
 
-            _hint.position = _hintBase + Vector3.up * (Mathf.Sin(_time * 1.5f) * 0.025f);
+            var hint = group.transform;
+            hint.position = position + Vector3.up * (Mathf.Sin(_time * 1.5f) * 0.025f);
 
             var camera = ResolveCamera();
             if (camera == null) return;
 
-            var to = _hint.position - camera.transform.position;
+            var to = hint.position - camera.transform.position;
             to.y = 0f;
             if (to.sqrMagnitude > 0.0001f)
-                _hint.rotation = Quaternion.LookRotation(to.normalized, Vector3.up);
+                hint.rotation = Quaternion.LookRotation(to.normalized, Vector3.up);
         }
 
         private Camera ResolveCamera()

@@ -534,6 +534,7 @@ namespace Greatwall.VRAnimation.Timeline
         public int CurrentChapterIndex => currentChapterIndex;
         public int ChapterCount => chapters.Count;
         public bool IsTransitionPending => transitionPending;
+        public bool IsChapterTransitionActive => transitionPending || networkTransitionVisible;
         public PlayableDirector CurrentDirector => GetChapter(currentChapterIndex)?.director;
         private bool networkTransitionVisible;
 
