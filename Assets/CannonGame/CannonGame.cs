@@ -266,7 +266,7 @@ namespace Greatwall.CannonGame
 
         private void CreateGuidance()
         {
-            var font = Resources.Load<Font>("NotoSansSC-Guide");
+            var font = Resources.Load<Font>("STXINGKA") ?? Resources.Load<Font>("NotoSansSC-Guide");
             if (font == null)
                 Debug.LogWarning("[CannonGame] 缺少悬浮提示字体 Resources/NotoSansSC-Guide.ttf", this);
 

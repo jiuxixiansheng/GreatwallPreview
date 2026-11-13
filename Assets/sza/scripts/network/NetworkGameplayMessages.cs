@@ -35,7 +35,7 @@ public struct GameplaySnapshotMessage : NetworkMessage
     public bool dragonTransformationStarted, dragonTransformationCompleted;
     public double dragonTransformationTimelineTime;
     public float dragonTransformationDuration;
-    public bool[] solved, objectActive;
+    public bool[] solved, brickRepairUnlocked, objectActive;
     public GameplayVisualState[] visuals;
     public Vector3 characterPosition;
     public Quaternion characterRotation;

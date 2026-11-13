@@ -23,7 +23,10 @@ namespace Sza.Characters
         [Min(0.1f)] public float groundSearchDistance = 1.5f;
 
         public bool IsPaused { get; private set; }
-        private bool resumeVoice, resumeAgent;
+        private bool resumeVoice, resumeAgent, animatorFrozen;
+        private StoryTimelineManager story;
+        private bool IsChapterTransitionActive =>
+            (NetworkGameplayCoordinator.Instance?.story ?? story)?.IsChapterTransitionActive == true;
         private float previousAnimatorSpeed = 1f;
         private static bool Follower => NetworkClient.active && !NetworkServer.active;
 
@@ -31,6 +34,8 @@ namespace Sza.Characters
         {
             if (!Application.isPlaying) return;
             IsPaused = false;
+            if (story == null)
+                story = FindFirstObjectByType<StoryTimelineManager>();
             if (mover != null) mover.onMoveStarted.AddListener(ResetVisualTurn);
             if (!Follower)
             {
@@ -47,27 +52,41 @@ namespace Sza.Characters
             }
         }
 
-        private void OnDirectorPaused(PlayableDirector source) => SetPaused(true);
-        private void OnDirectorPlayed(PlayableDirector source) => SetPaused(false);
+        private void OnDirectorPaused(PlayableDirector source) => RefreshLocalPause();
+        private void OnDirectorPlayed(PlayableDirector source) => RefreshLocalPause();
 
         private void Update()
         {
             if (Follower) { if (agent != null && agent.enabled) agent.enabled = false; return; }
-            bool paused = director != null && director.state != PlayState.Playing;
-            var coordinator = NetworkGameplayCoordinator.Instance;
-            if (coordinator != null && coordinator.story != null) paused |= coordinator.story.IsTransitionPending;
-            SetPaused(paused);
+            RefreshLocalPause();
         }
 
-        public void ApplyNetworkPause(bool paused) => SetPaused(paused);
-
-        private void SetPaused(bool paused)
+        private void RefreshLocalPause()
         {
+            if (Follower) return;
+            bool transitioning = IsChapterTransitionActive;
+            SetPaused(transitioning || (director != null && director.state != PlayState.Playing), transitioning);
+        }
+
+        public void ApplyNetworkPause(bool paused) => SetPaused(paused, paused && IsChapterTransitionActive);
+
+        private void SetPaused(bool paused, bool freezeAnimator = false)
+        {
+            // An interaction can become a chapter transition without the Director resuming in between.
+            if (animatorFrozen != freezeAnimator)
+            {
+                if (animator != null)
+                {
+                    if (freezeAnimator) { previousAnimatorSpeed = animator.speed; animator.speed = 0f; }
+                    else animator.speed = previousAnimatorSpeed;
+                }
+                animatorFrozen = freezeAnimator;
+            }
+
             if (IsPaused == paused) return;
             IsPaused = paused;
             if (paused)
             {
-                if (animator != null) { previousAnimatorSpeed = animator.speed; animator.speed = 0f; }
                 resumeVoice = voice != null && voice.isPlaying;
                 if (resumeVoice) voice.Pause();
                 resumeAgent = agent != null && agent.enabled && agent.isOnNavMesh && !agent.isStopped;
@@ -75,7 +94,6 @@ namespace Sza.Characters
             }
             else
             {
-                if (animator != null) animator.speed = previousAnimatorSpeed;
                 if (resumeVoice && voice != null) voice.UnPause();
                 if (!Follower && resumeAgent && agent != null && agent.enabled && agent.isOnNavMesh && agent.hasPath)
                     agent.isStopped = false;
