@@ -277,7 +277,8 @@ public sealed class NetworkGameplayCoordinator : MonoBehaviour
 
     public void ServerSolve(BrickDropZone zone)
     {
-        if (!NetworkServer.active || !serverInitialized || zone == null || !zone.gameObject.activeInHierarchy) return;
+        if (!NetworkServer.active || !serverInitialized || zone == null || !zone.gameObject.activeInHierarchy ||
+            !zone.IsRepairUnlocked) return;
         int index = Array.IndexOf(brickZones, zone);
         if (index < 0 || serverSolved[index]) return;
         serverSolved[index] = true;
@@ -373,6 +374,7 @@ public sealed class NetworkGameplayCoordinator : MonoBehaviour
             serverTime = NetworkTime.time, timelineTime = director != null ? director.time : 0,
             playing = director != null && director.state == PlayState.Playing,
             transitioning = story.IsTransitionPending, solved = (bool[])serverSolved.Clone(), objectActive = active,
+            brickRepairUnlocked = Array.ConvertAll(brickZones, z => z != null && z.IsRepairUnlocked),
             visuals = visuals, characterPosition = characterAgent != null ? characterAgent.transform.position : Vector3.zero,
             characterRotation = characterAgent != null ? characterAgent.transform.rotation : Quaternion.identity,
             parameters = parameters.ToArray(),
@@ -388,7 +390,9 @@ public sealed class NetworkGameplayCoordinator : MonoBehaviour
         if (NetworkServer.active || story == null || message.sequence <= acceptedSequence) return;
         if (message.configuration != configuration || message.objectActive == null ||
             message.objectActive.Length != persistentObjects.Length || message.solved == null ||
-            message.solved.Length != brickZones.Length || message.visuals == null || message.visuals.Length != persistentRenderers.Length)
+            message.solved.Length != brickZones.Length || message.brickRepairUnlocked == null ||
+            message.brickRepairUnlocked.Length != brickZones.Length ||
+            message.visuals == null || message.visuals.Length != persistentRenderers.Length)
         {
             if (!mismatchReported) Debug.LogError("[联机剧情] 配置不一致，已拒绝应用状态，请让所有电脑使用相同版本。", this);
             mismatchReported = true;
@@ -422,7 +426,11 @@ public sealed class NetworkGameplayCoordinator : MonoBehaviour
             if (o != null && o.activeSelf != message.objectActive[i]) o.SetActive(message.objectActive[i]);
         }
         for (int i = 0; i < brickZones.Length; i++)
-            if (message.solved[i] && brickZones[i] != null) brickZones[i].ApplySolvedState(false);
+            if (brickZones[i] != null)
+            {
+                brickZones[i].ApplyUnlockState(message.brickRepairUnlocked[i]);
+                if (message.solved[i]) brickZones[i].ApplySolvedState(false);
+            }
     }
 
     private void ApplyVisuals(GameplaySnapshotMessage message)
@@ -449,7 +457,10 @@ public sealed class NetworkGameplayCoordinator : MonoBehaviour
         uint hash = 2166136261;
         Action<string> add = value => { foreach (char c in value) hash = unchecked((hash ^ c) * 16777619); };
         add(story != null ? story.ChapterCount.ToString() : "missing-story");
-        foreach (var z in brickZones) add(z != null ? ObjectPath(z.transform) : "null-zone");
+        add("brick-recovery-v1");
+        foreach (var z in brickZones)
+            add(z != null ? ObjectPath(z.transform) + ":" + z.targetBrickCount + ":" + z.waitForTimelineSignal : "null-zone");
+        foreach (var b in bricks) add(b != null ? ObjectPath(b.transform) : "null-brick");
         foreach (var o in persistentObjects) add(o != null ? ObjectPath(o.transform) : "null-object");
         foreach (var r in persistentRenderers) add(r != null ? ObjectPath(r.transform) : "null-renderer");
         return hash;

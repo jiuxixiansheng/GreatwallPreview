@@ -5,6 +5,7 @@ using UnityEngine;
 using UnityEngine.Playables;
 using UnityEngine.Rendering.Universal;
 using UnityEngine.Timeline;
+using UnityEngine.UI;
 using UnityEngine.XR;
 
 namespace Greatwall.VRAnimation.Timeline
@@ -13,6 +14,7 @@ namespace Greatwall.VRAnimation.Timeline
     [RequireComponent(typeof(PlayableDirector))]
     public sealed class Part2TremorEffects : MonoBehaviour
     {
+        private const float RepairHintSeconds = 10f;
         [SerializeField, Min(0f)] private float shakeDuration = 8f;
         [SerializeField, Min(0f)] private float vrShakeMeters = 0.009f;
         [SerializeField, Min(0f)] private float desktopShakeMeters = 0.035f;
@@ -31,6 +33,8 @@ namespace Greatwall.VRAnimation.Timeline
         private int cameraSibling;
         private double shakeStartedAt;
         private float shakeMeters;
+        private Canvas repairHint;
+        private float repairHintUntil;
 
         private void Awake()
         {
@@ -60,6 +64,7 @@ namespace Greatwall.VRAnimation.Timeline
             director.stopped -= OnTimelineStopped;
             StopShake();
             ClearSmoke();
+            ClearRepairHint();
             SetCracksVisible(true);
         }
 
@@ -67,6 +72,7 @@ namespace Greatwall.VRAnimation.Timeline
         {
             StopShake();
             ClearSmoke();
+            ClearRepairHint();
             SetCracksVisible(false);
         }
 
@@ -122,6 +128,7 @@ namespace Greatwall.VRAnimation.Timeline
 
         private void LateUpdate()
         {
+            UpdateRepairHint();
             if (shakePivot == null) return;
             float elapsed = (float)(director.time - shakeStartedAt);
             if (cameraTransform == null || elapsed < 0f || elapsed >= shakeDuration)
@@ -157,6 +164,7 @@ namespace Greatwall.VRAnimation.Timeline
         {
             if (!Application.isPlaying || !isActiveAndEnabled || revealed) return;
             SetCracksVisible(true);
+            repairHintUntil = Time.unscaledTime + RepairHintSeconds;
             // 迟加入或跳到后面的玩家也要看见裂缝，但不补播旧烟雾。
             if (smokePrefab == null || director.time - revealTime > 1d) return;
 
@@ -178,6 +186,68 @@ namespace Greatwall.VRAnimation.Timeline
                 smoke.Add(puff);
                 puff.Play();
             }
+        }
+
+        private void UpdateRepairHint()
+        {
+            if (repairHintUntil <= 0f) return;
+            if (Time.unscaledTime >= repairHintUntil)
+            {
+                ClearRepairHint();
+                return;
+            }
+
+            if (repairHint != null && repairHint.worldCamera != null && repairHint.worldCamera.isActiveAndEnabled)
+                return;
+
+            if (repairHint != null) Destroy(repairHint.gameObject);
+            repairHint = null;
+            Camera view = FindPlayerView(XRSettings.isDeviceActive);
+            if (view == null || !view.isActiveAndEnabled) return;
+            Font font = Resources.Load<Font>("STXINGKA");
+            if (font == null)
+            {
+                ClearRepairHint();
+                return;
+            }
+
+            // 和越界提示一样，把世界空间 Canvas 挂到本机头显相机上，双眼都能看到。
+            var canvasObject = new GameObject("Crack Repair Hint", typeof(RectTransform), typeof(Canvas));
+            var rect = (RectTransform)canvasObject.transform;
+            rect.SetParent(view.transform, false);
+            rect.localPosition = new Vector3(0f, -0.20f, 1.35f);
+            rect.localScale = Vector3.one * 0.0011f;
+            rect.sizeDelta = new Vector2(450f, 120f);
+            repairHint = canvasObject.GetComponent<Canvas>();
+            repairHint.renderMode = RenderMode.WorldSpace;
+            repairHint.worldCamera = view;
+            repairHint.sortingOrder = 30;
+
+            var label = new GameObject("Label", typeof(RectTransform), typeof(Text), typeof(Outline));
+            var labelRect = (RectTransform)label.transform;
+            labelRect.SetParent(rect, false);
+            labelRect.anchorMin = Vector2.zero;
+            labelRect.anchorMax = Vector2.one;
+            labelRect.offsetMin = Vector2.zero;
+            labelRect.offsetMax = Vector2.zero;
+
+            var text = label.GetComponent<Text>();
+            text.font = font;
+            text.text = "靠近裂缝，\n扣动扳机开始修复";
+            text.fontSize = 40;
+            text.alignment = TextAnchor.MiddleCenter;
+            text.color = Color.white;
+            text.raycastTarget = false;
+            var outline = label.GetComponent<Outline>();
+            outline.effectColor = new Color(0f, 0f, 0f, 0.75f);
+            outline.effectDistance = new Vector2(1.5f, -1.5f);
+        }
+
+        private void ClearRepairHint()
+        {
+            repairHintUntil = 0f;
+            if (repairHint != null) Destroy(repairHint.gameObject);
+            repairHint = null;
         }
 
         private void SetCracksVisible(bool visible)
