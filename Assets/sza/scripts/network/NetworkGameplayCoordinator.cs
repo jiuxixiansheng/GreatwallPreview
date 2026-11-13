@@ -356,6 +356,7 @@ public sealed class NetworkGameplayCoordinator : MonoBehaviour
             visuals[i] = new GameplayVisualState {
                 distanceSet = distance, restoreSet = restore, shadows = (int)r.shadowCastingMode,
                 disappearQueueApplied = disappearOwners[i] != null && disappearOwners[i].IsRenderQueueApplied,
+                buildQueueApplied = buildOwners[i] != null && buildOwners[i].IsRenderQueueApplied,
                 distance = block.HasFloat(DistanceId) ? block.GetFloat(DistanceId) : distance ? material.GetFloat(DistanceId) : 0,
                 restore = block.HasFloat(RestoreId) ? block.GetFloat(RestoreId) : restore ? material.GetFloat(RestoreId) : 0
             };
@@ -446,7 +447,11 @@ public sealed class NetworkGameplayCoordinator : MonoBehaviour
             r.SetPropertyBlock(block);
             r.shadowCastingMode = (UnityEngine.Rendering.ShadowCastingMode)v.shadows;
             var build = buildOwners != null ? buildOwners[i] : null;
-            if (build != null && v.distanceSet) build.SetDistance(block.GetFloat(DistanceId));
+            if (build != null)
+            {
+                if (v.distanceSet) build.SetDistance(block.GetFloat(DistanceId));
+                build.ApplyNetworkRenderQueue(v.buildQueueApplied);
+            }
             var disappear = disappearOwners != null ? disappearOwners[i] : null;
             if (disappear != null && v.distanceSet) disappear.ApplyNetworkRenderQueue(v.disappearQueueApplied);
         }
@@ -458,6 +463,7 @@ public sealed class NetworkGameplayCoordinator : MonoBehaviour
         Action<string> add = value => { foreach (char c in value) hash = unchecked((hash ^ c) * 16777619); };
         add(story != null ? story.ChapterCount.ToString() : "missing-story");
         add("brick-recovery-v1");
+        add("build-queue-v1");
         foreach (var z in brickZones)
             add(z != null ? ObjectPath(z.transform) + ":" + z.targetBrickCount + ":" + z.waitForTimelineSignal : "null-zone");
         foreach (var b in bricks) add(b != null ? ObjectPath(b.transform) : "null-brick");

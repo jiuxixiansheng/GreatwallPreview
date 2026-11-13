@@ -207,7 +207,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: "\u8BF7\u62FE\u53D6\u5F13\u7BAD"
+  m_Text: "拾取弓箭可拉弓发射"
 --- !u!114 &7280813148400802459
 MonoBehaviour:
   m_ObjectHideFlags: 0

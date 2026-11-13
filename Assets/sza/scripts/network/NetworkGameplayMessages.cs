@@ -14,7 +14,7 @@ public struct GameplayRequestMessage : NetworkMessage
 public struct GameplayVisualState
 {
     public bool distanceSet, restoreSet;
-    public bool disappearQueueApplied;
+    public bool disappearQueueApplied, buildQueueApplied;
     public float distance, restore;
     public int shadows;
 }
