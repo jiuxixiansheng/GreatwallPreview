@@ -45,7 +45,7 @@ namespace Greatwall.CannonGame
                 _hintGroup = CreateHint("PickupHint", HintText, font, _hintBase);
                 if (chain != null && chain.TryGetComponent<Renderer>(out var chainRenderer))
                 {
-                    _pullHintBase = chainRenderer.bounds.center + game.transform.right * 0.45f
+                    _pullHintBase = chainRenderer.bounds.center - game.transform.right * 0.35f
                         - game.transform.forward * 0.22f + Vector3.up * 0.14f;
                     _pullHintGroup = CreateHint("PullHint", PullHintText, font, _pullHintBase);
                 }
