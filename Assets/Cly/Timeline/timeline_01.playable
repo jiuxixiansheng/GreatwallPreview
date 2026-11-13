@@ -6257,6 +6257,19 @@ MonoBehaviour:
   referenceAnimationClip: {fileID: 8993902097722301239, guid: 44077fe00da64cd4f878192f2a6d34a3, type: 3}
   statePath: FaceLayer.Chapter1.LipSync_08
   crossFadeSeconds: 0.05
+--- !u!114 &-6220913445368569370
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 86014c7ba64ef044db43c84a3628e196, type: 3}
+  m_Name: DragonTurnClip
+  m_EditorClassIdentifier: 
+  turnAngleDegrees: -100
 --- !u!114 &-6161684006057182390
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -7060,6 +7073,144 @@ MonoBehaviour:
     m_ClipIn: 0
     m_Asset: {fileID: 3747300248463231293}
     m_Duration: 1.9579466812900534
+    m_TimeScale: 1
+    m_ParentTrack: {fileID: -5419102308370045347}
+    m_EaseInDuration: 0
+    m_EaseOutDuration: 0
+    m_BlendInDuration: 0
+    m_BlendOutDuration: 0
+    m_MixInCurve:
+      serializedVersion: 2
+      m_Curve:
+      - serializedVersion: 3
+        time: 0
+        value: 0
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      - serializedVersion: 3
+        time: 1
+        value: 1
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    m_MixOutCurve:
+      serializedVersion: 2
+      m_Curve:
+      - serializedVersion: 3
+        time: 0
+        value: 1
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      - serializedVersion: 3
+        time: 1
+        value: 0
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    m_BlendInCurveMode: 0
+    m_BlendOutCurveMode: 0
+    m_ExposedParameterNames: []
+    m_AnimationCurves: {fileID: 0}
+    m_Recordable: 0
+    m_PostExtrapolationMode: 0
+    m_PreExtrapolationMode: 0
+    m_PostExtrapolationTime: 0
+    m_PreExtrapolationTime: 0
+    m_DisplayName: DragonTurnClip
+  - m_Version: 1
+    m_Start: 161.25
+    m_ClipIn: 0
+    m_Asset: {fileID: -6220913445368569370}
+    m_Duration: 1
+    m_TimeScale: 1
+    m_ParentTrack: {fileID: -5419102308370045347}
+    m_EaseInDuration: 0
+    m_EaseOutDuration: 0
+    m_BlendInDuration: 0
+    m_BlendOutDuration: 0
+    m_MixInCurve:
+      serializedVersion: 2
+      m_Curve:
+      - serializedVersion: 3
+        time: 0
+        value: 0
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      - serializedVersion: 3
+        time: 1
+        value: 1
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    m_MixOutCurve:
+      serializedVersion: 2
+      m_Curve:
+      - serializedVersion: 3
+        time: 0
+        value: 1
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      - serializedVersion: 3
+        time: 1
+        value: 0
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    m_BlendInCurveMode: 0
+    m_BlendOutCurveMode: 0
+    m_ExposedParameterNames: []
+    m_AnimationCurves: {fileID: 0}
+    m_Recordable: 0
+    m_PostExtrapolationMode: 0
+    m_PreExtrapolationMode: 0
+    m_PostExtrapolationTime: 0
+    m_PreExtrapolationTime: 0
+    m_DisplayName: DragonTurnClip
+  - m_Version: 1
+    m_Start: 165.69308986618805
+    m_ClipIn: 0
+    m_Asset: {fileID: -1235837517126528229}
+    m_Duration: 1.5402434671452738
     m_TimeScale: 1
     m_ParentTrack: {fileID: -5419102308370045347}
     m_EaseInDuration: 0
@@ -9083,6 +9234,19 @@ MonoBehaviour:
   referenceAnimationClip: {fileID: 8993902097722301239, guid: 34f7d7524bcaddd4b8b5c81b43484714, type: 3}
   statePath: FaceLayer.Chapter1.LipSync_06
   crossFadeSeconds: 0.05
+--- !u!114 &-1235837517126528229
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 86014c7ba64ef044db43c84a3628e196, type: 3}
+  m_Name: DragonTurnClip
+  m_EditorClassIdentifier: 
+  turnAngleDegrees: 100
 --- !u!114 &-1188017803610474066
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -9384,6 +9548,7 @@ MonoBehaviour:
   - {fileID: -5419102308370045347}
   - {fileID: -8935653769916947683}
   - {fileID: 6912046314466025287}
+  - {fileID: 8966372346663003471}
   - {fileID: -434059248053273407}
   m_FixedDuration: 0
   m_EditorSettings:
@@ -9639,6 +9804,18 @@ MonoBehaviour:
   m_bufferingTime: 0.1
   m_ClipProperties:
     volume: 0.2
+--- !u!114 &1912266217561058555
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ea69391daf06a3544964a2d61126e733, type: 3}
+  m_Name: MagicBowClip
+  m_EditorClassIdentifier: 
 --- !u!114 &1946766548048955672
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -12149,3 +12326,96 @@ MonoBehaviour:
   m_bufferingTime: 0.1
   m_ClipProperties:
     volume: 0.2
+--- !u!114 &8966372346663003471
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3667fd27970d9b14fadba9fd9a6131a8, type: 3}
+  m_Name: "\u5F13\u7BAD \xB7 \u51FA\u573A\u3001\u5C04\u7BAD\u4E0E\u62FE\u53D6"
+  m_EditorClassIdentifier: 
+  m_Version: 3
+  m_AnimClip: {fileID: 0}
+  m_Locked: 0
+  m_Muted: 0
+  m_CustomPlayableFullTypename: 
+  m_Curves: {fileID: 0}
+  m_Parent: {fileID: 11400000}
+  m_Children: []
+  m_Clips:
+  - m_Version: 1
+    m_Start: 161.25
+    m_ClipIn: 0
+    m_Asset: {fileID: 1912266217561058555}
+    m_Duration: 8
+    m_TimeScale: 1
+    m_ParentTrack: {fileID: 8966372346663003471}
+    m_EaseInDuration: 0
+    m_EaseOutDuration: 0
+    m_BlendInDuration: 0
+    m_BlendOutDuration: 0
+    m_MixInCurve:
+      serializedVersion: 2
+      m_Curve:
+      - serializedVersion: 3
+        time: 0
+        value: 0
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      - serializedVersion: 3
+        time: 1
+        value: 1
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    m_MixOutCurve:
+      serializedVersion: 2
+      m_Curve:
+      - serializedVersion: 3
+        time: 0
+        value: 1
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      - serializedVersion: 3
+        time: 1
+        value: 0
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    m_BlendInCurveMode: 0
+    m_BlendOutCurveMode: 0
+    m_ExposedParameterNames: []
+    m_AnimationCurves: {fileID: 0}
+    m_Recordable: 0
+    m_PostExtrapolationMode: 0
+    m_PreExtrapolationMode: 0
+    m_PostExtrapolationTime: 0
+    m_PreExtrapolationTime: 0
+    m_DisplayName: "Explosion \u2192 \u5F00\u5F13 \u2192 \u6EB6\u89E3\u7BAD \u2192
+      Love hit \u2192 \u6389\u843D\u62FE\u53D6"
+  m_Markers:
+    m_Objects: []
