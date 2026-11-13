@@ -35,6 +35,7 @@ namespace Greatwall.VRAnimation.Timeline
         private float shakeMeters;
         private Canvas repairHint;
         private float repairHintUntil;
+        private bool repairPromptGlowing;
 
         private void Awake()
         {
@@ -65,6 +66,7 @@ namespace Greatwall.VRAnimation.Timeline
             StopShake();
             ClearSmoke();
             ClearRepairHint();
+            repairPromptGlowing = false;
             SetCracksVisible(true);
         }
 
@@ -73,6 +75,7 @@ namespace Greatwall.VRAnimation.Timeline
             StopShake();
             ClearSmoke();
             ClearRepairHint();
+            repairPromptGlowing = false;
             SetCracksVisible(false);
         }
 
@@ -164,7 +167,6 @@ namespace Greatwall.VRAnimation.Timeline
         {
             if (!Application.isPlaying || !isActiveAndEnabled || revealed) return;
             SetCracksVisible(true);
-            repairHintUntil = Time.unscaledTime + RepairHintSeconds;
             // 迟加入或跳到后面的玩家也要看见裂缝，但不补播旧烟雾。
             if (smokePrefab == null || director.time - revealTime > 1d) return;
 
@@ -186,6 +188,14 @@ namespace Greatwall.VRAnimation.Timeline
                 smoke.Add(puff);
                 puff.Play();
             }
+        }
+
+        public void SetRepairPromptGlowing(bool glowing)
+        {
+            if (!Application.isPlaying || !isActiveAndEnabled || repairPromptGlowing == glowing) return;
+            repairPromptGlowing = glowing;
+            if (glowing)
+                repairHintUntil = Time.unscaledTime + RepairHintSeconds;
         }
 
         private void UpdateRepairHint()

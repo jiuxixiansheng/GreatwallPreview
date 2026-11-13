@@ -256,6 +256,7 @@ namespace Xcy.Audio
             if (crackRepair == null) return;
             foreach (var crack in crackRepair.Cracks)
                 if (crack != null) crack.SetPromptGlow(active);
+            crackRepair.SetRepairPromptGlowing(active);
         }
 
         private static int Key(InteractionAudioCue cue, int emitter) => (int)cue * 100 + emitter;
