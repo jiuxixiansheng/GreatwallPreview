@@ -39,9 +39,24 @@ namespace Sza.Telescope
             if (promptRoot != null) promptPosition = promptRoot.localPosition;
         }
 
-        private void OnEnable() { touching = false; floating = false; }
+        private void OnEnable()
+        {
+            touching = false;
+            floating = false;
+            RefreshPrompt();
+        }
 
-        private void OnDisable() => RestoreTelescopePosition();
+        private void OnDisable()
+        {
+            RestoreTelescopePosition();
+            if (promptRoot != null) promptRoot.gameObject.SetActive(false);
+            if (manager != null) manager.ResetInteractionGate();
+        }
+
+        public void RefreshPrompt()
+        {
+            if (promptRoot != null) promptRoot.gameObject.SetActive(manager != null && manager.CanInteract);
+        }
 
         private void LateUpdate()
         {
@@ -50,7 +65,7 @@ namespace Sza.Telescope
             Camera camera = TelescopeVideoManager.LocalCamera;
             if (promptRoot != null)
             {
-                promptRoot.gameObject.SetActive(manager.CanInteract);
+                RefreshPrompt();
                 promptRoot.localPosition = promptPosition + transform.InverseTransformVector(Vector3.up *
                     (Mathf.Sin(Time.unscaledTime * 2f) * floatAmplitude));
                 if (camera != null) promptRoot.rotation = camera.transform.rotation;
