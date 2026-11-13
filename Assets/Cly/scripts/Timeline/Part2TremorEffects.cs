@@ -14,7 +14,7 @@ namespace Greatwall.VRAnimation.Timeline
     [RequireComponent(typeof(PlayableDirector))]
     public sealed class Part2TremorEffects : MonoBehaviour
     {
-        private const float RepairHintSeconds = 6f;
+        private const float RepairHintSeconds = 10f;
         [SerializeField, Min(0f)] private float shakeDuration = 8f;
         [SerializeField, Min(0f)] private float vrShakeMeters = 0.009f;
         [SerializeField, Min(0f)] private float desktopShakeMeters = 0.035f;
@@ -215,9 +215,9 @@ namespace Greatwall.VRAnimation.Timeline
             var canvasObject = new GameObject("Crack Repair Hint", typeof(RectTransform), typeof(Canvas));
             var rect = (RectTransform)canvasObject.transform;
             rect.SetParent(view.transform, false);
-            rect.localPosition = new Vector3(0f, -0.24f, 1.35f);
+            rect.localPosition = new Vector3(0f, -0.20f, 1.35f);
             rect.localScale = Vector3.one * 0.0011f;
-            rect.sizeDelta = new Vector2(450f, 112f);
+            rect.sizeDelta = new Vector2(450f, 120f);
             repairHint = canvasObject.GetComponent<Canvas>();
             repairHint.renderMode = RenderMode.WorldSpace;
             repairHint.worldCamera = view;
@@ -234,7 +234,7 @@ namespace Greatwall.VRAnimation.Timeline
             var text = label.GetComponent<Text>();
             text.font = font;
             text.text = "靠近裂缝，\n扣动扳机开始修复";
-            text.fontSize = 36;
+            text.fontSize = 40;
             text.alignment = TextAnchor.MiddleCenter;
             text.color = Color.white;
             text.raycastTarget = false;
