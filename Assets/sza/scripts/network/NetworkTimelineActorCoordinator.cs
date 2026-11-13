@@ -194,7 +194,8 @@ public sealed class NetworkTimelineActorCoordinator : MonoBehaviour
             var target = state.layers[l];
             if (target.hash == 0 || !animator.HasState(l, target.hash)) continue;
             animator.SetLayerWeight(l, target.weight);
-            float normalized = target.normalizedTime + (state.paused || target.length <= 0.001f ? 0f : elapsed * target.speed / target.length);
+            // A paused Timeline can still have a running Animator (for example an Idle loop).
+            float normalized = target.normalizedTime + (target.length <= 0.001f ? 0f : elapsed * target.speed / target.length);
             if (!target.loop) normalized = Mathf.Clamp01(normalized);
             var current = animator.GetCurrentAnimatorStateInfo(l);
             bool different = current.fullPathHash != target.hash;
