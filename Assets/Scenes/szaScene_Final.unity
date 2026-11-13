@@ -74062,6 +74062,7 @@ MonoBehaviour:
   - {fileID: 569586449}
   smokePrefab: {fileID: 1385934893211648348, guid: 8eb503696b886e04faff8fc0f480d473, type: 3}
   revealSignal: {fileID: 11400000, guid: e20d703d626a47e7a32e9a1222f279fd, type: 2}
+  repairHintOverlayMaterial: {fileID: 2100000, guid: 6f3d696f7c3365846b6dc2402afb3d3e, type: 2}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

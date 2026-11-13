@@ -21,6 +21,7 @@ namespace Greatwall.VRAnimation.Timeline
         [SerializeField] private DecalProjector[] cracks;
         [SerializeField] private ParticleSystem smokePrefab;
         [SerializeField] private SignalAsset revealSignal;
+        [SerializeField] private Material repairHintOverlayMaterial;
 
         private readonly List<ParticleSystem> smoke = new List<ParticleSystem>();
         private PlayableDirector director;
@@ -243,6 +244,8 @@ namespace Greatwall.VRAnimation.Timeline
 
             var text = label.GetComponent<Text>();
             text.font = font;
+            // 只让这条提示忽略场景深度，保留头显跟随和双眼渲染。
+            text.material = repairHintOverlayMaterial;
             text.text = "靠近裂缝，\n扣动扳机开始修复";
             text.fontSize = 40;
             text.alignment = TextAnchor.MiddleCenter;
