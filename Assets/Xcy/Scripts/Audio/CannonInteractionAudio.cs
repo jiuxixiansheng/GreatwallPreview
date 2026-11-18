@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace Xcy.Audio
 {
-    /// <summary>Local feedback for the existing local cannon game; no Timeline or scene bindings.</summary>
+    /// <summary>Plays audio for cannon events applied to this peer.</summary>
     [DisallowMultipleComponent]
     public sealed class CannonInteractionAudio : MonoBehaviour
     {

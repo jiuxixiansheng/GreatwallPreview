@@ -1,18 +1,22 @@
 using UnityEngine;
 using UnityEngine.XR.Interaction.Toolkit;
+using UnityEngine.XR.Interaction.Toolkit.Filtering;
 using UnityEngine.XR.Interaction.Toolkit.Interactables;
+using UnityEngine.XR.Interaction.Toolkit.Interactors;
 
 namespace Greatwall.CannonGame
 {
-    public class CannonChain : MonoBehaviour
+    public class CannonChain : MonoBehaviour, IXRSelectFilter
     {
         // 链底距地面仅约 5.7cm，下拉行程限制在 5cm 内，避免链条穿地。
-        private const float MaxPull = 0.05f;
-        private const float FireThreshold = 0.045f;
+        internal const float MaxPull = 0.05f;
+        internal const float FireThreshold = 0.045f;
+        private const float PullSoundThreshold = 0.005f;
         private const float PullStretch = 0.1f;
         private const float ReturnSpeed = 1.8f;
 
         private CannonGame _game;
+        private int _item;
         private Transform _chain;
         private XRGrabInteractable _grab;
         private Vector3 _chainHome;
@@ -27,14 +31,18 @@ namespace Greatwall.CannonGame
         private bool _held;
         private bool _fired;
         private bool _pullSoundStarted;
+        private bool _remoteHeld;
+        private bool _networkPullSoundStarted;
         public event System.Action PullStarted;
 
         public float Pull => _pull;
         public bool IsHeld => _held;
+        internal Vector3 GrabHomePosition => _grabHomePosition;
 
-        public void Initialize(CannonGame game, Transform chain, XRGrabInteractable grab)
+        public void Initialize(CannonGame game, int item, Transform chain, XRGrabInteractable grab)
         {
             _game = game;
+            _item = item;
             _chain = chain;
             _grab = grab;
             _chainHome = chain.position;
@@ -43,9 +51,15 @@ namespace Greatwall.CannonGame
             _axis = Vector3.down;
             _grabHomePosition = transform.position;
             _grabHomeRotation = transform.rotation;
+            grab.selectFilters.Add(this);
             grab.selectEntered.AddListener(OnSelectEntered);
             grab.selectExited.AddListener(OnSelectExited);
         }
+
+        public bool canProcess => isActiveAndEnabled;
+        public bool Process(IXRSelectInteractor interactor, IXRSelectInteractable interactable) =>
+            !CannonNetwork.IsActive || (_grab.isSelected ? _grab.IsSelected(interactor) :
+                _game.Network != null && _game.Network.CanSelect(_item));
 
         private void OnSelectEntered(SelectEnterEventArgs args)
         {
@@ -55,10 +69,12 @@ namespace Greatwall.CannonGame
             _pull = 0f;
             _hand = args.interactorObject.transform;
             _handStart = _hand.position;
+            if (CannonNetwork.IsActive) _game.Network?.Grab(_item);
         }
 
         private void OnSelectExited(SelectExitEventArgs args)
         {
+            if (CannonNetwork.IsActive) _game.Network?.Release(_item);
             _held = false;
             _hand = null;
             transform.SetPositionAndRotation(_grabHomePosition, _grabHomeRotation);
@@ -72,7 +88,7 @@ namespace Greatwall.CannonGame
                 _pull = Mathf.Clamp(raw, 0f, MaxPull);
                 ApplyPull(_pull);
 
-                if (!_pullSoundStarted && _pull >= 0.005f)
+                if (!_pullSoundStarted && _pull >= PullSoundThreshold && !CannonNetwork.IsActive)
                 {
                     _pullSoundStarted = true;
                     PullStarted?.Invoke();
@@ -81,14 +97,39 @@ namespace Greatwall.CannonGame
                 if (!_fired && _pull >= FireThreshold)
                 {
                     _fired = true;
-                    _game.TryFire();
+                    if (CannonNetwork.IsActive) _game.Network?.SendChainThreshold();
+                    else _game.TryFire();
                 }
             }
-            else if (_pull > 0f)
+            else if (!_remoteHeld && _pull > 0f)
             {
                 _pull = Mathf.MoveTowards(_pull, 0f, ReturnSpeed * Time.deltaTime);
                 ApplyPull(_pull);
             }
+        }
+
+        internal void ApplyNetworkPull(CannonItemState item, bool local, bool initial)
+        {
+            bool held = item.phase == CannonItemPhase.Held;
+            _remoteHeld = held && !local;
+            if (_remoteHeld || initial)
+            {
+                _pull = item.pull;
+                ApplyPull(_pull);
+            }
+
+            if (!held) _networkPullSoundStarted = false;
+            else if (!_networkPullSoundStarted && item.pull >= PullSoundThreshold)
+            {
+                _networkPullSoundStarted = true;
+                if (!initial) PullStarted?.Invoke();
+            }
+        }
+
+        internal void CancelNetworkSelection()
+        {
+            if (_grab.isSelected && _grab.interactionManager != null)
+                _grab.interactionManager.CancelInteractableSelection((IXRSelectInteractable)_grab);
         }
 
         private void ApplyPull(float pull)

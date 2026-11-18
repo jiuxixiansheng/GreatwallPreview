@@ -140,7 +140,6 @@ namespace Greatwall.Flight
             if (RideDragon == null) RideDragon = FindSceneTransform("骑龙飞上天空");
             if (StoryDragon == null) StoryDragon = FindSceneTransform("Dragon_root");
             if (ChapterDirector == null) ChapterDirector = FindSceneDirector(ChapterDirectorName);
-            _rider = FindFirstObjectByType<DragonRideController>(FindObjectsInactive.Include);
 
             if (ChapterDirector == null)
                 Debug.LogWarning($"[FlightStage] 没找到章节导演 '{ChapterDirectorName}'，只按章节索引触发。", this);
@@ -225,12 +224,23 @@ namespace Greatwall.Flight
         {
             if (_rider != null) return _rider;
 
-            Camera cam = Camera.main;
-            Transform rig = cam != null ? cam.transform.root : null;
+            bool networked = Mirror.NetworkClient.active || Mirror.NetworkServer.active;
+            Transform rig;
+            if (networked)
+            {
+                var localPlayer = Mirror.NetworkClient.localPlayer;
+                if (localPlayer == null) return null;
+                rig = localPlayer.transform;
+            }
+            else
+            {
+                Camera cam = Camera.main;
+                rig = cam != null ? cam.transform.root : null;
+            }
 
-            // 优先认本机镜头所在的 rig，避免多人时误抓远端玩家的控制器
             var rider = rig != null ? rig.GetComponent<DragonRideController>() : null;
-            if (rider == null) rider = FindFirstObjectByType<DragonRideController>(FindObjectsInactive.Include);
+            if (rider == null && !networked)
+                rider = FindFirstObjectByType<DragonRideController>(FindObjectsInactive.Include);
             if (rider == null)
             {
                 if (rig == null) return null;   // 玩家 rig 还没生成（联机 host/client 尚未就绪）
@@ -262,6 +272,7 @@ namespace Greatwall.Flight
             }
 
             _rider = rider;
+            if (Gate != null) Gate.Rider = rider;
             return _rider;
         }
 
