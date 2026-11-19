@@ -189,6 +189,7 @@ namespace Sza.Editor
             }
             handle.transform.localPosition = weapon.relaxedNock;
             handle.weapon = weapon;
+            handle.interactionLayers = InteractionLayerMask.GetMask("Default", "Bow String");
             handle.colliders.Clear(); handle.colliders.Add(handle.GetComponent<SphereCollider>());
             weapon.stringHandle = handle;
             handle.gameObject.SetActive(false);

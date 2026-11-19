@@ -19788,26 +19788,6 @@ MonoBehaviour:
   rideMusic: {fileID: 8300000, guid: ba2c75d9f2f8dbe478aec9f2bb5bc039, type: 3}
   rideMusicVolume: 0.5
   rideMusicFadeSeconds: 4
---- !u!114 &1938166201
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 720828844}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 84fb703cb6784b6a9a57aff111d626e0, type: 3}
-  m_Name:
-  m_EditorClassIdentifier:
-  terrainSource: {fileID: 15600000, guid: 1fd3c09b180f30f49a07edec50fbaaea, type: 2}
-  terrainShader: {fileID: 4800000, guid: f6a7aed5f82548cf8d35d93c2224140b, type: 3}
-  wallSection: {fileID: 1087534514110836952, guid: 0701312390bc7c74a805f145618e99c3, type: 3}
-  towerMesh: {fileID: -5597002278806442958, guid: 0635a43b710c27a48adb23984b578e8b, type: 3}
-  towerMaterial: {fileID: 2100000, guid: 6f950f2160963204f824a65988e1a52c, type: 2}
-  horizonSky: {fileID: 2100000, guid: 14162961806330b4987e6cf447092a7f, type: 2}
-  scrollSpeed: 11
-  depthBelowSeat: 70
 --- !u!1 &720828850
 GameObject:
   m_ObjectHideFlags: 0
@@ -21552,7 +21532,7 @@ Transform:
   m_GameObject: {fileID: 854449001}
   serializedVersion: 2
   m_LocalRotation: {x: -0.000000009189006, y: -0.13416637, z: -0.000000046912213, w: 0.9909588}
-  m_LocalPosition: {x: -0.4182553, y: 6.265998, z: 4.8414993}
+  m_LocalPosition: {x: -0.418, y: 6.298, z: 4.841}
   m_LocalScale: {x: 0.03918574, y: 0.039185755, z: 0.03918574}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -62415,14 +62395,14 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1704568909}
   serializedVersion: 2
-  m_LocalRotation: {x: 8.902044e-10, y: -0.00000005960465, z: 0.00000003002106, w: 1}
-  m_LocalPosition: {x: -0.483, y: 6.386, z: 4.817}
+  m_LocalRotation: {x: 0.000000008235995, y: 0.34651262, z: 0.000000036787483, w: 0.9380453}
+  m_LocalPosition: {x: -0.405, y: 6.469, z: 4.817}
   m_LocalScale: {x: 0.03918575, y: 0.039185755, z: 0.039185748}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 530024186}
   m_Father: {fileID: 760417533}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 40.548, z: 0}
 --- !u!65 &1704568911
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -63579,7 +63559,7 @@ Transform:
   m_GameObject: {fileID: 1734989696}
   serializedVersion: 2
   m_LocalRotation: {x: 8.902044e-10, y: -0.00000005960465, z: 0.00000003002106, w: 1}
-  m_LocalPosition: {x: -0.48299932, y: 6.5160007, z: 4.8170004}
+  m_LocalPosition: {x: -0.483, y: 6.268, z: 4.323}
   m_LocalScale: {x: 0.03918575, y: 0.039185755, z: 0.039185748}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -70895,6 +70875,26 @@ MonoBehaviour:
   restoreDuration: 3
   startProgress: 1.5
   endProgress: 4.3
+--- !u!114 &1938166201
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 720828844}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 84fb703cb6784b6a9a57aff111d626e0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  terrainSource: {fileID: 15600000, guid: 1fd3c09b180f30f49a07edec50fbaaea, type: 2}
+  terrainShader: {fileID: 4800000, guid: f6a7aed5f82548cf8d35d93c2224140b, type: 3}
+  wallSection: {fileID: 1087534514110836952, guid: 0701312390bc7c74a805f145618e99c3, type: 3}
+  towerMesh: {fileID: -5597002278806442958, guid: 0635a43b710c27a48adb23984b578e8b, type: 3}
+  towerMaterial: {fileID: 2100000, guid: 6f950f2160963204f824a65988e1a52c, type: 2}
+  horizonSky: {fileID: 2100000, guid: 14162961806330b4987e6cf447092a7f, type: 2}
+  scrollSpeed: 11
+  depthBelowSeat: 70
 --- !u!1001 &1956923355
 PrefabInstance:
   m_ObjectHideFlags: 0
