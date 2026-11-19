@@ -2422,12 +2422,13 @@ MonoBehaviour:
   TakeOffDensity: 0.309
   OrbitDensity: 1
   DepartureDensity: 0.87
-  EnableCloudSea: 1
+  EnableCloudSea: 0
   CloudSeaDistance: 119
   CloudSeaRadius: 130
   CloudSeaOpacity: 0.411
-  CloudSeaCount: 732
+  CloudSeaCount: 0
   DisableRuntimeSpawn: 1
+  ScenicFlight: 1
   EndingWallCount: 120
   EndingWallForward: 80
   EndingWallSizeMul: 1.35
@@ -19686,6 +19687,7 @@ GameObject:
   - component: {fileID: 720828845}
   - component: {fileID: 720828846}
   - component: {fileID: 720828847}
+  - component: {fileID: 1938166201}
   m_Layer: 0
   m_Name: "\u4E0A\u9F99\u4F20\u9001\u95E8"
   m_TagString: Untagged
@@ -19770,12 +19772,12 @@ MonoBehaviour:
   DragonHeight: 3.06
   HoverHeadWorldPos: {x: -21.345, y: 8.2, z: -1.71}
   DragonYawOffset: -12
-  CloudDistantCount: 72
-  CloudDistantSizeMul: 3.6
-  CloudDistantMinDist: 120
-  CloudDistantMaxDist: 500
-  CloudMaxCount: 200
-  CloudPreWarm: 220
+  CloudDistantCount: 20
+  CloudDistantSizeMul: 1.6
+  CloudDistantMinDist: 165
+  CloudDistantMaxDist: 355
+  CloudMaxCount: 80
+  CloudPreWarm: 72
   CloudMinSpawnDistance: 100
   CloudSpawnInterval: 0.9
   CloudOpacity: 0.62
@@ -19783,6 +19785,29 @@ MonoBehaviour:
   CloudEndingWallForward: 45
   CloudEndingWallSizeMul: 1.6
   OpeningDragonRevealDelay: 1
+  rideMusic: {fileID: 8300000, guid: ba2c75d9f2f8dbe478aec9f2bb5bc039, type: 3}
+  rideMusicVolume: 0.5
+  rideMusicFadeSeconds: 4
+--- !u!114 &1938166201
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 720828844}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 84fb703cb6784b6a9a57aff111d626e0, type: 3}
+  m_Name:
+  m_EditorClassIdentifier:
+  terrainSource: {fileID: 15600000, guid: 1fd3c09b180f30f49a07edec50fbaaea, type: 2}
+  terrainShader: {fileID: 4800000, guid: f6a7aed5f82548cf8d35d93c2224140b, type: 3}
+  wallSection: {fileID: 1087534514110836952, guid: 0701312390bc7c74a805f145618e99c3, type: 3}
+  towerMesh: {fileID: -5597002278806442958, guid: 0635a43b710c27a48adb23984b578e8b, type: 3}
+  towerMaterial: {fileID: 2100000, guid: 6f950f2160963204f824a65988e1a52c, type: 2}
+  horizonSky: {fileID: 2100000, guid: 14162961806330b4987e6cf447092a7f, type: 2}
+  scrollSpeed: 11
+  depthBelowSeat: 70
 --- !u!1 &720828850
 GameObject:
   m_ObjectHideFlags: 0

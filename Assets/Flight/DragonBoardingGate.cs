@@ -368,6 +368,17 @@ namespace Greatwall.Flight
 
             if (RevealDragonOnBoard) StartCoroutine(RevealDragonCoroutine());
 
+            if (Rider.Director != null)
+            {
+                var director = Rider.Director;
+                Vector3 seat = Rider.SeatAnchor.SeatWorldPosition;
+                if (TryGetComponent(out FlightLandscape landscape) && landscape.isActiveAndEnabled)
+                    landscape.SetDeparturePose(seat, director.ScenicDepartureHeading);
+                if (FlightCloudsRoot != null
+                    && FlightCloudsRoot.TryGetComponent(out FlightCloudSpawner cloudSpawner))
+                    cloudSpawner.SetScenicRouteOrigin(director, seat);
+            }
+
             // 每位玩家取自己的头显水平位置，统一使用传送区的地面高度。
             Rider.MountFromWorldPosition(boarding.padPosition);
             Debug.Log("[BoardingGate] 本机玩家开始登龙。", this);
