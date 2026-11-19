@@ -189,6 +189,7 @@ namespace Sza.Editor
             }
             handle.transform.localPosition = weapon.relaxedNock;
             handle.weapon = weapon;
+            handle.interactionLayers = InteractionLayerMask.GetMask("Default", "Bow String");
             handle.colliders.Clear(); handle.colliders.Add(handle.GetComponent<SphereCollider>());
             weapon.stringHandle = handle;
             handle.gameObject.SetActive(false);
@@ -264,7 +265,7 @@ namespace Sza.Editor
             label.transform.SetParent(go.transform, false);
             var text = label.GetComponent<Text>();
             text.font = Resources.Load<Font>("NotoSansSC-Guide");
-            text.text = "请拾取弓箭"; text.fontSize = 58; text.alignment = TextAnchor.MiddleCenter;
+            text.text = "拾取弓箭可拉弓发射"; text.fontSize = 58; text.alignment = TextAnchor.MiddleCenter;
             text.color = new Color(1f, 0.95f, 0.12f); text.raycastTarget = false;
             var labelRect = (RectTransform)label.transform;
             labelRect.anchorMin = Vector2.zero; labelRect.anchorMax = Vector2.one;

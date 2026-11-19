@@ -17,6 +17,9 @@ public class BrickDropZone : MonoBehaviour
         new Dictionary<Rigidbody, HashSet<Collider>>();
     private bool isSolved;
     private bool repairUnlocked;
+    private MeshRenderer repairPromptFrame;
+    private Canvas repairPromptCanvas;
+    private XRSimpleInteractable repairPromptInteraction;
     private readonly HashSet<Rigidbody> accepted = new HashSet<Rigidbody>();
     private readonly HashSet<Rigidbody> earlyPlacements = new HashSet<Rigidbody>();
     public bool IsSolved => isSolved;
@@ -26,6 +29,26 @@ public class BrickDropZone : MonoBehaviour
     public event System.Action<BrickDropZone> Solved;
 
     private bool CanJudge => !NetworkClient.active || NetworkServer.active;
+
+    private void Awake()
+    {
+        if (!waitForTimelineSignal) return;
+        repairPromptFrame = GetComponent<MeshRenderer>();
+        repairPromptCanvas = GetComponentInChildren<Canvas>(true);
+        if (TryGetComponent(out XRSimpleInteractable interaction) && interaction.enabled)
+            repairPromptInteraction = interaction;
+    }
+
+    private void OnEnable() => RefreshRepairPrompt();
+
+    private void RefreshRepairPrompt()
+    {
+        if (!waitForTimelineSignal) return;
+        bool visible = IsRepairUnlocked && !isSolved;
+        if (repairPromptFrame != null) repairPromptFrame.enabled = visible;
+        if (repairPromptCanvas != null) repairPromptCanvas.enabled = visible;
+        if (repairPromptInteraction != null) repairPromptInteraction.enabled = visible;
+    }
 
     private void OnTriggerEnter(Collider other) => TrackBrick(other);
     private void OnTriggerStay(Collider other) => TrackBrick(other);
@@ -80,10 +103,15 @@ public class BrickDropZone : MonoBehaviour
     public void BeginRepair()
     {
         if (!CanJudge || isSolved) return;
-        repairUnlocked = true;
+        ApplyUnlockState(true);
     }
 
-    public void ApplyUnlockState(bool value) => repairUnlocked = value;
+    public void ApplyUnlockState(bool value)
+    {
+        if (repairUnlocked == value) return;
+        repairUnlocked = value;
+        RefreshRepairPrompt();
+    }
     public bool HasEarlyPlacement(Rigidbody brick) => earlyPlacements.Contains(brick);
     public bool ContainsBrick(Rigidbody brick) => bricksInside.ContainsKey(brick);
     public bool HasAcceptedBrick(Rigidbody brick) => accepted.Contains(brick);

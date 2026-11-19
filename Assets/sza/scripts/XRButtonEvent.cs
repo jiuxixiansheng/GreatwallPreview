@@ -4,17 +4,21 @@ using UnityEngine.InputSystem;
 
 public class XRButtonEvent : MonoBehaviour
 {
+    [Header("å³æ‰‹æŸ„è°ƒè¯•")]
+    [Tooltip("å‹¾é€‰åå¯ç”¨ A é”®è·³å…³å’Œ B é”®æ˜¾ç¤ºæˆ–éšè—è¾¹ç•Œã€‚")]
+    [SerializeField] private bool enableDebugButtons = false;
+
     [Header("Input Action Asset")]
     [SerializeField] private InputActionAsset inputActions;
 
     [Header("Action Map")]
     [SerializeField] private string actionMapName = "XRI Right Interaction";
 
-    [Header("A ¼ü")]
+    [Header("A é”®")]
     [SerializeField] private string primaryButtonActionName = "Right Primary Button";
     public UnityEvent onPrimaryPressed;
 
-    [Header("B ¼ü")]
+    [Header("B é”®")]
     [SerializeField] private string secondaryButtonActionName = "Right Secondary Button";
     [SerializeField] private GameObject secondaryButtonTarget;
 
@@ -28,7 +32,7 @@ public class XRButtonEvent : MonoBehaviour
 
     private bool CanHandleInput()
     {
-        if (!isActiveAndEnabled) return false;
+        if (!enableDebugButtons || !isActiveAndEnabled) return false;
         var identity = GetComponentInParent<Mirror.NetworkIdentity>();
         return identity == null || identity.isLocalPlayer;
     }
@@ -98,7 +102,7 @@ public class XRButtonEvent : MonoBehaviour
     private void OnEnable()
     {
         UnityEngine.SceneManagement.SceneManager.sceneLoaded += HandleSceneLoaded;
-        BindSceneTargets();
+        if (CanHandleInput()) BindSceneTargets();
         InputActionMap actionMap = FindActionMap();
         if (actionMap == null) return;
 
@@ -128,7 +132,7 @@ public class XRButtonEvent : MonoBehaviour
     {
         if (inputActions == null)
         {
-            Debug.LogWarning("XRButtonEvent: Ã»ÓĞ°ó¶¨ Input Action Asset¡£", this);
+            Debug.LogWarning("XRButtonEvent: æ²¡æœ‰ç»‘å®š Input Action Assetã€‚", this);
             return null;
         }
 
@@ -136,7 +140,7 @@ public class XRButtonEvent : MonoBehaviour
         if (actionMap == null)
         {
             Debug.LogWarning(
-                $"XRButtonEvent: ÕÒ²»µ½ Action Map: {actionMapName}",
+                $"XRButtonEvent: æ‰¾ä¸åˆ° Action Map: {actionMapName}",
                 this);
         }
 
@@ -152,7 +156,7 @@ public class XRButtonEvent : MonoBehaviour
         if (targetAction == null)
         {
             Debug.LogWarning(
-                $"XRButtonEvent: ÔÚ {actionMapName} ÖĞÕÒ²»µ½ Action: {targetActionName}",
+                $"XRButtonEvent: åœ¨ {actionMapName} ä¸­æ‰¾ä¸åˆ° Action: {targetActionName}",
                 this);
             return null;
         }
@@ -187,7 +191,7 @@ public class XRButtonEvent : MonoBehaviour
         BindSceneTargets();
         if (secondaryButtonTarget == null)
         {
-            Debug.LogWarning("XRButtonEvent: B ¼üÃ»ÓĞ°ó¶¨ÒªÏÔÊ¾/Òş²ØµÄÄ¿±êÎïÌå¡£", this);
+            Debug.LogWarning("XRButtonEvent: B é”®æ²¡æœ‰ç»‘å®šè¦æ˜¾ç¤º/éšè—çš„ç›®æ ‡ç‰©ä½“ã€‚", this);
             return;
         }
 

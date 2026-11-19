@@ -12,6 +12,9 @@ namespace Sza.Ending
         public string endingScene = "Assets/Scenes/szaScene_end.unity";
         public string menuScene = "Assets/Scenes/Menu.unity";
         public VideoClip video;
+        [Tooltip("进入片尾场景时开始播放的背景音乐。")]
+        public AudioClip music;
+        [Range(0f, 1f)] public float musicVolume = 0.85f;
         [Tooltip("片尾专用渲染器，不包含关卡的全屏雾或调色效果。")]
         public ScriptableRendererData presentationRenderer;
         [Min(0f)] public float revealSeconds = 0.6f;

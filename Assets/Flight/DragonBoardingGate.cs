@@ -1,3 +1,4 @@
+using Mirror;
 using UnityEngine;
 using UnityEngine.Events;
 
@@ -10,7 +11,7 @@ namespace Greatwall.Flight
     ///   chapter2_2 的 timeline 播完 → 自动跳 chapter3 → timeline_03 激活
     ///   part3/骑龙飞上天空（播放 CircleToHover：盘旋 → 笔直悬浮）
     ///   → 本组件检测到龙已出现，延迟 ShowDelay 秒后在玩家前方地面
-    ///     亮起蓝色传送区 → 玩家走进去 → Rider.Mount() → 骑龙起飞。
+    ///     亮起蓝色传送区 → 任意玩家走进去 → 全体登龙 → 起飞。
     ///
     /// 设计要点：
     ///   - 不依赖章节系统，也不改 AutoMountOnStart，
@@ -71,7 +72,7 @@ namespace Greatwall.Flight
         [Range(0f, 3f)] public float AppearDuration = 0.6f;
 
         [Header("触发")]
-        [Tooltip("玩家进入该水平半径即触发上龙（米）。")]
+        [Tooltip("任意玩家进入该水平半径即触发全体上龙（米）。")]
         [Range(0.3f, 3f)] public float TriggerRadius = 0.7f;
 
         [Tooltip("玩家与传送区的高度差超过这个值不触发（防止楼上楼下误触）。")]
@@ -103,7 +104,8 @@ namespace Greatwall.Flight
 
         private void Awake()
         {
-            if (Rider == null) Rider = FindObjectOfType<DragonRideController>(true);
+            if (Rider == null && !NetworkServer.active && !NetworkClient.active)
+                Rider = FindFirstObjectByType<DragonRideController>(FindObjectsInactive.Include);
             if (PadVisual != null)
             {
                 _padScale = PadVisual.transform.localScale;
@@ -134,7 +136,18 @@ namespace Greatwall.Flight
         }
 
         private void Update()
-        {            if (_boarded) return;
+        {
+            if (_boarded) return;
+
+            bool networked = NetworkGameplayCoordinator.IsManaged && (NetworkServer.active || NetworkClient.active);
+            var sync = NetworkGameplayCoordinator.Instance;
+            if (networked && sync.DragonBoarding.boardAt > 0d)
+            {
+                // 快照可能先于本地玩家生成或传送区淡入。等本机骑乘控制器就绪再执行。
+                if (NetworkTime.time >= sync.DragonBoarding.boardAt && Rider != null && Rider.SeatAnchor != null)
+                    Board(sync.DragonBoarding);
+                return;
+            }
 
             if (!_padShown)
             {
@@ -143,24 +156,42 @@ namespace Greatwall.Flight
             }
 
             UpdateAppearAnimation();
+            Vector3 padPosition = PadVisual.transform.position;
+            if (networked)
+            {
+                if (NetworkServer.active && AnyPlayerInRange(NetworkServer.connections.Values, padPosition))
+                    sync.ScheduleDragonBoarding(CaptureBoarding(padPosition));
+                return;
+            }
 
-            // 玩家走进去 → 上龙
-            Transform player = PlayerTransform;
-            if (player == null) return;
+            if (Rider != null && Rider.SeatAnchor != null &&
+                IsPlayerInRange((HeadTransform != null ? HeadTransform : Rider.transform).position,
+                    Rider.transform.position.y, padPosition))
+                Board(CaptureBoarding(padPosition));
+        }
 
-            Vector3 padPos = PadVisual.transform.position;
+        private bool AnyPlayerInRange(System.Collections.Generic.IEnumerable<NetworkConnectionToClient> connections,
+            Vector3 padPosition)
+        {
+            foreach (var connection in connections)
+            {
+                if (connection == null || !connection.isReady || connection.identity == null) continue;
+                var player = connection.identity;
+                var setup = player.GetComponent<PlayerNetworkSetup>();
+                Camera head = setup != null ? setup.localCamera : null;
+                // 远端相机组件是禁用的，但其 Transform 仍通过 Mirror 同步。
+                if (head != null && IsPlayerInRange(head.transform.position, player.transform.position.y, padPosition))
+                    return true;
+            }
+            return false;
+        }
 
-            // ★ 水平判定必须用「头显」而不是 XR Origin 根：
-            //   - XR Device Simulator / 房间尺度下，玩家走动只改相机（头显）位置，
-            //     XR Origin 根可能原地不动，用根判定会永远踩不到传送区；
-            //   - 高度仍用根（脚底），避免上楼/下楼误触。
-            Transform probe = HeadTransform != null ? HeadTransform : player;
-            Vector3 a = new Vector3(probe.position.x, 0f, probe.position.z);
-            Vector3 b = new Vector3(padPos.x, 0f, padPos.z);
-            bool inRange = Vector3.Distance(a, b) <= TriggerRadius;
-            bool heightOk = Mathf.Abs(player.position.y - padPos.y) <= MaxHeightDifference;
-
-            if (inRange && heightOk) Board();
+        private bool IsPlayerInRange(Vector3 headPosition, float groundY, Vector3 padPosition)
+        {
+            Vector3 offset = headPosition - padPosition;
+            offset.y = 0f;
+            return offset.sqrMagnitude <= TriggerRadius * TriggerRadius &&
+                Mathf.Abs(groundY - padPosition.y) <= MaxHeightDifference;
         }
 
         /// <summary>玩家脚底（XR Origin 根），只用来取地面高度</summary>
@@ -291,71 +322,66 @@ namespace Greatwall.Flight
             }
         }
 
-        private void Board()
+        private GameplayDragonBoardingState CaptureBoarding(Vector3 padPosition)
+        {
+            var head = AlignRideDragonToOpening && OpeningDragon != null
+                ? FindDeep(OpeningDragon.transform, "Head") : null;
+            return new GameplayDragonBoardingState
+            {
+                padPosition = padPosition,
+                alignToOpeningHead = head != null,
+                openingHeadPosition = head != null ? head.position : Vector3.zero
+            };
+        }
+
+        private void Board(GameplayDragonBoardingState boarding)
         {
             _boarded = true;
 
-            // ★ 云雾只在真正骑上龙之后才出现（早点亮会在城墙上就看到云）
             if (FlightCloudsRoot != null && !FlightCloudsRoot.activeSelf)
                 FlightCloudsRoot.SetActive(true);
 
             if (PadVisual != null) PadVisual.SetActive(false);
             if (PadLabel != null) PadLabel.SetActive(false);
 
-            if (Rider == null) Rider = FindObjectOfType<DragonRideController>(true);
-
-            // 记下开场龙的龙头位置（上龙后要把骑龙挪到这里，玩家才不会跨几十米瞬移）
-            Vector3 openingHead = Vector3.zero;
-            bool hasOpeningHead = false;
-            if (OpeningDragon != null)
-            {
-                var h = FindDeep(OpeningDragon.transform, "Head");
-                if (h != null) { openingHead = h.position; hasOpeningHead = true; }
-            }
-
-            // 骑龙模型整段都是隐藏的（观众看到的是独立的盘旋龙），这一瞬间才激活；
-            // 同一帧把盘旋龙藏掉 —— 玩家紧接着被瞬移到龙背，看不到切换过程。
             if (DragonRide != null && !DragonRide.gameObject.activeSelf)
                 DragonRide.gameObject.SetActive(true);
             if (OpeningDragon != null && OpeningDragon.activeSelf)
                 OpeningDragon.SetActive(false);
 
-            if (Rider != null)
-            {
-                StartCoroutine(MountNextFrame(hasOpeningHead ? (Vector3?)openingHead : null));
-            }
-            else
-            {
-                Debug.LogWarning("[BoardingGate] 场景里没有 DragonRideController，无法上龙。", this);
-            }
-
+            StartCoroutine(MountNextFrame(boarding));
             onBoarded?.Invoke();
         }
 
-        /// <summary>
-        /// 等一帧，让刚激活的骑龙跑完 Awake/OnEnable，再对齐、显示材质、瞬移上龙。
-        /// </summary>
-        private System.Collections.IEnumerator MountNextFrame(Vector3? openingHead)
+        private System.Collections.IEnumerator MountNextFrame(GameplayDragonBoardingState boarding)
         {
+            // 让刚激活的骑龙完成初始化，再对齐到服务器记录的开场龙头位置。
             yield return null;
-            if (Rider == null) yield break;
+            if (Rider == null || Rider.SeatAnchor == null) yield break;
 
-            // ★ 1) 把骑龙整体挪到开场龙的龙头位置：
-            //     两个模型的龙头是同一个视觉锚点，对齐后玩家只是"从传送板挪到龙背"，
-            //     不会横跨几十米。
-            if (AlignRideDragonToOpening && openingHead.HasValue && DragonRide != null && Rider.SeatAnchor != null)
+            if (boarding.alignToOpeningHead && DragonRide != null)
             {
-                Vector3 delta = openingHead.Value - Rider.SeatAnchor.SeatWorldPosition;
-                DragonRide.position += delta;
-                yield return null;              // 让骨骼/座位跟随刷新一帧
+                DragonRide.position += boarding.openingHeadPosition - Rider.SeatAnchor.SeatWorldPosition;
+                yield return null;
+                if (Rider == null) yield break;
             }
 
-            // ★ 2) 把大龙材质从「完全透明」显出来，否则骑龙全程看不见龙
             if (RevealDragonOnBoard) StartCoroutine(RevealDragonCoroutine());
 
-            Rider.MountFromWorldPosition(PadVisual != null
-                ? PadVisual.transform.position : BoardingWorldPosition);
-            Debug.Log("[BoardingGate] 玩家走上传送区 → 上龙。", this);
+            if (Rider.Director != null)
+            {
+                var director = Rider.Director;
+                Vector3 seat = Rider.SeatAnchor.SeatWorldPosition;
+                if (TryGetComponent(out FlightLandscape landscape) && landscape.isActiveAndEnabled)
+                    landscape.SetDeparturePose(seat, director.ScenicDepartureHeading);
+                if (FlightCloudsRoot != null
+                    && FlightCloudsRoot.TryGetComponent(out FlightCloudSpawner cloudSpawner))
+                    cloudSpawner.SetScenicRouteOrigin(director, seat);
+            }
+
+            // 每位玩家取自己的头显水平位置，统一使用传送区的地面高度。
+            Rider.MountFromWorldPosition(boarding.padPosition);
+            Debug.Log("[BoardingGate] 本机玩家开始登龙。", this);
         }
 
         /// <summary>把骑龙材质的不透明度从 1.01（全透明）渐变到 0（实体）。</summary>

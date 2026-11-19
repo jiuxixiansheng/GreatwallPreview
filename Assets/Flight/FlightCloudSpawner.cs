@@ -184,6 +184,9 @@ namespace Greatwall.Flight
                  "关掉后云量完全由 PreWarmClouds（含末段云墙）决定。")]
         public bool DisableRuntimeSpawn = true;
 
+        [Tooltip("巡航时把薄云放在航线两侧，保留俯瞰地面的视野和原有收尾云幕。")]
+        public bool ScenicFlight;
+
         [Header("收尾云墙（纯预撒）")]
         [Tooltip("黑场前云墙的云团数：在最后 14% 轨迹 + 终点之外一次性铺好。\n" +
                  "数值越大，冲进黑场前的云越厚；全部预先生成，飞行中不会再冒新云。")]
@@ -342,7 +345,7 @@ namespace Greatwall.Flight
             //   所以飞行中新增的云是「淡入」，不会在视野里凭空闪现。
             {
                 var col = _system.colorOverLifetime;
-                col.enabled = true;
+                col.enabled = !ScenicFlight || !DisableRuntimeSpawn;
                 var g = new Gradient();
                 g.SetKeys(
                     new[] { new GradientColorKey(Color.white, 0f), new GradientColorKey(Color.white, 1f) },
@@ -390,7 +393,7 @@ namespace Greatwall.Flight
                 // 远景同样做出生渐入（寿命 300s，前 1% ≈ 3 秒）
                 {
                     var dcol = _distantSystem.colorOverLifetime;
-                    dcol.enabled = true;
+                    dcol.enabled = !ScenicFlight || !DisableRuntimeSpawn;
                     var dg = new Gradient();
                     dg.SetKeys(
                         new[] { new GradientColorKey(Color.white, 0f), new GradientColorKey(Color.white, 1f) },
@@ -436,10 +439,13 @@ namespace Greatwall.Flight
         {
             if (_director == null || _director.Keyframes == null) return;
             float total = Mathf.Max(0.01f, _director.Keyframes.totalTime);
-            float p = Mathf.Clamp01(_director.KeyframeTime / total);
+            float time = ScenicFlight ? _director.ScenicFlightTime : _director.KeyframeTime;
+            float p = Mathf.Clamp01(time / total);
             // ★ 统一取样（滑杆/曲线/自动）。滑杆与曲线模式直接赋值
             //   （拖动立即生效）；自动模式保留 MoveTowards 平滑。
             float target = SampleNearDensity(p);
+            if (ScenicFlight)
+                target = Mathf.Max(target, 0.48f);
             bool direct = 使用滑杆控制 || UseExternalCurve;
             _globalFade = direct
                 ? target
@@ -452,8 +458,10 @@ namespace Greatwall.Flight
             if (_distantMat != null && _distantMat.HasProperty("_BaseColor"))
             {
                 var dc = _distantMat.color;
-                dc.a = Mathf.Clamp01(
-                    CloudOpacity * SampleDistantDensity(p));
+                float density = SampleDistantDensity(p);
+                if (ScenicFlight)
+                    density = Mathf.Max(density, 0.46f);
+                dc.a = Mathf.Clamp01(CloudOpacity * density);
                 _distantMat.color = dc;
             }
         }
@@ -676,6 +684,32 @@ namespace Greatwall.Flight
         private Vector3 _routeOrigin;
         private Vector3 _routeRefPos;
         private float _routeYawOffset;
+        private Vector3 _scenicSeatOffset = Vector3.up * 2f;
+
+        internal void SetScenicRouteOrigin(FlightDirector director, Vector3 seat)
+        {
+            if (!ScenicFlight || director.Keyframes == null
+                || director.Keyframes.frames == null || director.Keyframes.frames.Count == 0)
+                return;
+
+            if (_prewarmed)
+            {
+                _system.Clear(true);
+                _arcPoints = null;
+                _arcProgress = null;
+                _prewarmed = false;
+                _random = new System.Random(RandomSeed);
+            }
+
+            _director = director;
+            var first = director.Keyframes.frames[0];
+            _routeOrigin = director.CurrentRouteOrigin;
+            _scenicSeatOffset = seat - _routeOrigin + Vector3.up * 1.6f;
+            _routeRefPos = first.pos;
+            _routeYawOffset = Mathf.DeltaAngle(first.yaw, director.transform.eulerAngles.y);
+            _routeOffsetValid = true;
+            _routeOffsetResolved = true;
+        }
 
         private bool TryResolveRouteOffset()
         {
@@ -750,10 +784,17 @@ namespace Greatwall.Flight
             // 真正的「遮盖视野」交给下面的收尾云墙，避免两处叠加导致后段过密。
             int wallCount = Mathf.RoundToInt(PreWarmClouds * 0.15f);
             int spreadCount = Mathf.Max(0, PreWarmClouds - wallCount);
-            for (int i = 0; i < spreadCount; i++)
+            if (ScenicFlight)
             {
-                float p = Mathf.Pow((float)_random.NextDouble(), 0.45f);
-                EmitCloudAtProgress(p, 6f, SpawnRadius * 0.5f);
+                EmitScenicClouds(_system, spreadCount, false);
+            }
+            else
+            {
+                for (int i = 0; i < spreadCount; i++)
+                {
+                    float p = Mathf.Pow((float)_random.NextDouble(), 0.45f);
+                    EmitCloudAtProgress(p, 6f, SpawnRadius * 0.5f);
+                }
             }
             for (int i = 0; i < wallCount; i++)
             {
@@ -776,12 +817,19 @@ namespace Greatwall.Flight
             }
             // ★ 远景天际线云：外围环带大尺寸云团，
             //   消除"只有玩家周围有云、远处天空空荡"的出戏感
-            if (DistantCloudCount > 0)
+            if (DistantCloudCount > 0 && _distantSystem != null)
             {
-                if (_distantSystem != null && !_distantSystem.isPlaying) _distantSystem.Play();
-                for (int i = 0; i < DistantCloudCount; i++)
+                if (!_distantSystem.isPlaying) _distantSystem.Play();
+                if (ScenicFlight)
                 {
-                    EmitCloud(1, spreadAcrossTrack: true, distant: true);
+                    EmitScenicClouds(_distantSystem, DistantCloudCount, true);
+                }
+                else
+                {
+                    for (int i = 0; i < DistantCloudCount; i++)
+                    {
+                        EmitCloud(1, spreadAcrossTrack: true, distant: true);
+                    }
                 }
             }
             if (PreWarmClouds > 0 || DistantCloudCount > 0)
@@ -791,6 +839,66 @@ namespace Greatwall.Flight
                           $"远景粒子={(_distantSystem != null ? _distantSystem.particleCount : -1)}）", this);
             }
         }
+
+        private void EmitScenicClouds(ParticleSystem system, int count, bool distant)
+        {
+            if (count == 0) return;
+            if (_arcPoints == null || _arcPoints.Count == 0) BuildArcPoints();
+            if (_arcPoints.Count < 2) return;
+
+            Vector3 forward = _arcPoints[_arcPoints.Count - 1] - _arcPoints[0];
+            forward.y = 0f;
+            forward = forward.sqrMagnitude < 0.001f ? Vector3.forward : forward.normalized;
+            Vector3 right = Vector3.Cross(Vector3.up, forward);
+            int takeoffClouds = Mathf.Min(count, distant ? 8 : 5);
+            int stations = Mathf.Max(1, (count - takeoffClouds + 2) / 3);
+            for (int i = 0; i < count; i++)
+            {
+                float size = distant ? DistantSizeMul * CloudRange(0.73f, 1f) : CloudRange(0.68f, 1.12f);
+                float height = CloudSize * size * 0.64f + CloudRange(3f, 21f);
+                Vector3 center;
+                if (i < takeoffClouds)
+                {
+                    // Use eye-level puffs on the horizon and a looser group overhead.
+                    float angle = (i + CloudRange(-0.14f, 0.14f)) * Mathf.PI * 2f / takeoffClouds;
+                    float radius = distant ? CloudRange(DistantMinDist, DistantMaxDist * 0.82f)
+                        : (i == 0 ? 20f : CloudRange(45f, 86f));
+                    height = distant ? CloudRange(0f, 14f) : CloudRange(60f, 97f);
+                    float lateral = Mathf.Cos(angle) * radius;
+                    float along = Mathf.Sin(angle) * radius;
+                    // The dragon can climb past takeoff clouds without passing directly over them.
+                    if (distant && along > 0f && Mathf.Abs(lateral) < SpawnRadius * 1.75f)
+                        lateral = Mathf.Sign(lateral) * SpawnRadius * 1.75f;
+                    center = _arcPoints[0] + right * lateral + forward * along;
+                }
+                else
+                {
+                    int index = i - takeoffClouds;
+                    int station = index / 3;
+                    int band = index % 3;
+                    float progress = Mathf.Clamp01((station + CloudRange(0f, 0.66f)) / stations) * 0.9f;
+                    int routeIndex = Mathf.RoundToInt(progress * (_arcPoints.Count - 1));
+                    center = _arcPoints[routeIndex] + forward * CloudRange(-28f, 28f);
+                    if (band == 2)
+                    {
+                        center += right * CloudRange(-75f, 75f);
+                        height += CloudRange(36f, 78f);
+                    }
+                    else
+                    {
+                        float distance = distant ? CloudRange(DistantMinDist, DistantMaxDist)
+                            : SpawnRadius * CloudRange(0.9f, 1.95f);
+                        center += right * distance * (band == 0 ? -1f : 1f);
+                    }
+                }
+
+                center += _scenicSeatOffset + Vector3.up * height;
+                float opacity = CloudOpacity * (distant ? 0.8f : 0.72f);
+                EmitCloudCluster(system, center, size, opacity);
+            }
+        }
+
+        private float CloudRange(float min, float max) => Mathf.Lerp(min, max, (float)_random.NextDouble());
 
         /// <summary>
         /// 在指定【飞行进度】处撒一团云。预撒专用：可按进度精确控制密度分布
@@ -822,9 +930,13 @@ namespace Greatwall.Flight
             float h = Mathf.Lerp(HeightRangeMin, HeightRangeMax, (float)_random.NextDouble());
             Vector3 center = basePos + new Vector3(
                 Mathf.Cos(ang) * dist, h, Mathf.Sin(ang) * dist);
+            EmitCloudCluster(_system, center, sizeMul, CloudOpacity);
+        }
 
-            float clusterR = CloudSize * 0.30f;
-            Color col = new Color(1f, 1f, 1f, CloudOpacity);
+        private void EmitCloudCluster(ParticleSystem system, Vector3 center, float sizeMul, float opacity)
+        {
+            float clusterR = CloudSize * 0.30f * Mathf.Min(1f, sizeMul);
+            Color col = new Color(1f, 1f, 1f, opacity);
             for (int i = 0; i < ParticlesPerCloud; i++)
             {
                 float rr = clusterR * Mathf.Pow((float)_random.NextDouble(), 0.5f);
@@ -835,7 +947,7 @@ namespace Greatwall.Flight
                     rr * Mathf.Cos(b) * 0.55f,
                     rr * Mathf.Sin(b) * Mathf.Sin(a));
 
-                _system.Emit(new ParticleSystem.EmitParams
+                system.Emit(new ParticleSystem.EmitParams
                 {
                     position = center + off,
                     startSize = CloudSize * sizeMul

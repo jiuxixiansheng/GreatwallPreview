@@ -876,6 +876,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   inputActions: {fileID: -944628639613478452, guid: c348712bda248c246b8c49b3db54643f, type: 3}
+  enableDebugButtons: 0
   actionMapName: XRI Right Interaction
   primaryButtonActionName: Right Primary Button
   onPrimaryPressed:
@@ -974,6 +975,8 @@ MonoBehaviour:
   playerCollider: {fileID: 6364434178339178241}
   localAvatarMeshes:
   - {fileID: 6368932251612906524}
+  - {fileID: 7893750732572474512}
+  avatarVisual: {fileID: 9063231102879647743}
   localOnlyObjects:
   - {fileID: 461380627857764997}
 --- !u!114 &7657332536989105028
@@ -985,7 +988,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 1872175024373908918}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a553cb17010b2403e8523b558bffbc14, type: 3}
+  m_Script: {fileID: 11500000, guid: 6a25b531fe954ecbad7e565e6e653d2f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   syncMethod: 0
@@ -1020,7 +1023,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 1872175024373908918}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a553cb17010b2403e8523b558bffbc14, type: 3}
+  m_Script: {fileID: 11500000, guid: 6a25b531fe954ecbad7e565e6e653d2f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   syncMethod: 0
@@ -1124,6 +1127,11 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 57e8a1c7727dbb0418392605536fad1f, type: 3}
+--- !u!23 &7893750732572474512 stripped
+MeshRenderer:
+  m_CorrespondingSourceObject: {fileID: 6484037917162457168, guid: 57e8a1c7727dbb0418392605536fad1f, type: 3}
+  m_PrefabInstance: {fileID: 3780721680399725760}
+  m_PrefabAsset: {fileID: 0}
 --- !u!4 &9063231102879647743 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 5309958352933892927, guid: 57e8a1c7727dbb0418392605536fad1f, type: 3}

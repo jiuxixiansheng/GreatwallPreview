@@ -14,7 +14,7 @@ public struct GameplayRequestMessage : NetworkMessage
 public struct GameplayVisualState
 {
     public bool distanceSet, restoreSet;
-    public bool disappearQueueApplied;
+    public bool disappearQueueApplied, buildQueueApplied;
     public float distance, restore;
     public int shadows;
 }
@@ -24,6 +24,14 @@ public struct GameplayAnimatorParameter
     public int hash;
     public bool isBool, boolValue;
     public float floatValue;
+}
+
+public struct GameplayDragonBoardingState
+{
+    public double boardAt;
+    public Vector3 padPosition;
+    public bool alignToOpeningHead;
+    public Vector3 openingHeadPosition;
 }
 
 public struct GameplaySnapshotMessage : NetworkMessage
@@ -40,4 +48,5 @@ public struct GameplaySnapshotMessage : NetworkMessage
     public Vector3 characterPosition;
     public Quaternion characterRotation;
     public GameplayAnimatorParameter[] parameters;
+    public GameplayDragonBoardingState dragonBoarding;
 }

@@ -1,30 +1,51 @@
-using UnityEngine;
+ï»¿using UnityEngine;
 using UnityEngine.Rendering;
+using System.Collections;
+using System.Collections.Generic;
 
 [ExecuteAlways]
 public class BuildUpController : MonoBehaviour
 {
     private static readonly int DistanceId = Shader.PropertyToID("_distance");
 
-    [Header("×é¼şÒıÓÃ")]
-    [Tooltip("Èç¹ûÁô¿Õ£¬½Å±¾»á×Ô¶¯×¥È¡µ±Ç°ÎïÌå¼°ÆäËùÓĞ×ÓÎïÌåÉíÉÏµÄËùÓĞ Renderer")]
+    [Header("ç»„ä»¶å¼•ç”¨")]
+    [Tooltip("å¦‚æœç•™ç©ºï¼Œè„šæœ¬ä¼šè‡ªåŠ¨æŠ“å–å½“å‰ç‰©ä½“åŠå…¶æ‰€æœ‰å­ç‰©ä½“èº«ä¸Šçš„æ‰€æœ‰ Renderer")]
     public Renderer[] houseRenderers;
 
-    [Header("Shader ²ÎÊı")]
+    [Header("Shader å‚æ•°")]
     [Range(0f, 1.01f)]
     public float distance = 0f;
 
-    [Header("¶¯»­ÅäÖÃ")]
+    [Header("åŠ¨ç”»é…ç½®")]
     public float startDistance = 0f;
     public float endDistance = 1.01f;
     public float duration = 4f;
 
-    [Header("ÒõÓ°Í¶Éä")]
+    [Header("é˜´å½±æŠ•å°„")]
     [SerializeField] private bool castShadows = true;
+
+    [Header("å‡ºç°å®Œæˆåçš„æ¸²æŸ“é˜Ÿåˆ—")]
+    [Tooltip("å‡ºåœºå®Œæˆååˆ‡æ¢ï¼Œé‡æ–°æ’­æ”¾æ—¶æ¢å¤åŸé˜Ÿåˆ—ã€‚åªä¿®æ”¹è¿è¡Œæ—¶æè´¨å‰¯æœ¬ã€‚")]
+    [SerializeField] private bool changeRenderQueueOnComplete;
+    [Tooltip("2450 åœ¨ç©å®¶é€æ˜æ·±åº¦é¢„é€šé“ä¹‹å‰ç»˜åˆ¶ï¼Œé¿å…åŠé€æ˜ç©å®¶æŒ–ç©ºèº«åçš„å°æ¥¼ã€‚")]
+    [SerializeField, Range(-1, 5000)] private int renderQueueAfterAppearance = 2450;
+    [SerializeField, Min(0f)] private float renderQueueChangeDelay;
+
+    public bool IsRenderQueueApplied { get; private set; }
+    private Coroutine queueChangeRoutine;
+    private sealed class QueueMaterials
+    {
+        public Renderer renderer;
+        public Material[] originals;
+        public Material[] instances;
+    }
+    private readonly Dictionary<Renderer, QueueMaterials> queueMaterials =
+        new Dictionary<Renderer, QueueMaterials>();
 
     private bool isPlaying = false;
     private float elapsedTime = 0f;
     private MaterialPropertyBlock propBlock;
+    private EventDispatcher eventDispatcher;
 
     private void OnEnable()
     {
@@ -32,14 +53,22 @@ public class BuildUpController : MonoBehaviour
         UpdateShaderProperties();
         ApplyShadowCasting();
 
-        EventDispatcher.Instance.AddListener("ĞŞ¸´Ğ¡Â¥", AnimateAppearance);
-        EventDispatcher.Instance.AddListener("ÇĞ»»ÒõÓ°Í¶Éä×´Ì¬", ToggleShadowCasting);
+        eventDispatcher = EventDispatcher.Instance;
+        eventDispatcher.AddListener("ä¿®å¤å°æ¥¼", AnimateAppearance);
+        eventDispatcher.AddListener("åˆ‡æ¢é˜´å½±æŠ•å°„çŠ¶æ€", ToggleShadowCasting);
     }
 
     private void OnDisable()
     {
-        EventDispatcher.Instance.RemoveListener("ĞŞ¸´Ğ¡Â¥", AnimateAppearance);
-        EventDispatcher.Instance.RemoveListener("ÇĞ»»ÒõÓ°Í¶Éä×´Ì¬", ToggleShadowCasting);
+        CancelQueueChange();
+        SetRenderQueueApplied(false);
+        // Do not recreate a dispatcher while its scene is being unloaded.
+        if (eventDispatcher != null)
+        {
+            eventDispatcher.RemoveListener("ä¿®å¤å°æ¥¼", AnimateAppearance);
+            eventDispatcher.RemoveListener("åˆ‡æ¢é˜´å½±æŠ•å°„çŠ¶æ€", ToggleShadowCasting);
+        }
+        eventDispatcher = null;
     }
 
     private void OnValidate()
@@ -71,9 +100,11 @@ public class BuildUpController : MonoBehaviour
         }
     }
 
-    [ContextMenu("²¥·Å³öÏÖ¶¯»­")]
+    [ContextMenu("æ’­æ”¾å‡ºç°åŠ¨ç”»")]
     public void AnimateAppearance()
     {
+        CancelQueueChange();
+        SetRenderQueueApplied(false);
         elapsedTime = 0f;
         distance = startDistance;
         isPlaying = true;
@@ -81,7 +112,7 @@ public class BuildUpController : MonoBehaviour
         UpdateShaderProperties();
     }
 
-    [ContextMenu("ÇĞ»»ÒõÓ°Í¶Éä")]
+    [ContextMenu("åˆ‡æ¢é˜´å½±æŠ•å°„")]
     private void ToggleShadowCasting()
     {
         castShadows = !castShadows;
@@ -109,10 +140,84 @@ public class BuildUpController : MonoBehaviour
             {
                 distance = endDistance;
                 isPlaying = false;
+                OnAppearanceCompleted();
             }
         }
 
         UpdateShaderProperties();
+    }
+
+    private void OnAppearanceCompleted()
+    {
+        if (!Application.isPlaying || NetworkGameplayCoordinator.IsFollower || !changeRenderQueueOnComplete) return;
+        if (renderQueueChangeDelay <= 0f) SetRenderQueueApplied(true);
+        else queueChangeRoutine = StartCoroutine(ChangeQueueAfterDelay());
+    }
+
+    private IEnumerator ChangeQueueAfterDelay()
+    {
+        yield return new WaitForSeconds(renderQueueChangeDelay);
+        queueChangeRoutine = null;
+        SetRenderQueueApplied(changeRenderQueueOnComplete);
+    }
+
+    private void CancelQueueChange()
+    {
+        if (queueChangeRoutine == null) return;
+        StopCoroutine(queueChangeRoutine);
+        queueChangeRoutine = null;
+    }
+
+    // The host publishes the completed state; late joiners do not replay the delay.
+    public void ApplyNetworkRenderQueue(bool applied)
+    {
+        if (!Application.isPlaying) return;
+        CancelQueueChange();
+        SetRenderQueueApplied(changeRenderQueueOnComplete && applied);
+    }
+
+    private void SetRenderQueueApplied(bool applied)
+    {
+        if (IsRenderQueueApplied == applied) return;
+        IsRenderQueueApplied = applied;
+        if (!applied)
+        {
+            foreach (var entry in queueMaterials.Values)
+                if (entry.renderer != null) entry.renderer.sharedMaterials = entry.originals;
+            return;
+        }
+
+        Initialize();
+        foreach (Renderer r in houseRenderers)
+        {
+            if (r == null) continue;
+            if (!queueMaterials.TryGetValue(r, out var entry))
+            {
+                Material[] originals = r.sharedMaterials;
+                var instances = new Material[originals.Length];
+                for (int i = 0; i < originals.Length; i++)
+                    if (originals[i] != null) instances[i] = new Material(originals[i]);
+                entry = new QueueMaterials { renderer = r, originals = originals, instances = instances };
+                queueMaterials.Add(r, entry);
+            }
+            foreach (Material material in entry.instances)
+                if (material != null) material.renderQueue = renderQueueAfterAppearance;
+            r.sharedMaterials = entry.instances;
+        }
+    }
+
+    private void OnDestroy()
+    {
+        CancelQueueChange();
+        SetRenderQueueApplied(false);
+        foreach (var entry in queueMaterials.Values)
+            foreach (Material material in entry.instances)
+            {
+                if (material == null) continue;
+                if (Application.isPlaying) Destroy(material);
+                else DestroyImmediate(material);
+            }
+        queueMaterials.Clear();
     }
 
     private void UpdateShaderProperties()

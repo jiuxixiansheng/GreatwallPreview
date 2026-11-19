@@ -112,6 +112,12 @@ namespace Greatwall.Flight
         [Tooltip("收到 Timeline 的变身信号后，大龙延迟多少秒开始显现。")]
         [Min(0f)] public float OpeningDragonRevealDelay = 1f;
 
+        [Header("骑龙配乐")]
+        [SerializeField] private AudioClip rideMusic;
+        [SerializeField, Range(0f, 1f)] private float rideMusicVolume = 0.5f;
+        [Tooltip("骑龙音乐在画面全黑前多少秒开始淡出。")]
+        [SerializeField, Min(0.1f)] private float rideMusicFadeSeconds = 4f;
+
         private bool _preparing;
         private bool _transitionRequested;
         private double _transitionStartTime;
@@ -127,6 +133,8 @@ namespace Greatwall.Flight
 
         private bool _started;
         private bool _everMounted;
+        private FlightLandscape _landscape;
+        private AudioSource _rideMusicSource;
         private DragonRideController _rider;
         private bool _riderWarned;
         private XRDeviceSimulator _simulator;
@@ -136,11 +144,11 @@ namespace Greatwall.Flight
 
         private void Awake()
         {
+            _landscape = GetComponent<FlightLandscape>();
             if (Gate == null) Gate = GetComponent<DragonBoardingGate>();
             if (RideDragon == null) RideDragon = FindSceneTransform("骑龙飞上天空");
             if (StoryDragon == null) StoryDragon = FindSceneTransform("Dragon_root");
             if (ChapterDirector == null) ChapterDirector = FindSceneDirector(ChapterDirectorName);
-            _rider = FindFirstObjectByType<DragonRideController>(FindObjectsInactive.Include);
 
             if (ChapterDirector == null)
                 Debug.LogWarning($"[FlightStage] 没找到章节导演 '{ChapterDirectorName}'，只按章节索引触发。", this);
@@ -150,10 +158,12 @@ namespace Greatwall.Flight
         {
             _eventDispatcher = EventDispatcher.Instance;
             _eventDispatcher.AddListener<float>("小龙特效转场", HandleTransformationSignal);
+            Gate?.onBoarded?.AddListener(PlayRideMusic);
         }
 
         private void OnDisable()
         {
+            Gate?.onBoarded?.RemoveListener(PlayRideMusic);
             if (_eventDispatcher != null)
                 _eventDispatcher.RemoveListener<float>("小龙特效转场", HandleTransformationSignal);
             _eventDispatcher = null;
@@ -201,12 +211,53 @@ namespace Greatwall.Flight
                 if (_everMounted && _rider.Director != null
                     && _rider.Director.CurrentPhase == FlightPhase.WaitingForPlayers)
                 {
+                    if (_rideMusicSource != null) _rideMusicSource.Stop();
                     HideRideDragonAfterFlight();
                     SetBackdropPartActive(true);
                 }
 
                 TransferSimulatorOffsetToRig();
             }
+        }
+
+        private void LateUpdate()
+        {
+            if (!_started) return;
+            var director = _rider != null ? _rider.Director : null;
+            UpdateRideMusic(director);
+
+            if (_landscape == null) return;
+            if (director != null && _rider.IsMounted && _rider.SeatAnchor != null)
+                _landscape.Show(_rider.SeatAnchor.SeatWorldPosition, director.ScenicFlightTime);
+            else
+                _landscape.Hide();
+        }
+
+        private void PlayRideMusic()
+        {
+            if (rideMusic == null) return;
+            if (_rideMusicSource == null)
+            {
+                _rideMusicSource = gameObject.AddComponent<AudioSource>();
+                _rideMusicSource.playOnAwake = false;
+                _rideMusicSource.spatialBlend = 0f;
+                _rideMusicSource.clip = rideMusic;
+            }
+
+            _rideMusicSource.volume = rideMusicVolume;
+            _rideMusicSource.Play();
+        }
+
+        private void UpdateRideMusic(FlightDirector director)
+        {
+            if (_rideMusicSource == null || !_rideMusicSource.isPlaying || director == null
+                || director.CurrentPhase == FlightPhase.WaitingForPlayers) return;
+
+            float blackoutTime = director.EndingPhaseStartTime + Mathf.Max(0f, director.FadeOutDuration);
+            float remaining = blackoutTime - director.ScenicFlightTime;
+            float gain = Mathf.SmoothStep(0f, 1f, Mathf.Clamp01(remaining / Mathf.Max(0.1f, rideMusicFadeSeconds)));
+            _rideMusicSource.volume = rideMusicVolume * gain;
+            if (remaining <= 0f) _rideMusicSource.Stop();
         }
 
         private void HideRideDragonAfterFlight()
@@ -225,12 +276,23 @@ namespace Greatwall.Flight
         {
             if (_rider != null) return _rider;
 
-            Camera cam = Camera.main;
-            Transform rig = cam != null ? cam.transform.root : null;
+            bool networked = Mirror.NetworkClient.active || Mirror.NetworkServer.active;
+            Transform rig;
+            if (networked)
+            {
+                var localPlayer = Mirror.NetworkClient.localPlayer;
+                if (localPlayer == null) return null;
+                rig = localPlayer.transform;
+            }
+            else
+            {
+                Camera cam = Camera.main;
+                rig = cam != null ? cam.transform.root : null;
+            }
 
-            // 优先认本机镜头所在的 rig，避免多人时误抓远端玩家的控制器
             var rider = rig != null ? rig.GetComponent<DragonRideController>() : null;
-            if (rider == null) rider = FindFirstObjectByType<DragonRideController>(FindObjectsInactive.Include);
+            if (rider == null && !networked)
+                rider = FindFirstObjectByType<DragonRideController>(FindObjectsInactive.Include);
             if (rider == null)
             {
                 if (rig == null) return null;   // 玩家 rig 还没生成（联机 host/client 尚未就绪）
@@ -262,6 +324,7 @@ namespace Greatwall.Flight
             }
 
             _rider = rider;
+            if (Gate != null) Gate.Rider = rider;
             return _rider;
         }
 
@@ -314,6 +377,7 @@ namespace Greatwall.Flight
             ApplyCloudOverrides();
             PlaceRideDragon();
             SpawnOpeningDragon();
+            _landscape?.Prepare();
         }
 
         private void HandleTransformationSignal(float duration)
@@ -372,6 +436,8 @@ namespace Greatwall.Flight
 
         private void ResetSegment()
         {
+            _landscape?.Hide();
+            if (_rideMusicSource != null) _rideMusicSource.Stop();
             if (Gate != null && _preparing)
             {
                 Gate.OpeningDragon = null;

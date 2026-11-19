@@ -253,6 +253,36 @@ namespace Greatwall.Flight
         [SyncVar]
         public int NetSeatedCount = 0;
 
+        [SyncVar]
+        private double _networkLaunchTime;
+
+        internal float ScenicFlightTime
+        {
+            get
+            {
+                if (CurrentPhase == FlightPhase.WaitingForPlayers) return 0f;
+                if (IsLocalAuthority) return Keyframes != null ? _keyTime : Time.time - _localLaunchTime;
+                if (_networkLaunchTime <= 0d) return 0f;
+                float elapsed = Mathf.Max(0f, (float)(NetworkTime.time - _networkLaunchTime));
+                return Keyframes != null ? Mathf.Min(elapsed, Keyframes.totalTime) : elapsed;
+            }
+        }
+
+        internal float ScenicDepartureHeading
+        {
+            get
+            {
+                float heading = transform.eulerAngles.y;
+                var frames = Keyframes != null ? Keyframes.frames : null;
+                if (frames == null || frames.Count < 2) return heading;
+                Vector3 travel = frames[frames.Count - 1].pos - frames[0].pos;
+                if (travel.x * travel.x + travel.z * travel.z < 0.01f) return heading;
+                return heading - frames[0].yaw + Mathf.Atan2(travel.x, travel.z) * Mathf.Rad2Deg;
+            }
+        }
+
+        internal Vector3 CurrentRouteOrigin => GetVisualCenter();
+
         // ---------------- 运行时 ----------------
 
         /// <summary>
@@ -269,6 +299,7 @@ namespace Greatwall.Flight
 
         /// <summary>K 帧驱动的全局时间（秒）</summary>
         private float _keyTime;
+        private float _localLaunchTime;
 
         // ★ 轨迹原点偏移：K 帧表里烘焙的是「设计时的绝对世界坐标」。
         //   如果龙在起飞前被摆到了别处（例如盘悬浮段落把它放到城墙外），
@@ -295,6 +326,20 @@ namespace Greatwall.Flight
         private float DepartureEnd => Keyframes != null
             ? Keyframes.departureEnd
             : TakeOffDuration + OrbitDuration + DepartureDuration;
+
+        internal float EndingPhaseStartTime
+        {
+            get
+            {
+                if (Keyframes == null || Keyframes.frames == null || Keyframes.frames.Count <= 1)
+                    return DepartureEnd;
+
+                // Begin the blackout before the last keyed pose.
+                return Mathf.Max(OrbitEnd, Mathf.Min(DepartureEnd,
+                    Keyframes.totalTime - Mathf.Max(0.3f, FadeOutDuration) - 0.2f));
+            }
+        }
+
         private float _takeOffElapsed;
 
         /// <summary>平滑后的实际角速度（度/秒），避免阶段切换时突跳</summary>
@@ -599,19 +644,6 @@ namespace Greatwall.Flight
         {
             float t = _keyTime;
 
-            // ★ 轨迹末端保护（黑场前移）：Ending 必须在龙动画停止前
-            //   FadeOutDuration + 0.2s 就触发——否则动画停在最后一帧、
-            //   黑场才刚开始淡出，出现一段"龙静止"的空窗（观感差）。
-            //   提前淡出后，动画停止瞬间画面已基本全黑。
-            float endingAt = DepartureEnd;
-            if (Keyframes != null && Keyframes.frames != null
-                && Keyframes.frames.Count > 1)
-            {
-                endingAt = Mathf.Min(DepartureEnd,
-                    Keyframes.totalTime
-                    - Mathf.Max(0.3f, FadeOutDuration) - 0.2f);
-            }
-
             if (t < TakeOffEnd)
             {
                 if (CurrentPhase != FlightPhase.TakeOff)
@@ -622,7 +654,7 @@ namespace Greatwall.Flight
                 if (CurrentPhase != FlightPhase.Orbit)
                     SetPhase(FlightPhase.Orbit);
             }
-            else if (t < endingAt)
+            else if (t < EndingPhaseStartTime)
             {
                 if (CurrentPhase != FlightPhase.Departure)
                     SetPhase(FlightPhase.Departure);
@@ -1058,6 +1090,8 @@ namespace Greatwall.Flight
 
         private void LaunchNow(int expected)
         {
+            _localLaunchTime = Time.time;
+            if (isServer) _networkLaunchTime = NetworkTime.time;
             _launched = true;
             _phaseTimer = 0f;
             _phaseStartPos = GetVisualCenter();
@@ -1094,6 +1128,7 @@ namespace Greatwall.Flight
 
             _launched = false;
             _keyTime = 0f;
+            if (isServer) _networkLaunchTime = 0d;
             _phaseTimer = 0f;
             NetSeatedCount = 0;
             _localPhase = FlightPhase.WaitingForPlayers;

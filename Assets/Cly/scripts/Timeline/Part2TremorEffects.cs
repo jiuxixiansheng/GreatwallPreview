@@ -21,6 +21,7 @@ namespace Greatwall.VRAnimation.Timeline
         [SerializeField] private DecalProjector[] cracks;
         [SerializeField] private ParticleSystem smokePrefab;
         [SerializeField] private SignalAsset revealSignal;
+        [SerializeField] private Material repairHintOverlayMaterial;
 
         private readonly List<ParticleSystem> smoke = new List<ParticleSystem>();
         private PlayableDirector director;
@@ -35,6 +36,7 @@ namespace Greatwall.VRAnimation.Timeline
         private float shakeMeters;
         private Canvas repairHint;
         private float repairHintUntil;
+        private bool repairPromptGlowing;
 
         private void Awake()
         {
@@ -65,6 +67,7 @@ namespace Greatwall.VRAnimation.Timeline
             StopShake();
             ClearSmoke();
             ClearRepairHint();
+            repairPromptGlowing = false;
             SetCracksVisible(true);
         }
 
@@ -73,6 +76,7 @@ namespace Greatwall.VRAnimation.Timeline
             StopShake();
             ClearSmoke();
             ClearRepairHint();
+            repairPromptGlowing = false;
             SetCracksVisible(false);
         }
 
@@ -164,7 +168,6 @@ namespace Greatwall.VRAnimation.Timeline
         {
             if (!Application.isPlaying || !isActiveAndEnabled || revealed) return;
             SetCracksVisible(true);
-            repairHintUntil = Time.unscaledTime + RepairHintSeconds;
             // 迟加入或跳到后面的玩家也要看见裂缝，但不补播旧烟雾。
             if (smokePrefab == null || director.time - revealTime > 1d) return;
 
@@ -186,6 +189,14 @@ namespace Greatwall.VRAnimation.Timeline
                 smoke.Add(puff);
                 puff.Play();
             }
+        }
+
+        public void SetRepairPromptGlowing(bool glowing)
+        {
+            if (!Application.isPlaying || !isActiveAndEnabled || repairPromptGlowing == glowing) return;
+            repairPromptGlowing = glowing;
+            if (glowing)
+                repairHintUntil = Time.unscaledTime + RepairHintSeconds;
         }
 
         private void UpdateRepairHint()
@@ -233,6 +244,8 @@ namespace Greatwall.VRAnimation.Timeline
 
             var text = label.GetComponent<Text>();
             text.font = font;
+            // 只让这条提示忽略场景深度，保留头显跟随和双眼渲染。
+            text.material = repairHintOverlayMaterial;
             text.text = "靠近裂缝，\n扣动扳机开始修复";
             text.fontSize = 40;
             text.alignment = TextAnchor.MiddleCenter;

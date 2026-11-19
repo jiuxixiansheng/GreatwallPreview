@@ -13,7 +13,7 @@ namespace Sza.Telescope
     {
         public uint revision;
         public double startTime;
-        public bool active;
+        public bool active, interactionUnlocked;
     }
 
     /// <summary>Lives on NetworkManager. Video frames are local; only start time is networked.</summary>
@@ -49,9 +49,11 @@ namespace Sza.Telescope
         private TelescopeStateMessage pending;
         private bool hasPending;
         private bool waitingForVideo;
+        private bool interactionUnlocked;
 
         public bool IsViewing => view != null && view.IsViewing;
-        public bool CanInteract => interaction != null && interaction.IsAvailable && videoClip != null &&
+        public bool IsInteractionUnlocked => interactionUnlocked;
+        public bool CanInteract => interactionUnlocked && interaction != null && interaction.IsAvailable && videoClip != null &&
             !IsViewing && !hasPending && !(playOnce && hasPlayed) &&
             !(NetworkServer.active && NetworkTime.time < serverEnd);
 
@@ -93,6 +95,8 @@ namespace Sza.Telescope
                     view.StopViewing();
                     hasPending = hasPlayed = false;
                     waitingForVideo = false;
+                    interactionUnlocked = false;
+                    if (interaction != null) interaction.RefreshPrompt();
                     acceptedRevision = serverRevision = 0;
                     serverStart = serverEnd = 0d;
                     initializedConnections.Clear();
@@ -158,6 +162,19 @@ namespace Sza.Telescope
                 !CanControlWaitingTimeline() || hasPlayed) return;
             waitingForVideo = true;
             SetWaitingTimelinePlayback(false);
+            interactionUnlocked = true;
+            if (NetworkServer.active) NetworkServer.SendToAll(CurrentState(), Channels.Reliable, true);
+            if (interaction != null) interaction.RefreshPrompt();
+        }
+
+        // Leaving the telescope/chapter closes the gate until the next authoritative wait signal.
+        public void ResetInteractionGate()
+        {
+            bool changed = interactionUnlocked;
+            interactionUnlocked = waitingForVideo = false;
+            if (interaction != null) interaction.RefreshPrompt();
+            if (changed && NetworkServer.active)
+                NetworkServer.SendToAll(CurrentState(), Channels.Reliable, true);
         }
 
         private void ResumeWaitingTimeline()
@@ -181,7 +198,7 @@ namespace Sza.Telescope
             var coordinator = NetworkGameplayCoordinator.Instance;
             if (NetworkServer.active && coordinator != null && coordinator.isActiveAndEnabled)
                 coordinator.HandleTimelineSignal(waitingTimeline, play);
-            else if (!NetworkClient.active)
+            else if (!NetworkClient.active || NetworkServer.active)
             {
                 if (coordinator != null && coordinator.isActiveAndEnabled && coordinator.story != null)
                     coordinator.story.SetNetworkPlayback(play);
@@ -193,6 +210,7 @@ namespace Sza.Telescope
         private TelescopeStateMessage CurrentState() => new TelescopeStateMessage
         {
             revision = serverRevision, startTime = serverStart,
+            interactionUnlocked = interactionUnlocked,
             active = videoClip != null && serverRevision != 0 && NetworkTime.time < serverStart + videoClip.length
         };
 
@@ -204,9 +222,18 @@ namespace Sza.Telescope
 
         private void OnState(TelescopeStateMessage message)
         {
-            if (message.revision == 0 || message.revision <= acceptedRevision) return;
+            if (message.revision < acceptedRevision) return;
+            // Gate changes must be applied even before the first video (revision == 0),
+            // and on queries/late joins that repeat an existing playback revision.
+            interactionUnlocked = message.interactionUnlocked;
+            if (message.revision == 0 || message.revision == acceptedRevision)
+            {
+                if (interaction != null) interaction.RefreshPrompt();
+                return;
+            }
             acceptedRevision = message.revision;
             hasPlayed = true;
+            if (interaction != null) interaction.RefreshPrompt();
             if (!message.active || videoClip == null ||
                 NetworkTime.time >= message.startTime + videoClip.length) return;
             if (LocalCamera == null) { pending = message; hasPending = true; }
@@ -223,6 +250,7 @@ namespace Sza.Telescope
 
         private void OnDisable()
         {
+            ResetInteractionGate();
             if (view != null) view.StopViewing();
         }
 

@@ -20,6 +20,9 @@ public sealed class NetworkGameplayCoordinator : MonoBehaviour
     public bool DragonTransformationCompleted { get; private set; }
     public double DragonTransformationTimelineTime { get; private set; }
     public float DragonTransformationDuration { get; private set; }
+    public GameplayDragonBoardingState DragonBoarding { get; private set; }
+
+    private const double DragonBoardingNetworkLead = 0.35d;
 
     public void RecordDragonTransformation(float duration)
     {
@@ -38,8 +41,21 @@ public sealed class NetworkGameplayCoordinator : MonoBehaviour
         Broadcast();
     }
 
-    private void ResetDragonTransformation()
+    public void ScheduleDragonBoarding(GameplayDragonBoardingState boarding)
     {
+        if (!NetworkServer.active || !serverInitialized || story == null ||
+            story.IsTransitionPending || !DragonTransformationCompleted || DragonBoarding.boardAt > 0d)
+            return;
+
+        // Leave time for the reliable snapshot to reach the peers before they mount.
+        boarding.boardAt = NetworkTime.time + DragonBoardingNetworkLead;
+        DragonBoarding = boarding;
+        Broadcast();
+    }
+
+    private void ResetDragonSequence()
+    {
+        DragonBoarding = default;
         DragonTransformationStarted = false;
         DragonTransformationCompleted = false;
         DragonTransformationTimelineTime = 0d;
@@ -153,6 +169,7 @@ public sealed class NetworkGameplayCoordinator : MonoBehaviour
     {
         NetworkServer.ReplaceHandler<GameplayRequestMessage>(OnRequest);
         NetworkClient.ReplaceHandler<GameplaySnapshotMessage>(OnSnapshot);
+        Greatwall.CannonGame.CannonNetwork.RegisterHandlers();
     }
 
     private void Update()
@@ -162,6 +179,7 @@ public sealed class NetworkGameplayCoordinator : MonoBehaviour
             RegisterMessages();
             if (!NetworkServer.active) serverInitialized = false;
             if (!NetworkClient.active) { hasSnapshot = false; acceptedSequence = 0; mismatchReported = false;
+                if (!NetworkServer.active) ResetDragonSequence();
                 if (locomotion != null) locomotion.enabled = locomotionWasEnabled; }
             previousServer = NetworkServer.active;
             previousClient = NetworkClient.active;
@@ -172,7 +190,7 @@ public sealed class NetworkGameplayCoordinator : MonoBehaviour
             for (int i = 0; i < serverSolved.Length; i++) serverSolved[i] = brickZones[i] != null && brickZones[i].IsSolved;
             requestTimes.Clear();
             sequence = 0;
-            ResetDragonTransformation();
+            ResetDragonSequence();
             RunServerAction(() => story.InitializeNetworkChapter());
         }
         if (IsFollower && NetworkClient.isConnected && NetworkClient.localPlayer != null &&
@@ -319,7 +337,7 @@ public sealed class NetworkGameplayCoordinator : MonoBehaviour
         if (kind == GameplayRequestKind.Chapter)
         {
             if (argument < 0 || argument >= story.ChapterCount || story.IsTransitionPending) return;
-            if (argument != story.CurrentChapterIndex) ResetDragonTransformation();
+            if (argument != story.CurrentChapterIndex) ResetDragonSequence();
             RunServerAction(() => story.SwitchToChapterByIndex(argument));
         }
         else if (!story.IsTransitionPending && kind == GameplayRequestKind.Pause)
@@ -356,6 +374,7 @@ public sealed class NetworkGameplayCoordinator : MonoBehaviour
             visuals[i] = new GameplayVisualState {
                 distanceSet = distance, restoreSet = restore, shadows = (int)r.shadowCastingMode,
                 disappearQueueApplied = disappearOwners[i] != null && disappearOwners[i].IsRenderQueueApplied,
+                buildQueueApplied = buildOwners[i] != null && buildOwners[i].IsRenderQueueApplied,
                 distance = block.HasFloat(DistanceId) ? block.GetFloat(DistanceId) : distance ? material.GetFloat(DistanceId) : 0,
                 restore = block.HasFloat(RestoreId) ? block.GetFloat(RestoreId) : restore ? material.GetFloat(RestoreId) : 0
             };
@@ -381,7 +400,8 @@ public sealed class NetworkGameplayCoordinator : MonoBehaviour
             dragonTransformationStarted = DragonTransformationStarted,
             dragonTransformationCompleted = DragonTransformationCompleted,
             dragonTransformationTimelineTime = DragonTransformationTimelineTime,
-            dragonTransformationDuration = DragonTransformationDuration
+            dragonTransformationDuration = DragonTransformationDuration,
+            dragonBoarding = DragonBoarding
         };
     }
 
@@ -405,6 +425,7 @@ public sealed class NetworkGameplayCoordinator : MonoBehaviour
         DragonTransformationCompleted = message.dragonTransformationCompleted;
         DragonTransformationTimelineTime = message.dragonTransformationTimelineTime;
         DragonTransformationDuration = message.dragonTransformationDuration;
+        DragonBoarding = message.dragonBoarding;
         applyingSnapshot = true;
         try
         {
@@ -446,7 +467,11 @@ public sealed class NetworkGameplayCoordinator : MonoBehaviour
             r.SetPropertyBlock(block);
             r.shadowCastingMode = (UnityEngine.Rendering.ShadowCastingMode)v.shadows;
             var build = buildOwners != null ? buildOwners[i] : null;
-            if (build != null && v.distanceSet) build.SetDistance(block.GetFloat(DistanceId));
+            if (build != null)
+            {
+                if (v.distanceSet) build.SetDistance(block.GetFloat(DistanceId));
+                build.ApplyNetworkRenderQueue(v.buildQueueApplied);
+            }
             var disappear = disappearOwners != null ? disappearOwners[i] : null;
             if (disappear != null && v.distanceSet) disappear.ApplyNetworkRenderQueue(v.disappearQueueApplied);
         }
@@ -458,6 +483,8 @@ public sealed class NetworkGameplayCoordinator : MonoBehaviour
         Action<string> add = value => { foreach (char c in value) hash = unchecked((hash ^ c) * 16777619); };
         add(story != null ? story.ChapterCount.ToString() : "missing-story");
         add("brick-recovery-v1");
+        add("build-queue-v1");
+        add("dragon-boarding-v1");
         foreach (var z in brickZones)
             add(z != null ? ObjectPath(z.transform) + ":" + z.targetBrickCount + ":" + z.waitForTimelineSignal : "null-zone");
         foreach (var b in bricks) add(b != null ? ObjectPath(b.transform) : "null-brick");
