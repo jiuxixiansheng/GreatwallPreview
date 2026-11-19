@@ -6,7 +6,9 @@ using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.Rendering.Universal;
 using UnityEngine.UI;
+using UnityEngine.Video;
 using UnityEngine.XR.Interaction.Toolkit;
 using UnityEngine.XR.Interaction.Toolkit.Interactors;
 using UnityEngine.XR.Interaction.Toolkit.Locomotion;
@@ -18,6 +20,8 @@ namespace Sza.Editor
     public static class MenuVisualSetup
     {
         private const string ImagePath = "Assets/sza/tex/主视觉.jpg";
+        private const string TeaserPath = "Assets/sza/video/先导片.mp4";
+        private const string MaterialPath = "Assets/sza/Rendering/Menu/MainVisual_Unlit.mat";
         private const string RigPath = "Assets/sza/prefab/Menu_VR_Viewer.prefab";
         private const string StarterRig = "Assets/Samples/XR Interaction Toolkit/3.0.10/Starter Assets/Prefabs/XR Origin (XR Rig).prefab";
 
@@ -50,24 +54,6 @@ namespace Sza.Editor
             scaler.matchWidthOrHeight = 0.5f;
             StyleButtons(desktop);
 
-            // Copy only the controls: the headset sees the six world panels behind them.
-            var vr = Object.Instantiate(desktop.gameObject).GetComponent<Canvas>();
-            vr.name = "Menu VR Canvas";
-            vr.renderMode = RenderMode.WorldSpace;
-            vr.sortingOrder = 20;
-            var vrRect = vr.GetComponent<RectTransform>();
-            vrRect.anchorMin = vrRect.anchorMax = vrRect.pivot = new Vector2(0.5f, 0.5f);
-            vrRect.sizeDelta = new Vector2(1920, 1080);
-            vrRect.SetPositionAndRotation(new Vector3(0, 1.6f, 2.5f), Quaternion.identity);
-            vrRect.localScale = Vector3.one * 0.0015f;
-            vr.GetComponent<CanvasScaler>().uiScaleMode = CanvasScaler.ScaleMode.ConstantPixelSize;
-            Object.DestroyImmediate(vr.GetComponent<GraphicRaycaster>());
-            vr.gameObject.AddComponent<TrackedDeviceGraphicRaycaster>();
-            // The desktop menu owns the connection logic; VR buttons forward to it.
-            Object.DestroyImmediate(vr.GetComponent<NetworkMainMenu>());
-            foreach (var child in vr.GetComponentsInChildren<Transform>(true)) child.gameObject.layer = 0;
-            vr.gameObject.SetActive(false);
-
             var bg = new GameObject("Main Visual Background", typeof(RectTransform), typeof(RawImage));
             bg.transform.SetParent(desktop.transform, false);
             bg.transform.SetAsFirstSibling();
@@ -82,9 +68,8 @@ namespace Sza.Editor
             var shader = Shader.Find("Universal Render Pipeline/Unlit");
             if (shader == null) throw new InvalidOperationException("缺少 URP Unlit Shader。");
             if (!AssetDatabase.IsValidFolder("Assets/sza/Rendering/Menu")) AssetDatabase.CreateFolder("Assets/sza/Rendering", "Menu");
-            const string materialPath = "Assets/sza/Rendering/Menu/MainVisual_Unlit.mat";
-            var material = AssetDatabase.LoadAssetAtPath<Material>(materialPath);
-            if (material == null) { material = new Material(shader); AssetDatabase.CreateAsset(material, materialPath); }
+            var material = AssetDatabase.LoadAssetAtPath<Material>(MaterialPath);
+            if (material == null) { material = new Material(shader); AssetDatabase.CreateAsset(material, MaterialPath); }
             material.SetTexture("_BaseMap", image); material.SetColor("_BaseColor", Color.white);
             material.renderQueue = 2000;
             EditorUtility.SetDirty(material); AssetDatabase.SaveAssetIfDirty(material);
@@ -111,30 +96,84 @@ namespace Sza.Editor
             var origin = rig.GetComponent<XROrigin>();
             foreach (var interactor in rig.GetComponentsInChildren<XRBaseInteractor>(true)) interactor.interactionManager = interactionManager;
             origin.Camera.enabled = false; origin.Camera.tag = "Untagged";
-            origin.Camera.cullingMask &= ~(1 << 5);
             var xrAudio = origin.Camera.GetComponent<AudioListener>(); if (xrAudio != null) xrAudio.enabled = false;
-            vr.worldCamera = origin.Camera;
-            var desktopCamera = scene.GetRootGameObjects().Select(g => g.GetComponent<Camera>()).First(c => c != null);
-            desktopCamera.stereoTargetEye = StereoTargetEyeMask.None;
-            desktopCamera.clearFlags = CameraClearFlags.SolidColor; desktopCamera.backgroundColor = Color.black;
-            desktopCamera.cullingMask = 0;
-            desktop.renderMode = RenderMode.ScreenSpaceOverlay;
-            desktop.worldCamera = null;
-            presentation.desktopCamera = desktopCamera; presentation.desktopCanvas = desktop;
-            presentation.vrCanvas = vr; presentation.vrOrigin = origin;
-            var menu = new SerializedObject(desktop.GetComponent<NetworkMainMenu>());
-            presentation.desktopHostButton = (Button)menu.FindProperty("serverButton").objectReferenceValue;
-            presentation.desktopClientButton = (Button)menu.FindProperty("clientButton").objectReferenceValue;
-            presentation.vrHostButton = vr.GetComponentsInChildren<Button>(true).First(b => b.name == presentation.desktopHostButton.name);
-            presentation.vrClientButton = vr.GetComponentsInChildren<Button>(true).First(b => b.name == presentation.desktopClientButton.name);
-            var events = Object.FindFirstObjectByType<EventSystem>();
-            foreach (var old in events.GetComponents<BaseInputModule>()) Object.DestroyImmediate(old);
-            var module = events.gameObject.AddComponent<XRUIInputModule>();
-            module.enableXRInput = true; module.enableMouseInput = true; module.enableBuiltinActionsAsFallback = true;
+            presentation.desktopCamera = scene.GetRootGameObjects().Select(g => g.GetComponent<Camera>()).First(c => c != null);
+            presentation.vrOrigin = origin;
+            ConfigureMenuPlayback(presentation);
             foreach (var light in Object.FindObjectsByType<Light>(FindObjectsSortMode.None)) light.enabled = false;
             RenderSettings.skybox = null; RenderSettings.fog = false;
             EditorSceneManager.MarkSceneDirty(scene); EditorSceneManager.SaveScene(scene);
             Selection.activeGameObject = presentation.gameObject;
+        }
+
+        public static void ConfigureMenuPlayback(MenuPresentation presentation)
+        {
+            var clip = AssetDatabase.LoadAssetAtPath<VideoClip>(TeaserPath);
+            var material = AssetDatabase.LoadAssetAtPath<Material>(MaterialPath);
+            if (clip == null || material == null)
+                throw new InvalidOperationException("缺少菜单先导片或主视觉材质。");
+
+            var roots = presentation.gameObject.scene.GetRootGameObjects();
+            var desktop = roots.First(go => go.GetComponent<NetworkMainMenu>() != null).GetComponent<Canvas>();
+            var events = roots.Select(go => go.GetComponent<EventSystem>()).First(system => system != null);
+            var desktopCamera = presentation.desktopCamera;
+            var headsetCamera = presentation.vrOrigin.Camera;
+            foreach (var root in roots)
+                if (root.name == "Menu VR Canvas") Object.DestroyImmediate(root);
+
+            // URP blits the XR mirror after the headset camera and then renders the monitor UI.
+            desktopCamera.depth = Mathf.Max(100f, headsetCamera.depth + 1f);
+            desktopCamera.enabled = true;
+            desktopCamera.stereoTargetEye = StereoTargetEyeMask.None;
+            desktopCamera.GetUniversalAdditionalCameraData().allowXRRendering = false;
+            desktopCamera.clearFlags = CameraClearFlags.SolidColor;
+            desktopCamera.backgroundColor = Color.black;
+            int desktopLayer = 1 << desktop.gameObject.layer;
+            desktopCamera.cullingMask = desktopLayer;
+            headsetCamera.cullingMask &= ~desktopLayer;
+            desktop.renderMode = RenderMode.ScreenSpaceCamera;
+            desktop.worldCamera = desktopCamera;
+            desktop.planeDistance = 1f;
+
+            var module = events.GetComponent<XRUIInputModule>();
+            if (module == null) module = events.gameObject.AddComponent<XRUIInputModule>();
+            foreach (var old in events.GetComponents<BaseInputModule>())
+                if (old != module) Object.DestroyImmediate(old);
+            events.sendNavigationEvents = false;
+            module.enableXRInput = false;
+            module.enableGamepadInput = false;
+            module.enableJoystickInput = false;
+            module.enableMouseInput = true;
+            module.enableBuiltinActionsAsFallback = true;
+
+            var screen = presentation.vrIntroScreen;
+            if (screen == null)
+            {
+                var panel = GameObject.CreatePrimitive(PrimitiveType.Quad);
+                panel.name = "先导片屏幕";
+                panel.transform.SetParent(presentation.transform, false);
+                panel.transform.localPosition = new Vector3(0f, 1.65f, 3.5f);
+                const float width = 3.6f;
+                panel.transform.localScale = new Vector3(width, width * clip.height / clip.width, 1f);
+                Object.DestroyImmediate(panel.GetComponent<Collider>());
+                screen = panel.AddComponent<MenuIntroScreen>();
+            }
+
+            var renderer = screen.GetComponent<MeshRenderer>();
+            renderer.sharedMaterial = material;
+            renderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
+            renderer.receiveShadows = false;
+            renderer.enabled = false;
+            var video = screen.GetComponent<VideoPlayer>();
+            video.playOnAwake = false;
+            video.source = VideoSource.VideoClip;
+            video.clip = clip;
+            video.isLooping = true;
+            var audio = screen.GetComponent<AudioSource>();
+            audio.playOnAwake = false;
+            audio.spatialBlend = 0f;
+            screen.gameObject.SetActive(false);
+            presentation.vrIntroScreen = screen;
         }
 
         private static GameObject CreateRig()

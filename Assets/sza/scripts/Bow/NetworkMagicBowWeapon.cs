@@ -38,6 +38,8 @@ namespace Sza.Bow
         private IXRSelectInteractor pullingHand;
         private XRBaseInteractor persistentInteractor;
         private bool originalKeepSelectedTarget;
+        private Vector3 modelRestPosition, relaxedNockInBow;
+        private Quaternion modelRestRotation;
         private Vector3 arrowNockLocal;
         private Quaternion arrowRotation;
         private MaterialPropertyBlock material;
@@ -62,6 +64,7 @@ namespace Sza.Bow
         public uint ShotsFired => shotSequence;
         public int ImpactCount { get; private set; }
         public Vector3 LastImpactPoint { get; private set; }
+        private Vector3 RelaxedNockPosition => transform.TransformPoint(relaxedNockInBow);
 
         private void Awake() => Cache();
         private void Cache()
@@ -72,6 +75,10 @@ namespace Sza.Bow
             grip = GetComponent<XRGrabInteractable>();
             networkGrab = GetComponent<NetworkGrabbable>();
             material = new MaterialPropertyBlock();
+            Transform model = bow.model.transform;
+            modelRestPosition = transform.InverseTransformPoint(model.position);
+            modelRestRotation = Quaternion.Inverse(transform.rotation) * model.rotation;
+            relaxedNockInBow = transform.InverseTransformPoint(model.TransformPoint(relaxedNock));
             var bounds = bow.arrow.GetComponent<MeshFilter>().sharedMesh.bounds;
             arrowNockLocal = new Vector3(bounds.min.x, bounds.center.y, bounds.center.z);
             arrowRotation = bow.arrow.localRotation;
@@ -124,8 +131,7 @@ namespace Sza.Bow
         public void EndPull(bool fire)
         {
             if (!localDrawing) return;
-            float distance = MeasurePull();
-            Vector2 offset = MeasureLateral();
+            MeasureDraw(out float distance, out Vector2 offset);
             localDrawing = false;
             if (persistentInteractor != null)
                 persistentInteractor.keepSelectedTargetValid = originalKeepSelectedTarget;
@@ -137,14 +143,16 @@ namespace Sza.Bow
                 grip.interactorsSelecting.Count > 0 ? grip.interactorsSelecting[0].transform.GetComponentInParent<NetworkIdentity>() : null);
             localLoaded = false;
         }
-        private float MeasurePull() => pullingHand == null ? localPull :
-            Mathf.Clamp(Vector3.Dot(bow.model.transform.TransformPoint(relaxedNock) - Hand(pullingHand).position,
-                transform.right), 0f, maximumPull);
-        private Vector2 MeasureLateral()
+        private void MeasureDraw(out float distance, out Vector2 offset)
         {
-            if (pullingHand == null) return localLateral;
-            Vector3 delta = Hand(pullingHand).position - bow.model.transform.TransformPoint(relaxedNock);
-            return Vector2.ClampMagnitude(new Vector2(Vector3.Dot(delta, transform.up),
+            distance = localPull;
+            offset = localLateral;
+            if (pullingHand == null) return;
+
+            // Measure in the grip's unsteered frame. The rendered bow rotation is an output.
+            Vector3 delta = Hand(pullingHand).position - RelaxedNockPosition;
+            distance = Mathf.Clamp(-Vector3.Dot(delta, transform.right), 0f, maximumPull);
+            offset = Vector2.ClampMagnitude(new Vector2(Vector3.Dot(delta, transform.up),
                 Vector3.Dot(delta, transform.forward)), maximumLateralPull);
         }
 
@@ -158,8 +166,7 @@ namespace Sza.Bow
                 else
                 {
                     // A held grab remains held when the hand moves sideways or beyond the visual stretch limit.
-                    localPull = MeasurePull();
-                    localLateral = MeasureLateral();
+                    MeasureDraw(out localPull, out localLateral);
                     SetLoaded(localPull, ref localLoaded, ref localRevealStart);
                     if (Time.unscaledTime >= nextSend)
                     {
@@ -213,10 +220,10 @@ namespace Sza.Bow
             bool shoot = fire && loaded && pull >= arrowThreshold && Clock >= nextShot && projectiles.Count < 8;
             if (shoot)
             {
-                // Refresh the pose before capturing the arrow; a dedicated server has no selected XRI hand.
+                // Use the final accepted draw directly, including on a server without an XR hand.
                 renderPull = pull;
                 renderLateral = lateral;
-                RenderPose();
+                ApplyDrawPose(renderPull, renderLateral);
                 Vector3 position = bow.arrow.position;
                 Quaternion rotation = bow.arrow.rotation;
                 Vector3 scale = bow.arrow.lossyScale;
@@ -234,7 +241,7 @@ namespace Sza.Bow
         [Command(requiresAuthority = false)]
         private void CmdBeginPull(uint charge, Vector3 hand, NetworkConnectionToClient sender = null)
         {
-            Vector3 expected = bow.model.transform.TransformPoint(relaxedNock);
+            Vector3 expected = RelaxedNockPosition;
             if (!Holder(sender) || !Finite(hand.x) || !Finite(hand.y) || !Finite(hand.z) ||
                 Vector3.Distance(hand, expected) > stringGrabDistance + 0.35f) return;
             BeginServer(charge);
@@ -255,17 +262,8 @@ namespace Sza.Bow
             Vector2 desiredLateral = predicted ? localLateral : drawing ? lateral : Vector2.zero;
             renderPull = Application.isPlaying ? Mathf.MoveTowards(renderPull, desired, Time.unscaledDeltaTime * 6f) : desired;
             renderLateral = Application.isPlaying ? Vector2.MoveTowards(renderLateral, desiredLateral, Time.unscaledDeltaTime * 6f) : desiredLateral;
-            float draw = Mathf.Clamp01(renderPull / Mathf.Max(0.05f, maximumPull));
-            bow.drawAndFire.SampleAnimation(bow.model, draw);
-            Vector3 nock = bow.model.transform.TransformPoint(relaxedNock) - transform.right * renderPull +
-                transform.up * renderLateral.x + transform.forward * renderLateral.y;
-            stringBone.position = nock;
-            stringHandle.transform.SetPositionAndRotation(nock, transform.rotation);
+            ApplyDrawPose(renderPull, renderLateral);
             stringHandle.gameObject.SetActive(Application.isPlaying && bow.Dropped);
-            Vector3 aim = grip.attachTransform.position - nock;
-            bow.arrow.rotation = Quaternion.FromToRotation(transform.right, aim.normalized) * transform.rotation * arrowRotation;
-            Vector3 scaledNock = Vector3.Scale(arrowNockLocal, bow.arrow.lossyScale);
-            bow.arrow.position = nock - bow.arrow.rotation * scaledNock;
             bool visible = active && (predicted ? localLoaded : loaded) && Clock >= suppressNockUntil;
             bow.arrow.gameObject.SetActive(visible);
             double started = predicted ? localRevealStart : revealStart;
@@ -273,6 +271,33 @@ namespace Sza.Bow
             material.SetFloat("_Reveal", visible ? Mathf.Clamp01((float)(Clock - started) / Mathf.Max(0.02f, arrowDissolveSeconds)) : 0f);
             material.SetFloat("_Highlight", 0f);
             bow.arrowRenderer.SetPropertyBlock(material);
+        }
+
+        private void ApplyDrawPose(float distance, Vector2 offset)
+        {
+            float draw = Mathf.Clamp01(distance / Mathf.Max(0.05f, maximumPull));
+            bow.drawAndFire.SampleAnimation(bow.model, draw);
+
+            Vector3 gripPosition = grip.attachTransform.position;
+            Vector3 nock = RelaxedNockPosition - transform.right * distance +
+                transform.up * offset.x + transform.forward * offset.y;
+            Vector3 aim = gripPosition - nock;
+            Quaternion aimTurn = aim.sqrMagnitude > 0.000001f
+                ? Quaternion.FromToRotation(transform.right, aim.normalized) : Quaternion.identity;
+
+            // Rotate the animated model around the fixed grip. The networked root
+            // stays attached to the bow hand and the string stays on the draw hand.
+            Quaternion modelTurn = distance > 0f || offset != Vector2.zero ? aimTurn : Quaternion.identity;
+            Quaternion bowRotation = aimTurn * transform.rotation;
+            bow.model.transform.SetPositionAndRotation(
+                gripPosition + modelTurn * (transform.TransformPoint(modelRestPosition) - gripPosition),
+                modelTurn * transform.rotation * modelRestRotation);
+            stringBone.position = nock;
+            stringHandle.transform.SetPositionAndRotation(nock, bowRotation);
+
+            bow.arrow.rotation = bowRotation * arrowRotation;
+            Vector3 scaledNock = Vector3.Scale(arrowNockLocal, bow.arrow.lossyScale);
+            bow.arrow.position = nock - bow.arrow.rotation * scaledNock;
         }
 
         private void SpawnProjectile(uint id, Vector3 position, Quaternion rotation, Vector3 scale, Vector3 direction,
@@ -319,6 +344,9 @@ namespace Sza.Bow
             CancelLocalPull();
             if (Authority && Application.isPlaying) ResetServerCharge();
             if (stringHandle != null) stringHandle.gameObject.SetActive(false);
+            if (bow != null && bow.model != null)
+                bow.model.transform.SetPositionAndRotation(transform.TransformPoint(modelRestPosition),
+                    transform.rotation * modelRestRotation);
             foreach (var p in projectiles.Values) if (p != null) Destroy(p.gameObject);
             projectiles.Clear();
             foreach (var fx in impacts) if (fx != null) Destroy(fx);

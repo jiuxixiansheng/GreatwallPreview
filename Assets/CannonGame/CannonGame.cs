@@ -42,6 +42,7 @@ namespace Greatwall.CannonGame
         private CannonAmmo _loaded;
         private CannonChain _chainPull;
         private CannonVfx _vfx;
+        private CannonNetwork _network;
         private int _shotCount;
         private bool _ready;
 
@@ -52,6 +53,8 @@ namespace Greatwall.CannonGame
         public Vector3 MuzzlePosition => _muzzlePosition;
         public Vector3 FireDirection => _fireDirection;
         public Vector3 SlotPosition => _slotPosition;
+        internal Quaternion SlotRotation => _slotRotation;
+        internal CannonNetwork Network => _network;
         public event System.Action<CannonAmmo> AmmoInserted;
         public event System.Action Fired;
         public event System.Action<Vector3> FireworkExploded;
@@ -88,6 +91,7 @@ namespace Greatwall.CannonGame
             CreateChainGrab();
             CreateVfx();
             CreateGuidance();
+            _network = new CannonNetwork(this, _chainPull);
             _ready = true;
             var audio = GetComponent<Xcy.Audio.CannonInteractionAudio>();
             if (audio == null) audio = gameObject.AddComponent<Xcy.Audio.CannonInteractionAudio>();
@@ -230,7 +234,7 @@ namespace Greatwall.CannonGame
 
             var ammo = wrapper.GetComponent<CannonAmmo>();
             if (ammo == null) ammo = wrapper.gameObject.AddComponent<CannonAmmo>();
-            ammo.Initialize(grab, collider, body, visual, wrapper.position, wrapper.rotation);
+            ammo.Initialize(this, _ammo.Count, grab, collider, body, visual, wrapper.position, wrapper.rotation);
             _ammo.Add(ammo);
         }
 
@@ -253,7 +257,7 @@ namespace Greatwall.CannonGame
             grab.attachEaseInTime = 0f;
 
             _chainPull = zone.AddComponent<CannonChain>();
-            _chainPull.Initialize(this, _chain, grab);
+            _chainPull.Initialize(this, _ammo.Count, _chain, grab);
         }
 
         private void CreateVfx()
@@ -277,16 +281,42 @@ namespace Greatwall.CannonGame
 
         private void Update()
         {
-            if (!_ready || _loaded != null) return;
+            if (!_ready || CannonNetwork.IsActive || _loaded != null) return;
 
             for (int i = 0; i < _ammo.Count; i++)
             {
                 var ammo = _ammo[i];
                 if (ammo == null || !ammo.IsHeld) continue;
-                if ((ammo.transform.position - _slotPosition).sqrMagnitude > SlotRadius * SlotRadius) continue;
+                if (!IsInSlot(ammo.transform.position)) continue;
                 InsertAmmo(ammo);
                 return;
             }
+        }
+
+        private void OnEnable() => _network?.Enable();
+
+        private void LateUpdate() => _network?.Tick();
+
+        private void OnDisable()
+        {
+            _network?.Disable();
+            StopAllCoroutines();
+            if (_ready) _barrel.localPosition = _barrelHomeLocalPosition;
+        }
+
+        internal bool IsInSlot(Vector3 position) =>
+            (position - _slotPosition).sqrMagnitude <= SlotRadius * SlotRadius;
+
+        internal void ApplyNetworkCannonState(int index, int shots, bool initial)
+        {
+            CannonAmmo previous = _loaded;
+            _loaded = index >= 0 ? _ammo[index] : null;
+            bool fired = !initial && shots > _shotCount;
+            _shotCount = shots;
+            if (_loaded != null || initial || (previous != null && !fired))
+                _vfx.SetGhostVisible(_loaded == null);
+            if (!initial && _loaded != null && _loaded != previous) AmmoInserted?.Invoke(_loaded);
+            if (fired) StartCoroutine(FireSequence());
         }
 
         private void InsertAmmo(CannonAmmo ammo)
@@ -300,7 +330,7 @@ namespace Greatwall.CannonGame
 
         public void TryFire()
         {
-            if (!_ready || _loaded == null) return;
+            if (!_ready || CannonNetwork.IsActive || _loaded == null) return;
 
             var ammo = _loaded;
             _loaded = null;
@@ -325,7 +355,7 @@ namespace Greatwall.CannonGame
             StartCoroutine(Recoil());
 
             yield return new WaitForSeconds(0.35f);
-            _vfx.SetGhostVisible(true);
+            _vfx.SetGhostVisible(_loaded == null);
             yield return new WaitForSeconds(Mathf.Max(0f, apexTime - 0.35f));
             _vfx.PlayFirework(apex);
             FireworkExploded?.Invoke(apex);

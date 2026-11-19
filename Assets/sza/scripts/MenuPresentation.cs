@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using Unity.XR.CoreUtils;
 using UnityEngine;
-using UnityEngine.UI;
 using UnityEngine.XR;
 
 namespace Sza.Menu
@@ -10,27 +9,15 @@ namespace Sza.Menu
     [DefaultExecutionOrder(-1000), DisallowMultipleComponent]
     public sealed class MenuPresentation : MonoBehaviour
     {
-        public Canvas desktopCanvas;
-        public Canvas vrCanvas;
         public Camera desktopCamera;
         public XROrigin vrOrigin;
-        public Button desktopHostButton, desktopClientButton;
-        public Button vrHostButton, vrClientButton;
+        public MenuIntroScreen vrIntroScreen;
 
         private readonly List<XRDisplaySubsystem> displays = new List<XRDisplaySubsystem>();
         private bool initialized, vrMode;
         private float nextCheck;
 
-        private void Awake()
-        {
-            // Both views use the original menu's connection handlers.
-            if (vrHostButton != null) vrHostButton.onClick.AddListener(HostFromVR);
-            if (vrClientButton != null) vrClientButton.onClick.AddListener(ClientFromVR);
-            RefreshMode();
-        }
-
-        private void HostFromVR() => desktopHostButton?.onClick.Invoke();
-        private void ClientFromVR() => desktopClientButton?.onClick.Invoke();
+        private void Awake() => RefreshMode();
 
         private void Update()
         {
@@ -53,26 +40,28 @@ namespace Sza.Menu
             if (initialized && vrMode == useVR) return;
             initialized = true;
             vrMode = useVR;
-            if (desktopCanvas != null) desktopCanvas.gameObject.SetActive(true);
-            if (vrCanvas != null) vrCanvas.gameObject.SetActive(useVR);
-            // URP renders Screen Space Overlay on the monitor, outside the HMD eyes.
-            SetCamera(desktopCamera, !useVR);
-            if (vrOrigin != null) SetCamera(vrOrigin.Camera, useVR);
+            Camera headset = vrOrigin != null ? vrOrigin.Camera : null;
+            bool headsetActive = useVR && headset != null;
+            if (headsetActive)
+            {
+                SetView(desktopCamera, true, false);
+                SetView(headset, true, true);
+            }
+            else
+            {
+                SetView(headset, false, false);
+                SetView(desktopCamera, true, true);
+            }
+            if (vrIntroScreen != null) vrIntroScreen.gameObject.SetActive(headsetActive);
         }
 
-        private static void SetCamera(Camera camera, bool active)
+        private static void SetView(Camera camera, bool render, bool primary)
         {
             if (camera == null) return;
-            camera.enabled = active;
-            camera.tag = active ? "MainCamera" : "Untagged";
+            camera.enabled = render;
+            camera.tag = primary ? "MainCamera" : "Untagged";
             var listener = camera.GetComponent<AudioListener>();
-            if (listener != null) listener.enabled = active;
-        }
-
-        private void OnDestroy()
-        {
-            if (vrHostButton != null) vrHostButton.onClick.RemoveListener(HostFromVR);
-            if (vrClientButton != null) vrClientButton.onClick.RemoveListener(ClientFromVR);
+            if (listener != null) listener.enabled = primary;
         }
     }
 }

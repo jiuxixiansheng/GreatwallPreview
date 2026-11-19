@@ -26,6 +26,14 @@ public struct GameplayAnimatorParameter
     public float floatValue;
 }
 
+public struct GameplayDragonBoardingState
+{
+    public double boardAt;
+    public Vector3 padPosition;
+    public bool alignToOpeningHead;
+    public Vector3 openingHeadPosition;
+}
+
 public struct GameplaySnapshotMessage : NetworkMessage
 {
     public uint configuration, sequence;
@@ -40,4 +48,5 @@ public struct GameplaySnapshotMessage : NetworkMessage
     public Vector3 characterPosition;
     public Quaternion characterRotation;
     public GameplayAnimatorParameter[] parameters;
+    public GameplayDragonBoardingState dragonBoarding;
 }

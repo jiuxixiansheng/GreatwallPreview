@@ -992,6 +992,17 @@
                 },
                 {
                     "name": "",
+                    "id": "8bf34c4a-24dd-4a30-9db6-d98ed107c4ba",
+                    "path": "<XRController>{LeftHand}/{TriggerButton}",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Select",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
                     "id": "73325635-d9e5-481a-9279-ae7be089422d",
                     "path": "<MetaAimHand>{LeftHand}/indexPressed",
                     "interactions": "",
@@ -2072,6 +2083,17 @@
                     "name": "",
                     "id": "1ce80054-410d-4112-a332-50faa7fb4f23",
                     "path": "<XRController>{RightHand}/{GripButton}",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Select",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "1253ac87-d85d-4ba6-af43-e5240c4444a0",
+                    "path": "<XRController>{RightHand}/{TriggerButton}",
                     "interactions": "",
                     "processors": "",
                     "groups": "",

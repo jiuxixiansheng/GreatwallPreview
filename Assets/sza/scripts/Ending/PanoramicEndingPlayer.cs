@@ -29,6 +29,7 @@ namespace Sza.Ending
         private Camera viewCamera;
         private Transform rig;
         private RenderTexture texture;
+        private AudioSource musicSource;
         private Material sphereMaterial, fadeMaterial;
         private Material photoMaterial;
         private GameObject fadeQuad;
@@ -94,7 +95,20 @@ namespace Sza.Ending
             Application.onBeforeRender += FollowHead;
         }
 
-        private void Start() { ResolveViewer(); videoPlayer.Prepare(); }
+        private void Start()
+        {
+            ResolveViewer();
+            if (settings.music != null)
+            {
+                musicSource = gameObject.AddComponent<AudioSource>();
+                musicSource.playOnAwake = false;
+                musicSource.spatialBlend = 0f;
+                musicSource.clip = settings.music;
+                musicSource.volume = settings.musicVolume;
+                musicSource.Play();
+            }
+            videoPlayer.Prepare();
+        }
         private void OnPrepared(VideoPlayer source) { source.Play(); }
 
         private void OnFirstFrame(VideoPlayer source, long frame)
@@ -117,7 +131,10 @@ namespace Sza.Ending
         private void Update()
         {
             if (returning)
+            {
                 opacity = settings.returnFadeSeconds > 0f ? Mathf.MoveTowards(opacity, 1f, Time.unscaledDeltaTime / settings.returnFadeSeconds) : 1f;
+                if (musicSource != null) musicSource.volume = settings.musicVolume * (1f - opacity);
+            }
             else if (scheduled && IsReady && EndingSequenceCoordinator.Now >= startAt)
             {
                 double elapsed = EndingSequenceCoordinator.Now - startAt;

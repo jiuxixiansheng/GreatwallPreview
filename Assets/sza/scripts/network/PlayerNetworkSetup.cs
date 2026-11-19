@@ -31,6 +31,10 @@ public class PlayerNetworkSetup : NetworkBehaviour
     [Header("隐藏自己的头部模型，不隐藏手")]
     public Renderer[] localAvatarMeshes = Array.Empty<Renderer>();
 
+    [Header("玩家模型旋转")]
+    [Tooltip("指定 Main Camera 下的可见玩家模型。模型的本地位置仍用于调整站立高度。")]
+    [SerializeField] private Transform avatarVisual;
+
     [Header("仅本机显示的辅助物体，例如黑屏 Cube")]
     public GameObject[] localOnlyObjects = Array.Empty<GameObject>();
 
@@ -70,12 +74,16 @@ public class PlayerNetworkSetup : NetworkBehaviour
     private readonly List<RendererState> hiddenLocalRenderers = new List<RendererState>();
     private readonly List<ObjectState> localObjects = new List<ObjectState>();
     private readonly List<InputManagerState> inputManagers = new List<InputManagerState>();
+    private Transform avatarHead;
+    private Vector3 avatarCenterAtRest;
+    private Vector3 avatarCenterFromOrigin;
     private bool initialized;
     private bool IsLocalRig => netIdentity != null && isLocalPlayer;
 
     private void Awake()
     {
         CacheComponents();
+        CacheAvatarCenter();
         initialized = true;
         // Ownership is unknown in Awake. Isolate until Mirror identifies its local player.
         ApplyRole(false);
@@ -84,6 +92,7 @@ public class PlayerNetworkSetup : NetworkBehaviour
     private void OnEnable()
     {
         if (initialized) ApplyRole(IsLocalRig);
+        if (avatarHead != null) Application.onBeforeRender += UpdateLocalAvatarBeforeRender;
     }
 
     public override void OnStartClient()
@@ -115,7 +124,42 @@ public class PlayerNetworkSetup : NetworkBehaviour
 
     private void OnDisable()
     {
+        Application.onBeforeRender -= UpdateLocalAvatarBeforeRender;
         if (initialized) ApplyRole(false);
+    }
+
+    private void CacheAvatarCenter()
+    {
+        if (localCamera == null) return;
+        Transform head = localCamera.transform;
+        if (avatarVisual == null) avatarVisual = head.Find("base_basic_pbr");
+        if (avatarVisual == null || avatarVisual.parent != head) return;
+
+        Vector3 meshCenter = avatarVisual.TryGetComponent<Renderer>(out var renderer)
+            ? renderer.localBounds.center : Vector3.zero;
+        avatarCenterFromOrigin = avatarVisual.localRotation * Vector3.Scale(avatarVisual.localScale, meshCenter);
+        avatarCenterAtRest = avatarVisual.localPosition + avatarCenterFromOrigin;
+        avatarHead = head;
+    }
+
+    private void LateUpdate() => UpdateAvatarCenter();
+
+    [BeforeRenderOrder(1000)]
+    private void UpdateLocalAvatarBeforeRender()
+    {
+        if (IsLocalRig) UpdateAvatarCenter();
+    }
+
+    private void UpdateAvatarCenter()
+    {
+        if (avatarHead == null || avatarVisual == null) return;
+
+        // The tracking space moves with the rig. Only the avatar's orientation
+        // should inherit the head rotation, not the offset from head to body.
+        Vector3 neutralOffset = Vector3.Scale(avatarHead.localScale, avatarCenterAtRest);
+        Transform trackingSpace = avatarHead.parent;
+        if (trackingSpace != null) neutralOffset = trackingSpace.TransformVector(neutralOffset);
+        avatarVisual.localPosition = avatarHead.InverseTransformVector(neutralOffset) - avatarCenterFromOrigin;
     }
 
     private void CacheComponents()
